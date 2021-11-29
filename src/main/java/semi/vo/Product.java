@@ -5,18 +5,30 @@ import java.util.Date;
 public class Product {
 
 	private int no;
+
 	private int categoryNo;
 	private String name;
 	private int price;
 	private int discountPrice;
 	private Date discountFromDate;
 	private Date discountToDate;
+
+  private String name;
+	private int price;
+	private int discountPrice;
+	private Date discountFrom;
+	private Date discountTo;
+
 	private Date createdDate;
 	private Date updatedDate;
 	private String onSale;
 	private String detail;
+
 	private String thumbnailUrl;
-	
+
+	private ProductCategory productCategory;
+
+
 	public Product() {}
 
 	public int getNo() {
@@ -27,6 +39,7 @@ public class Product {
 		this.no = no;
 	}
 
+
 	public int getCategoryNo() {
 		return categoryNo;
 	}
@@ -34,6 +47,7 @@ public class Product {
 	public void setCategoryNo(int categoryNo) {
 		this.categoryNo = categoryNo;
 	}
+
 
 	public String getName() {
 		return name;
@@ -59,6 +73,7 @@ public class Product {
 		this.discountPrice = discountPrice;
 	}
 
+
 	public Date getDiscountFromDate() {
 		return discountFromDate;
 	}
@@ -73,6 +88,22 @@ public class Product {
 
 	public void setDiscountToDate(Date discountToDate) {
 		this.discountToDate = discountToDate;
+
+	public Date getDiscountFrom() {
+		return discountFrom;
+	}
+
+	public void setDiscountFrom(Date discountFrom) {
+		this.discountFrom = discountFrom;
+	}
+
+	public Date getDiscountTo() {
+		return discountTo;
+	}
+
+	public void setDiscountTo(Date discountTo) {
+		this.discountTo = discountTo;
+
 	}
 
 	public Date getCreatedDate() {
@@ -107,6 +138,7 @@ public class Product {
 		this.detail = detail;
 	}
 
+
 	public String getThumbnailUrl() {
 		return thumbnailUrl;
 	}
@@ -115,4 +147,13 @@ public class Product {
 		this.thumbnailUrl = thumbnailUrl;
 	}
 	
+
+	public ProductCategory getProductCategory() {
+		return productCategory;
+	}
+
+	public void setProductCategory(ProductCategory productCategory) {
+		this.productCategory = productCategory;
+	}
+
 }
