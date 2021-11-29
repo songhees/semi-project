@@ -1,6 +1,7 @@
 package semi.dao;
 
 import static utils.ConnectionUtil.getConnection;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,7 +12,82 @@ import java.util.List;
 import semi.vo.Product;
 import semi.vo.ProductCategory;
 
+import semi.vo.ProductDetailImage;
+
+
 public class ProductDao {
+	
+	private static ProductDao self = new ProductDao();
+	private ProductDao() {}
+	public static ProductDao getInstance() {
+		return self;
+	}
+
+	public List<String> getProductThumbnailImage(int no) throws SQLException {
+		String sql = "select thumbnail_image_url "
+				   + "from semi_product_thumbnail_image "
+				   + "where product_no = ? ";
+		
+		List<String> urlList = new ArrayList<>();
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, no);
+		ResultSet rs = pstmt.executeQuery();
+		
+		while (rs.next()) {
+			urlList.add(rs.getString("thumbnail_image_url"));
+		}
+		
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return urlList;
+	}
+	
+	public Product getProductDetail(int no) throws SQLException {
+		String sql = "select p.product_no, p.product_name, p.product_price, p.product_discount_price, "
+				   + "       p.product_discount_from, p.product_discount_to, p.product_created_date, "
+				   + "		 p.product_updated_date, p.product_on_sale, p.product_detail, c.category_no, "
+				   + "		 c.category_name "
+				   + "from semi_product p, semi_product_category c "
+				   + "where p.category_no = c.category_no "
+				   + "		and p.product_no = ? ";
+				
+		Product product = null;		
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, no);
+		ResultSet rs = pstmt.executeQuery();
+			
+		if (rs.next()) {
+			product = new Product();
+			ProductCategory category = new ProductCategory();
+			
+			product.setNo(rs.getInt("product_no"));
+			product.setName(rs.getString("product_name"));
+			product.setPrice(rs.getInt("product_price"));
+			product.setDiscountPrice(rs.getInt("product_discount_price"));
+			product.setDiscountFrom(rs.getDate("product_discount_from"));
+			product.setDiscountTo(rs.getDate("product_discount_to"));
+			product.setCreatedDate(rs.getDate("product_created_date"));
+			product.setUpdatedDate(rs.getDate("product_updated_date"));
+			product.setOnSale(rs.getString("product_on_sale"));
+			product.setDetail(rs.getString("product_detail"));
+			category.setNo(rs.getInt("category_no"));
+			category.setName(rs.getString("category_name"));
+			
+			product.setProductCategory(category);
+		}
+		
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return product;
+	}
 
 	private static ProductDao self = new ProductDao();
 	private ProductDao() {}

@@ -1,11 +1,11 @@
 package semi.vo;
 
 public class ProductCategory {
-
 	private int no;
 	private String name;
-	
-	public ProductCategory() {}
+
+	public ProductCategory() {
+	}
 
 	public int getNo() {
 		return no;
@@ -23,9 +23,4 @@ public class ProductCategory {
 		this.name = name;
 	}
 
-	@Override
-	public String toString() {
-		return "ProductCategory [no=" + no + ", name=" + name + "]";
-	}
-	
 }
