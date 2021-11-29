@@ -5,17 +5,17 @@ import java.util.Date;
 public class Product {
 
 	private int no;
-	private ProductCategory category;
 	private String name;
-	private long price;
-	private long discountPrice;
+	private int price;
+	private int discountPrice;
 	private Date discountFrom;
 	private Date discountTo;
 	private Date createdDate;
 	private Date updatedDate;
 	private String onSale;
 	private String detail;
-	
+	private ProductCategory productCategory;
+
 	public Product() {}
 
 	public int getNo() {
@@ -26,14 +26,6 @@ public class Product {
 		this.no = no;
 	}
 
-	public ProductCategory getCategory() {
-		return category;
-	}
-
-	public void setCategory(ProductCategory category) {
-		this.category = category;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -42,19 +34,19 @@ public class Product {
 		this.name = name;
 	}
 
-	public long getPrice() {
+	public int getPrice() {
 		return price;
 	}
 
-	public void setPrice(long price) {
+	public void setPrice(int price) {
 		this.price = price;
 	}
 
-	public long getDiscountPrice() {
+	public int getDiscountPrice() {
 		return discountPrice;
 	}
 
-	public void setDiscountPrice(long discountPrice) {
+	public void setDiscountPrice(int discountPrice) {
 		this.discountPrice = discountPrice;
 	}
 
@@ -106,13 +98,12 @@ public class Product {
 		this.detail = detail;
 	}
 
-	@Override
-	public String toString() {
-		return "Product [no=" + no + ", category=" + category + ", name=" + name + ", price=" + price
-				+ ", discountPrice=" + discountPrice + ", discountFrom=" + discountFrom + ", discountTo=" + discountTo
-				+ ", createdDate=" + createdDate + ", updatedDate=" + updatedDate + ", onSale=" + onSale + ", detail="
-				+ detail + "]";
+	public ProductCategory getProductCategory() {
+		return productCategory;
 	}
-	
-	
+
+	public void setProductCategory(ProductCategory productCategory) {
+		this.productCategory = productCategory;
+	}
+
 }
