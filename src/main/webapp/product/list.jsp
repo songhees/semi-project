@@ -1,3 +1,8 @@
+<%@page import="java.util.ArrayList"%>
+<%@page import="semi.vo.Product"%>
+<%@page import="semi.vo.ProductItem"%>
+<%@page import="java.util.List"%>
+<%@page import="semi.dao.ProductDao"%>
 <%@page import="semi.vo.Pagination"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
@@ -26,18 +31,39 @@
 <%@ include file="/common/navbar.jsp" %>
 <div class="container">
 	<%
-		// 요청 파라미터에서 선택된 카테고리를 조회한다.
-		String category = request.getParameter("category");
-		String pageNo = request.getParameter("pageNo");
+	// 요청 파라미터에서 선택된 카테고리를 조회한다.
+			String category = request.getParameter("category");
+			String pageNo = request.getParameter("pageNo");
+			String orderBy = request.getParameter("orderBy");
+			
+			// category가 비어있을 경우 초기값으로 TOP을 넣어준다.
+			if (category == null) {
+				category = "TOP";
+			}
+			// pageNo가 비어있을 경우 초기값으로 1을 넣어준다.
+			if (pageNo == null) {
+				pageNo = "1";
+			}
+			// orderBy가 비어있을 경우 초기값으로 신상품을 넣어준다.
+			if (orderBy == null) {
+				orderBy = "낮은가격";
+			}
+			
+			ProductDao productDao = ProductDao.getInstance();
+			
+			int totalRecords = productDao.getTotalRecords(category);
+			// TODO println
+			System.out.println("totalRecords: " + totalRecords);
+			Pagination pagination = new Pagination(pageNo, totalRecords);
 		
-		// TODO 30에 들어갈 값은 totalRecords로 ProductDao에서 구해와서 대입하기
-		Pagination pagination = new Pagination(pageNo, 30);
-	
-		if ("best".equals(category)) {
-			// TODO DB에서 상품 판매량 상위 ?개를 가져온다.
-		} else {
-			// TODO 카테고리가 알맞은지 먼저 확인하고, 해당하는 상품 리스트를 가져온다.
-		}
+			List<Product> products = new ArrayList<Product>();
+			if ("BEST".equals(category)) {
+				// TODO DB에서 상품 판매량 상위 ?개를 가져온다.
+						
+			} else {
+				// TODO 카테고리가 알맞은지 먼저 확인하고, 해당하는 상품 리스트를 가져온다.
+				products = productDao.getProductListBycategory(pagination.getBegin(), pagination.getEnd(), category, orderBy);
+			}
 	%>
 	<div class="row">
 		<div class="col my-4 text-center">
@@ -61,66 +87,23 @@
 		</div>
 	</div>
 	<div class="row row-cols-4 g-4 my-4">
+		<%
+			for (Product product : products) {
+		%>
 		<div class="col">
 			<div class="card border-light h-100">
+				<!-- 이미지 미구현 -->
 				<img src="http://localhost/semi-project/resources/images/product/1000/thumbnail/1000_1.jpg" class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
 				<div class="card-body">
-					<p class="card-text">히든 단추 블라우스 셔츠 4color</p>
+					<p class="card-text"><%=product.getName() %></p>
 					<hr>
-					<p class="card-text">25,500원</p>
+					<p class="card-text"><%=product.getPrice() %>원</p>
 				</div>
 			</div>
 		</div>
-		<div class="col">
-			<div class="card border-light h-100">
-				<img src="http://localhost/semi-project/resources/images/product/1001/thumbnail/1001_1.jpg" class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
-				<div class="card-body">
-					<p class="card-text">히든 단추 블라우스 셔츠 4color</p>
-					<hr>
-					<p class="card-text">25,500원</p>
-				</div>
-			</div>
-		</div>
-		<div class="col">
-			<div class="card border-light h-100">
-				<img src="http://localhost/semi-project/resources/images/product/1002/thumbnail/1002_1.jpg" class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
-				<div class="card-body">
-					<p class="card-text">히든 단추 블라우스 셔츠 4color</p>
-					<hr>
-					<p class="card-text">25,500원</p>
-				</div>
-			</div>
-		</div>
-		<div class="col">
-			<div class="card border-light h-100">
-				<img src="http://localhost/semi-project/resources/images/product/1003/thumbnail/1003_1.jpg" class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
-				<div class="card-body">
-					<p class="card-text">히든 단추 블라우스 셔츠 4color</p>
-					<hr>
-					<p class="card-text">25,500원</p>
-				</div>
-			</div>
-		</div>
-		<div class="col">
-			<div class="card border-light h-100">
-				<img src="http://localhost/semi-project/resources/images/product/1000/thumbnail/1000_1.jpg" class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
-				<div class="card-body">
-					<p class="card-text">히든 단추 블라우스 셔츠 4color</p>
-					<hr>
-					<p class="card-text">25,500원</p>
-				</div>
-			</div>
-		</div>
-		<div class="col">
-			<div class="card border-light h-100">
-				<img src="http://localhost/semi-project/resources/images/product/1001/thumbnail/1001_1.jpg" class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
-				<div class="card-body">
-					<p class="card-text">히든 단추 블라우스 셔츠 4color</p>
-					<hr>
-					<p class="card-text">25,500원</p>
-				</div>
-			</div>
-		</div>
+		<%
+			}
+		%>
 	</div>
 	<div class="row mb-3">
 		<div class="col-6 offset-3">
