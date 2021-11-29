@@ -7,15 +7,10 @@ public class Product {
 	private int no;
 
 	private int categoryNo;
-	private String name;
-	private int price;
-	private int discountPrice;
-	private Date discountFromDate;
-	private Date discountToDate;
 
-  private String name;
-	private int price;
-	private int discountPrice;
+	private String name;
+	private long price;
+	private long discountPrice;
 	private Date discountFrom;
 	private Date discountTo;
 
@@ -57,37 +52,21 @@ public class Product {
 		this.name = name;
 	}
 
-	public int getPrice() {
+	public long getPrice() {
 		return price;
 	}
 
-	public void setPrice(int price) {
+	public void setPrice(long price) {
 		this.price = price;
 	}
 
-	public int getDiscountPrice() {
+	public long getDiscountPrice() {
 		return discountPrice;
 	}
 
-	public void setDiscountPrice(int discountPrice) {
+	public void setDiscountPrice(long discountPrice) {
 		this.discountPrice = discountPrice;
 	}
-
-
-	public Date getDiscountFromDate() {
-		return discountFromDate;
-	}
-
-	public void setDiscountFromDate(Date discountFromDate) {
-		this.discountFromDate = discountFromDate;
-	}
-
-	public Date getDiscountToDate() {
-		return discountToDate;
-	}
-
-	public void setDiscountToDate(Date discountToDate) {
-		this.discountToDate = discountToDate;
 
 	public Date getDiscountFrom() {
 		return discountFrom;
