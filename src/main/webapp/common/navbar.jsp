@@ -1,3 +1,4 @@
+<%@page import="semi.vo.User"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" >
@@ -7,14 +8,19 @@
 		font-size: 13px;
 	}
 	
-	#navbarCenteredExample > ul > li > a {
+	#navbar-2 > ul > li > a.nav-link {
 		color: black;
 		font-weight: normal;
+		font-size: 15px;
+		min-width: 70px;
 	}
-	#navbarCenteredExample > ul > li {
-		padding: 3px;
+	#navbar-2 > ul > li.nav-item {
+		margin: 3px;
 	}
 </style>
+<%
+	User loginUserInfo = (User)session.getAttribute("LOGIN_USER_INFO");
+%>
 <!-- 맨 위 navbar -->
 <nav class="navbar navbar-expand-lg navbar-light border-bottom" style="font-weight: bold; background-color: #FFFAFA;">
 	<div class="container-fluid p-4">
@@ -25,9 +31,15 @@
 			</button>
 			<div class="collapse navbar-collapse" id="navbar-1">
 				<ul class="navbar-nav me-auto mb-1 mb-lg-0">
-					<li class="nav-item"><a href="/practice/logout.jsp" class="nav-link">LOGIN</a></li>
-					<li class="nav-item"><a href="/practice/logout.jsp" class="nav-link">JOIN US</a></li>
-					<li class="nav-item"><a href="/practice/logout.jsp" class="nav-link">LOGOUT</a></li>
+<%
+	if (loginUserInfo == null) {
+%>
+					<li class="nav-item"><a href="#" class="nav-link">LOGIN</a></li>
+					<li class="nav-item"><a href="#" class="nav-link">JOIN US</a></li>
+<%
+	} else {
+%>
+					<li class="nav-item"><a href="#" class="nav-link">LOGOUT</a></li>
 					<li class="nav-item dropdown">
 				    	<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">MY PAGE</a>
 				        <ul class="dropdown-menu">
@@ -39,12 +51,15 @@
 				            <li><a class="dropdown-item" href="#">최근본상품</a></li>
 				        </ul>
         			</li>
+<%
+	}
+%>
 				</ul>
 	  		</div>
 		</div>
 		<!-- logo bar -->
 		<div id="#logoImg">
-	  		<a href="#"><img alt="" src="/shopingMall/images/vin.png" style="width: 302px;"></a>
+	  		<a href="#"><img alt="" src="/semi-project/resources/images/home/vin.png" style="width: 302px;"></a>
 		</div>
 		<!-- right side bar-->
 		<div style="overflow: hidden;">
@@ -59,18 +74,22 @@
 	</div>
 </nav>
 <!-- product list navbar -->
-<nav class="navbar navbar-expand navbar-light mb-3 border-bottom" style="font-weight: bold;">
+<nav class="navbar navbar-expand navbar-light mb-3 border-bottom" style="font-weight: bold;" id="nav">
 	<div class="container">
 	    <!-- Collapsible wrapper -->
-		<div class="collapse navbar-collapse justify-content-between" id="navbarCenteredExample">
+		<div class="collapse navbar-collapse justify-content-center" id="navbar-2">
 	      <!-- Left links -->
 			<ul class="navbar-nav mb-2 mb-lg-0">
 				<li class="nav-item"><a class="nav-link fw-bold" href="#">BEST</a></li>
 	      		<li class="nav-item"><a class="nav-link fw-bold" href="#">NEW<code class="text-danger">5%</code></a></li>
 	        <!-- Navbar dropdown -->
-	        	<li class="nav-item"><a class="nav-link" href="#">상품1</a></li>
-	        	<li class="nav-item"><a class="nav-link" href="#">상품2</a></li>
-	        	<li class="nav-item"><a class="nav-link" href="#">상품3</a></li>
+	        	<li class="nav-item"><a class="nav-link" href="#">남녀공용</a></li>
+	        	<li class="nav-item"><a class="nav-link" href="#">베스트재진행</a></li>
+	        	<li class="nav-item"><a class="nav-link" href="#">OUTER</a></li>
+	        	<li class="nav-item"><a class="nav-link" href="#">SHIRT&amp;BLOUSE</a></li>
+	        	<li class="nav-item"><a class="nav-link" href="#">DRESS</a></li>
+	        	<li class="nav-item"><a class="nav-link" href="#">SKIRT</a></li>
+	        	<li class="nav-item"><a class="nav-link" href="#">PANTS</a></li>
 	        	<li class="nav-item"><a class="nav-link" href="#">전체상품</a></li>
 			</ul>
 			<ul class="navbar-nav mb-2 mb-lg-0">
