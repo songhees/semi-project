@@ -5,16 +5,29 @@ import java.util.Date;
 public class Product {
 
 	private int no;
+
+	private int categoryNo;
 	private String name;
+	private int price;
+	private int discountPrice;
+	private Date discountFromDate;
+	private Date discountToDate;
+
+  private String name;
 	private int price;
 	private int discountPrice;
 	private Date discountFrom;
 	private Date discountTo;
+
 	private Date createdDate;
 	private Date updatedDate;
 	private String onSale;
 	private String detail;
+
+	private String thumbnailUrl;
+
 	private ProductCategory productCategory;
+
 
 	public Product() {}
 
@@ -25,6 +38,16 @@ public class Product {
 	public void setNo(int no) {
 		this.no = no;
 	}
+
+
+	public int getCategoryNo() {
+		return categoryNo;
+	}
+
+	public void setCategoryNo(int categoryNo) {
+		this.categoryNo = categoryNo;
+	}
+
 
 	public String getName() {
 		return name;
@@ -50,6 +73,22 @@ public class Product {
 		this.discountPrice = discountPrice;
 	}
 
+
+	public Date getDiscountFromDate() {
+		return discountFromDate;
+	}
+
+	public void setDiscountFromDate(Date discountFromDate) {
+		this.discountFromDate = discountFromDate;
+	}
+
+	public Date getDiscountToDate() {
+		return discountToDate;
+	}
+
+	public void setDiscountToDate(Date discountToDate) {
+		this.discountToDate = discountToDate;
+
 	public Date getDiscountFrom() {
 		return discountFrom;
 	}
@@ -64,6 +103,7 @@ public class Product {
 
 	public void setDiscountTo(Date discountTo) {
 		this.discountTo = discountTo;
+
 	}
 
 	public Date getCreatedDate() {
@@ -97,6 +137,16 @@ public class Product {
 	public void setDetail(String detail) {
 		this.detail = detail;
 	}
+
+
+	public String getThumbnailUrl() {
+		return thumbnailUrl;
+	}
+
+	public void setThumbnailUrl(String thumbnailUrl) {
+		this.thumbnailUrl = thumbnailUrl;
+	}
+	
 
 	public ProductCategory getProductCategory() {
 		return productCategory;
