@@ -14,9 +14,6 @@ import semi.vo.ProductCategory;
 
 import semi.vo.ProductItem;
 
-import semi.vo.ProductDetailImage;
-
-
 
 public class ProductDao {
 	
@@ -24,6 +21,28 @@ public class ProductDao {
 	private ProductDao() {}
 	public static ProductDao getInstance() {
 		return self;
+	}
+	
+	public List<Integer> getProductStyleNo(int no) throws SQLException {
+		String sql = "select product_no "
+				   + "from semi_product_style "
+				   + "where product_style_no = ? ";
+		
+		List<Integer> productNo = new ArrayList<>();
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, no);
+		ResultSet rs = pstmt.executeQuery();
+		while (rs.next()) {
+			productNo.add(rs.getInt("product_no"));
+		}
+		
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return productNo;
 	}
 	
 	public List<String> getProductThumbnailImage(int no) throws SQLException {
