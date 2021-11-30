@@ -45,13 +45,13 @@ public class OrderDao {
 				+ "			s.thumbnail_image_url "
 				+ "			from semi_user u, semi_order o, semi_order_item i, semi_product_item t, semi_product p, semi_product_thumbnail_image s "
 				+ "			where u.user_id = ? ";
-		if ("주문완료".equals(criteria.getStatus())) {
-			sql += "			and o.order_status = '주문완료' ";
-			
-		} else {
+		if ("cancel".equals(criteria.getStatus())) {
 			sql += "			and o.order_status in ('취소', '반품', '교환') ";
+		} else {
+			sql += "			and o.order_status = '주문완료' ";
 		}
 		    sql += "         and o.order_created >= ? and o.order_created < ? "
+		    	+ "			and s.thumbnail_image_url=p.product_no || '_1.jpg' "
 				+ "			and u.user_no=o.user_no "
 				+ "			and o.order_no=i.order_no "
 				+ "			and i.product_item_no=t.product_item_no "
@@ -94,16 +94,24 @@ public class OrderDao {
 	}
 	
 	
-	public int getTotalRecords(String userId) throws SQLException {
+	public int getTotalRecords(OrderItemCriteria criteria) throws SQLException {
 		int totalRecords = 0;
 		String sql = "select count(*) cnt "
 				+ "from semi_user u, semi_order o, semi_order_item i "
-				+ "where user_id = ? "
-				+ "and u.user_no=o.user_no "
+				+ "where user_id = ? ";
+		if ("cancel".equals(criteria.getStatus())) {
+			sql += "and o.order_status in ('취소', '반품', '교환') ";
+		} else {
+			sql += "and o.order_status = '주문완료' ";
+		}
+		    sql += "and o.order_created >= ? and o.order_created < ? "
+		    	+ "and u.user_no=o.user_no "
 				+ "and o.order_no=i.order_no ";
 		Connection connection = getConnection();
 		PreparedStatement pstmt = connection.prepareStatement(sql);
-		pstmt.setString(1, userId);
+		pstmt.setString(1, criteria.getUserId());
+		pstmt.setString(2, criteria.getBeginDate());
+		pstmt.setString(3, criteria.getEndDate());
 		
 		ResultSet rs = pstmt.executeQuery();
 		rs.next();
