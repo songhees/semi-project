@@ -22,18 +22,24 @@ List<String> thumbnails = productDao.getProductThumbnailImage(no);
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-	rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <title><%=product.getName()%> - 빈스데이</title>
 </head>
 <style>
-.detail_list_img ul li {
+.thumbnail_list_img ul li {
 	display: inline;
 }
 
 .btn_list li {
 	display: inline;
+}
+
+.style_list ul li {
+	display: inline;
+}
+
+.style_list_div {
+	font-size: small;
 }
 </style>
 <body>
@@ -49,7 +55,7 @@ List<String> thumbnails = productDao.getProductThumbnailImage(no);
 							<li class="breadcrumb-item"><a
 								href="/semi-prodject/index.jsp"
 								style="text-decoration: none; color: gray;">Home</a></li>
-							<li class="breadcrumb-item active" aria-current="page"><%=product.getName()%></li>
+							<li class="breadcrumb-item active" aria-current="page"><%=product.getProductCategory().getName() %></li>
 						</ol>
 					</nav>
 				</div>
@@ -63,17 +69,15 @@ List<String> thumbnails = productDao.getProductThumbnailImage(no);
 							src="../resources/images/product/<%=product.getNo()%>/thumbnail/<%=thumbnails.get(0)%>"
 							alt="productImg" class="big_img img-fluid">
 					</div>
-					<div class="detail_list_img">
+					<div class="thumbnail_list_img">
 						<ul class="thumb_img p-0 mt-3" style="list-style: none">
-							<%
-							for (String thumbnail : thumbnails) {
-							%>
-							<li><img
-								src="../resources/images/product/<%=product.getNo()%>/thumbnail/<%=thumbnail%>"
-								style="width: 75px" class="img-fluid" alt="productImg"></li>
-							<%
-							}
-							%>
+<%
+	for (String thumbnail : thumbnails) {
+%>
+							<li><img src="../resources/images/product/<%=product.getNo()%>/thumbnail/<%=thumbnail%>" style="width: 75px" class="img-fluid" alt="productImg"></li>
+<%
+	}
+%>
 						</ul>
 					</div>
 				</div>
@@ -83,65 +87,63 @@ List<String> thumbnails = productDao.getProductThumbnailImage(no);
 					<form>
 						<table class="table table-borderless">
 							<tr>
-								<%
-								DecimalFormat formatter = new DecimalFormat("###,###");
+<%
+DecimalFormat formatter = new DecimalFormat("###,###");
 
-								SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-								Date date = new Date();
-								String today = format.format(date);
+SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+Date date = new Date();
+String today = format.format(date);
 
-								if (product.getDiscountFrom() != null || product.getDiscountTo() != null) {
-									Date startDate = product.getDiscountFrom();
-									Date endDate = product.getDiscountTo();
-									Date todate = format.parse(today);
-
-									int compareTo = endDate.compareTo(todate);
-									int compareFrom = todate.compareTo(startDate);
-
-									if (product.getDiscountPrice() != 0 && (compareTo >= 0 && compareFrom >= 0)) {
-								%>
+	if (product.getDiscountFrom() != null || product.getDiscountTo() != null) {
+		Date startDate = product.getDiscountFrom();
+		Date endDate = product.getDiscountTo();
+		Date todate = format.parse(today);
+	
+		int compareTo = endDate.compareTo(todate);
+		int compareFrom = todate.compareTo(startDate);
+	
+		if (product.getDiscountPrice() != 0 && (compareTo >= 0 && compareFrom >= 0)) {
+%>
 								<td>소비자가</td>
 								<td class="text-decoration-line-through"><%=formatter.format(product.getPrice())%>원</td>
 							</tr>
 							<tr>
 								<td>판매가</td>
 								<td><%=formatter.format(product.getDiscountPrice())%>원</td>
-								<%
-								} else {
-								%>
+<%
+		} else {
+%>
 								<td>판매가</td>
 								<td><%=formatter.format(product.getPrice())%>원</td>
-								<%
-								}
-								} else {
-								%>
+<%
+		}
+	} else {
+%>
 								<td>판매가</td>
 								<td><%=formatter.format(product.getPrice())%>원</td>
-								<%
-								}
-								%>
+<%
+	}
+%>
 							</tr>
 							<tr>
 								<td>색상</td>
 								<td>
-									<%
-									String color = null;
-									for (ProductItem productItem : productItems) {
-										if (productItem.getColor().equals(color)) {
-											break;
-										}
-									%>
+<%
+String color = null;
+for (ProductItem productItem : productItems) {
+	if (productItem.getColor().equals(color)) {
+		break;
+	}
+%>
 									<div class="form-check form-check-inline p-0 m-0">
-										<input type="radio" class="btn-check"
-											id="color btn-check-outlined<%=productItem.getNo()%>"
-											name="color" value="<%=productItem.getColor()%>"> <label
-											class="btn btn-outline-secondary"
-											for="color btn-check-outlined<%=productItem.getNo()%>"><%=productItem.getColor()%></label>
-									</div> <%
- color = productItem.getColor();
+										<input type="radio" class="btn-check" onclick="changeColorText()" id="color btn-check-outlined<%=productItem.getNo()%>" name="color" value="<%=productItem.getColor()%>">
+										<label class="btn btn-outline-secondary" for="color btn-check-outlined<%=productItem.getNo()%>"><%=productItem.getColor()%></label>
+									</div>
+<%
+ 	color = productItem.getColor();
  }
- %>
-									<P>[필수] 옵션을 선택해 주세요</P>
+%>
+									<P id="color-text">[필수] 옵션을 선택해 주세요</P>
 								</td>
 							<tr>
 								<td>사이즈</td>
@@ -235,7 +237,7 @@ List<String> thumbnails = productDao.getProductThumbnailImage(no);
 		</div>
 		<div class="row">
 			<div class="col">
-				<div class="d-flex justify-content-center mt-5 mb-4" id="guide">
+				<div class="d-flex justify-content-center mt-5 mb-5 pt-4 pb-5" id="guide">
 					<ul class="nav nav-tabs">
 						<li class="nav-item"><a class="nav-link" style="color: gray;"
 							href="#detailInfo">상품상세정보</a></li>
@@ -295,7 +297,7 @@ List<String> thumbnails = productDao.getProductThumbnailImage(no);
 		</div>
 		<div class="row">
 			<div class="col">
-				<div class="d-flex justify-content-center mt-5 mb-4" id="productStyle">
+				<div class="d-flex justify-content-center mt-5 mb-4 pt-5" id="productStyle">
 					<ul class="nav nav-tabs">
 						<li class="nav-item"><a class="nav-link" style="color: gray;"
 							href="#detailInfo">상품상세정보</a></li>
@@ -311,7 +313,95 @@ List<String> thumbnails = productDao.getProductThumbnailImage(no);
 				</div>
 			</div>
 		</div>
-
+		
+		<div class="row mt-4">
+			<div class="col">
+				<div class="style_list mb-4 pb-4">
+					<div class="mt-5 mb-5">
+						<p align="center" style="font-size: small"><strong>WITH ITEM</strong><br/>함께 코디된 상품입니다:)</p>
+					</div>
+					<div class="pb-5">
+						<form>
+							<ul class="p-0 d-flex justify-content-center" style="list-style: none">
+<%
+	List<Integer> styleProductNoList = productDao.getProductStyleNo(no);
+	String styleColor = null;
+	String styleSize = null;
+	for (Integer styleProductNo : styleProductNoList) {
+		styleColor = null;
+		styleSize = null;
+		Product styleProduct = productDao.getProductDetail(styleProductNo);
+		List<ProductItem> styleProductItems = productDao.getProductItemList(styleProductNo);
+		List<String> styleThumbnails = productDao.getProductThumbnailImage(styleProductNo);
+%>
+								<li>
+									<div class="style_list_div m-1" style="width: 186px;">
+										<div style="height: 251px;">
+											<img src="../resources/images/product/<%=styleProduct.getNo() %>/thumbnail/<%=styleThumbnails.get(0)%>" class="img-fluid" alt="productImg">
+											<div class="form-check">
+												<input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+											    <label class="form-check-label" for="flexCheckDefault"><strong><%=styleProduct.getName() %> </strong></label>
+											</div>
+											<p align="right"><%=formatter.format(styleProduct.getPrice()) %>원</p>
+										</div>
+										<select class="form-select mb-1" aria-label="Default select example">
+										    <option selected disabled="disabled">수량을 선택해주세요</option>
+										    <option value="1">1</option>
+										    <option value="1">2</option>
+										    <option value="1">3</option>
+										    <option value="1">4</option>
+										    <option value="1">5</option>
+										</select>
+										<select class="form-select mb-1" aria-label="Default select example">
+										    <option selected disabled="disabled">색상을 선택해주세요</option>
+<%
+		
+		for (ProductItem styleProductItem : styleProductItems) {
+			if (styleProductItem.getColor().equals(styleColor)) {
+				break;
+			}
+%>
+									    	<option value="<%=styleProductItem.getColor() %>"><%=styleProductItem.getColor() %></option>
+<%
+			styleColor = styleProductItem.getColor();
+		}
+%>
+										</select>
+										<select class="form-select mb-1" aria-label="Default select example">
+										    <option selected disabled="disabled">사이즈를 선택해주세요</option>
+<%
+		for (ProductItem styleProductItem : styleProductItems) {
+			if (styleProductItem.getSize().equals(styleSize)) {
+				break;	
+			}
+%>
+									    	<option value="<%=styleProductItem.getSize() %>"><%=styleProductItem.getSize() %></option>
+<%
+			styleSize = styleProductItem.getSize();
+		}
+%>
+										</select>
+									</div>
+								</li>
+<%
+	}
+%>
+							</ul>
+						</div>
+						<div class="d-flex justify-content-center mt-5">
+							<ul class="btn_list p-0" style="list-style: none">
+								<li><button type="button" class="btn btn-secondary"	type="submit">
+										<span class="fs-6">코디상품 함께 구매하기</span>
+									</button></li>
+								<li><button type="button" class="btn btn-outline-secondary" type="submit">
+										<span class="fs-6">코디상품 장바구니 담기</span>
+									</button></li>
+							</ul>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
 		<div class="row">
 			<div class="col">
 				<div class="d-flex justify-content-center mt-5 mb-4" id="review">
@@ -330,8 +420,73 @@ List<String> thumbnails = productDao.getProductThumbnailImage(no);
 				</div>
 			</div>
 		</div>
-
-
+		
+		
+		
+		
+		<div class="row mt-5 pt-3 mb-5">
+			<div class="col p-0">
+				<div>
+					<p style="font-size: small; color: gray; margin-bottom: 0"><strong>REVIEW</strong> | 문의글 혹은 악의적인 비방글은 무통보 삭제된다는 점 유의해주세요^^</p>
+					<form>
+						<div class="form-floating">
+  							<textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 120px"></textarea>
+  							<label for="floatingTextarea2">리뷰를 남겨주세요.</label>
+						</div>
+					
+						<div class="d-flex justify-content-between pt-1">
+							<div class="col-3">
+								<select class="form-select" aria-label="Default select example">
+									<option value="5" selected>아주 좋아요</option>
+								    <option value="4">맘에 들어요</option>
+								    <option value="3">보통이에요</option>
+								    <option value="2">그냥 그래요</option>
+								    <option value="1">별로에요</option>
+								</select>
+							</div>
+							<div>
+								<button type="button" class="btn btn-secondary"	type="submit">
+									<span class="fs-6">리뷰 등록하기</span>
+								</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="row border">
+			<div class="row pt-2">
+				<div class="col-2 pt-1 pb-1 m-2">
+					<div class="border pt-3 pb-3 bg-dark text-white">
+						<h1 align="center">5.0</h1>
+					</div>
+					<p align="center">85개 리뷰 평점</p>
+				</div>
+				<div class="col-7">
+					
+					
+				</div>
+				<div class="col-3">
+				
+				</div>
+			</div>
+			<p>99%의 구매자들이 이 상품을 좋아합니다. (85명 중 84명)</p>
+		</div>
+		
+		<div class="row">
+			<div class="col">
+				<div class="d-flex justify-content-between mt-5 mb-4 p-0">
+					<div>
+						<p><strong>추천순</strong> 리뷰 (85) | 최신순 | 평점순</p>
+					</div>
+					<div>
+						<span>리뷰 정렬 기준 ⓘ</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		
 		<div class="row">
 			<div class="col">
 				<div class="d-flex justify-content-center mt-5 mb-4" id="inquiry">
@@ -381,7 +536,15 @@ List<String> thumbnails = productDao.getProductThumbnailImage(no);
 			</div>
 		</div>
 	</div>
-	<script
-		src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript">
+	function changeColorText() {
+		var colorRadio = ('input[name="color"]:checked').val();
+		console.log(colorLabel);
+		
+		var el1 = document.querySelector("#color-text");
+		el.textContent = "[필수] ";
+	}
+</script>
 </body>
 </html>

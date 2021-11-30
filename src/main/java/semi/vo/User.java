@@ -12,9 +12,10 @@ public class User {
 	private String tel;
 	private String email;
 	private String emailSubscription;
-	private String smsSubscription;
+	private String snsSubscription;
 	private int point;
 	private String admin;
+	private String deleted;
 	private Date deletedDate;
 	private Date updatedDate;
 	private Date createdDate;
@@ -85,12 +86,12 @@ public class User {
 		this.emailSubscription = emailSubscription;
 	}
 
-	public String getSmsSubscription() {
-		return smsSubscription;
+	public String getSnsSubscription() {
+		return snsSubscription;
 	}
 
-	public void setSmsSubscription(String smsSubscription) {
-		this.smsSubscription = smsSubscription;
+	public void setSnsSubscription(String snsSubscription) {
+		this.snsSubscription = snsSubscription;
 	}
 
 	public int getPoint() {
@@ -107,6 +108,14 @@ public class User {
 
 	public void setAdmin(String admin) {
 		this.admin = admin;
+	}
+	
+	public String getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(String deleted) {
+		this.deleted = deleted;
 	}
 
 	public Date getDeletedDate() {

@@ -9,13 +9,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import semi.criteria.ProductCriteria;
 import semi.vo.Product;
 import semi.vo.ProductCategory;
 
 import semi.vo.ProductItem;
-
-import semi.vo.ProductDetailImage;
-
 
 
 public class ProductDao {
@@ -24,6 +22,28 @@ public class ProductDao {
 	private ProductDao() {}
 	public static ProductDao getInstance() {
 		return self;
+	}
+	
+	public List<Integer> getProductStyleNo(int no) throws SQLException {
+		String sql = "select product_no "
+				   + "from semi_product_style "
+				   + "where product_style_no = ? ";
+		
+		List<Integer> productNo = new ArrayList<>();
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, no);
+		ResultSet rs = pstmt.executeQuery();
+		while (rs.next()) {
+			productNo.add(rs.getInt("product_no"));
+		}
+		
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return productNo;
 	}
 	
 	public List<String> getProductThumbnailImage(int no) throws SQLException {
@@ -142,13 +162,13 @@ public class ProductDao {
 		return productItemList;
 	}
 	
-	public List<Product> getProductListBycategory(int begin, int end, String category, String orderBy) throws SQLException {
+	public List<Product> getProductListBycategory(ProductCriteria criteria) throws SQLException {
 		String sql = "SELECT PRODUCT_NO, CATEGORY_NO, PRODUCT_NAME, PRODUCT_PRICE, PRODUCT_DISCOUNT_PRICE, \r\n"
 				+ "       PRODUCT_DISCOUNT_FROM, PRODUCT_DISCOUNT_TO, PRODUCT_CREATED_DATE, PRODUCT_UPDATED_DATE, \r\n"
 				+ "       PRODUCT_ON_SALE, PRODUCT_DETAIL, PRODUCT_TOTAL_SALE_COUNT, PRODUCT_TOTAL_STOCK, \r\n"
 				+ "       PRODUCT_AVERAGE_REVIEW_RATE, CATEGORY_NAME \r\n"
 				+ "FROM (SELECT ROW_NUMBER() OVER (ORDER BY "
-				+ 				orderByToSqlOrderBy(orderBy)
+				+ 				orderByToSqlOrderBy(criteria.getOrderBy())
 				+ "				) RN, P.PRODUCT_NO, P.CATEGORY_NO, \r\n"
 				+ "             P.PRODUCT_NAME, P.PRODUCT_PRICE, P.PRODUCT_DISCOUNT_PRICE, P.PRODUCT_DISCOUNT_FROM, \r\n"
 				+ "             P.PRODUCT_DISCOUNT_TO, P.PRODUCT_CREATED_DATE, P.PRODUCT_UPDATED_DATE, \r\n"
@@ -164,12 +184,13 @@ public class ProductDao {
 		Connection connection = getConnection();
 		PreparedStatement pstmt = connection.prepareStatement(sql);
 		
-		System.out.println("begin: " + begin);
-		System.out.println("end: " + end);
-		System.out.println("category: " + category);
-		pstmt.setString(1, category);
-		pstmt.setInt(2, begin);
-		pstmt.setInt(3, end);
+		// TODO 테스트용 프린트
+		System.out.println("begin: " + criteria.getBegin());
+		System.out.println("end: " + criteria.getEnd());
+		System.out.println("category: " + criteria.getCategory());
+		pstmt.setString(1, criteria.getCategory());
+		pstmt.setInt(2, criteria.getBegin());
+		pstmt.setInt(3, criteria.getEnd());
 		ResultSet rs = pstmt.executeQuery();
 		
 		while (rs.next()) {
@@ -219,7 +240,6 @@ public class ProductDao {
 		if ("인기상품".equals(orderBy)) {
 			return "P.PRODUCT_TOTAL_SALE_COUNT DESC";
 		}
-		// TODO 미구현
 		if ("사용후기".equals(orderBy)) {
 			return "P.PRODUCT_AVERAGE_REVIEW_RATE DESC";
 		}
@@ -228,30 +248,92 @@ public class ProductDao {
 		return "P.PRODUCT_CREATED_DATE DESC";
 	}
 	
-	// TODO 미구현
-	public List<Product> getAllProductList(int begin, int end, String order) {
-		String sql = "";
+	public List<Product> getAllProductList(ProductCriteria criteria) throws SQLException {
+		String sql = "SELECT PRODUCT_NO, CATEGORY_NO, PRODUCT_NAME, PRODUCT_PRICE, PRODUCT_DISCOUNT_PRICE, \r\n"
+				+ "       PRODUCT_DISCOUNT_FROM, PRODUCT_DISCOUNT_TO, PRODUCT_CREATED_DATE, PRODUCT_UPDATED_DATE, \r\n"
+				+ "       PRODUCT_ON_SALE, PRODUCT_DETAIL, PRODUCT_TOTAL_SALE_COUNT, PRODUCT_TOTAL_STOCK, \r\n"
+				+ "       PRODUCT_AVERAGE_REVIEW_RATE \r\n"
+				+ "FROM (SELECT ROW_NUMBER() OVER (ORDER BY "
+				+ 				orderByToSqlOrderBy(criteria.getOrderBy())
+				+ "				) RN, PRODUCT_NO, CATEGORY_NO, \r\n"
+				+ "             PRODUCT_NAME, PRODUCT_PRICE, PRODUCT_DISCOUNT_PRICE, PRODUCT_DISCOUNT_FROM, \r\n"
+				+ "             PRODUCT_DISCOUNT_TO, PRODUCT_CREATED_DATE, PRODUCT_UPDATED_DATE, \r\n"
+				+ "             PRODUCT_ON_SALE, PRODUCT_DETAIL, PRODUCT_TOTAL_SALE_COUNT, \r\n"
+				+ "             PRODUCT_TOTAL_STOCK, PRODUCT_AVERAGE_REVIEW_RATE \r\n"
+				+ "      FROM SEMI_PRODUCT P) \r\n"
+				+ "WHERE RN >= ? AND RN <= ?";
 		
-		return null;
-	}
-	
-	// TODO 미구현
-	public int getTotalRecords(String category) throws SQLException {
-		String sql = "SELECT COUNT(*) CN \n"
-				+ "FROM SEMI_PRODUCT P, SEMI_PRODUCT_CATEGORY C \n"
-				+ "WHERE P.CATEGORY_NO = C.CATEGORY_NO \n"
-				+ "      AND C.CATEGORY_NAME = ?";
-		
-		int totalRecords = 0;
+		List<Product> products = new ArrayList<>();
 		
 		Connection connection = getConnection();
 		PreparedStatement pstmt = connection.prepareStatement(sql);
-		pstmt.setString(1, category);
+		
+		// TODO 테스트용 프린트
+		System.out.println("begin: " + criteria.getBegin());
+		System.out.println("end: " + criteria.getEnd());
+		pstmt.setInt(1, criteria.getBegin());
+		pstmt.setInt(2, criteria.getEnd());
+		ResultSet rs = pstmt.executeQuery();
+		
+		while (rs.next()) {
+			Product product = new Product();
+			
+			product.setNo(rs.getInt("PRODUCT_NO"));
+			product.setName(rs.getString("PRODUCT_NAME"));
+			product.setPrice(rs.getLong("PRODUCT_PRICE"));
+			product.setDiscountPrice(rs.getLong("PRODUCT_DISCOUNT_PRICE"));
+			product.setDiscountFrom(rs.getDate("PRODUCT_DISCOUNT_FROM"));
+			product.setDiscountTo(rs.getDate("PRODUCT_DISCOUNT_TO"));
+			product.setCreatedDate(rs.getDate("PRODUCT_CREATED_DATE"));
+			product.setUpdatedDate(rs.getDate("PRODUCT_UPDATED_DATE"));
+			product.setOnSale(rs.getString("PRODUCT_ON_SALE"));
+			product.setDetail(rs.getString("PRODUCT_DETAIL"));
+			product.setTotalSaleCount(rs.getInt("PRODUCT_TOTAL_SALE_COUNT"));
+			product.setTotalStock(rs.getInt("PRODUCT_TOTAL_STOCK"));
+			product.setAverageReviewRate(rs.getDouble("PRODUCT_AVERAGE_REVIEW_RATE"));
+			
+			products.add(product);
+		}
+		
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return products;
+	}
+	
+	/**
+	 * 검색조건에 따른 상품의 총 개수를 구한다.
+	 * @param criteria 검색조건
+	 * @return 검색조건에 따른 상품의 총 개수
+	 * @throws SQLException
+	 */
+	public int getProductTotalRecords(ProductCriteria criteria) throws SQLException {
+		String sql = "SELECT COUNT(*) CN \n"
+				+ "FROM SEMI_PRODUCT P";
+		if (!"전체상품".equals(criteria.getCategory())) {
+			sql += ", SEMI_PRODUCT_CATEGORY C \n"
+				   + "WHERE P.CATEGORY_NO = C.CATEGORY_NO \n"
+				   + "      AND C.CATEGORY_NAME = ?";
+		} else {}
+		
+		int productTotalRecords = 0;
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		if (!"전체상품".equals(criteria.getCategory())) {
+			pstmt.setString(1, criteria.getCategory());
+		}
 		ResultSet rs = pstmt.executeQuery();
 		
 		rs.next();
-		totalRecords = rs.getInt("CN");
+		productTotalRecords = rs.getInt("CN");
 		
-		return totalRecords;
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return productTotalRecords;
 	}
+	
 }

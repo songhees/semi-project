@@ -20,8 +20,8 @@ package semi.vo;
  */
 public class Pagination {
 
-	private int rowsPerPage = 8;			// 한 페이지당 표시할 데이터의 갯수
-	private int pagesPerBlock = 5;			// 한 블록당 표시할 페이지번호 숫자
+	private int rowsPerPage;			// 한 페이지당 표시할 데이터의 갯수
+	private int pagesPerBlock;			// 한 블록당 표시할 페이지번호 숫자
 	private int currentPageNo;				// 현재 페이지번호
 	private int totalRecords;				// 총 데이터 갯수
 	
@@ -41,7 +41,10 @@ public class Pagination {
 	 * @param pageNo 요청한 페이지 번호
 	 * @param totalRecords 총 데이터 갯수
 	 */
-	public Pagination(String pageNo, int totalRecords) {
+	public Pagination(String pageNo, int totalRecords, int setRowsPerPage, int setPagesPerBlock) {
+		rowsPerPage = setRowsPerPage;
+		pagesPerBlock = setPagesPerBlock;
+		
 		// 총 페이지 갯수를 계산해서 멤버변수 totalPages에 대입한다.
 		totalPages = (int)(Math.ceil((double)totalRecords/rowsPerPage));
 		// 총 블록 갯수를 계산해서 멤버변수 totalBlocks에 대입한다.
