@@ -143,18 +143,20 @@ public class ProductDao {
 	}
 	
 	public List<Product> getProductListBycategory(int begin, int end, String category, String orderBy) throws SQLException {
-		String sql = "SELECT PRODUCT_NO, CATEGORY_NO, PRODUCT_NAME, PRODUCT_PRICE, PRODUCT_DISCOUNT_PRICE, \n"
-				+ "       PRODUCT_DISCOUNT_FROM, PRODUCT_DISCOUNT_TO, PRODUCT_CREATED_DATE, PRODUCT_UPDATED_DATE, \n"
-				+ "       PRODUCT_ON_SALE, PRODUCT_DETAIL, CATEGORY_NAME \n"
+		String sql = "SELECT PRODUCT_NO, CATEGORY_NO, PRODUCT_NAME, PRODUCT_PRICE, PRODUCT_DISCOUNT_PRICE, \r\n"
+				+ "       PRODUCT_DISCOUNT_FROM, PRODUCT_DISCOUNT_TO, PRODUCT_CREATED_DATE, PRODUCT_UPDATED_DATE, \r\n"
+				+ "       PRODUCT_ON_SALE, PRODUCT_DETAIL, PRODUCT_TOTAL_SALE_COUNT, PRODUCT_TOTAL_STOCK, \r\n"
+				+ "       PRODUCT_AVERAGE_REVIEW_RATE, CATEGORY_NAME \r\n"
 				+ "FROM (SELECT ROW_NUMBER() OVER (ORDER BY "
-				+ orderByToSqlOrderBy(orderBy)
-				+ ") RN, P.PRODUCT_NO, P.CATEGORY_NO, \n"
-				+ "             P.PRODUCT_NAME, P.PRODUCT_PRICE, P.PRODUCT_DISCOUNT_PRICE, P.PRODUCT_DISCOUNT_FROM, \n"
-				+ "             P.PRODUCT_DISCOUNT_TO, P.PRODUCT_CREATED_DATE, P.PRODUCT_UPDATED_DATE, \n"
-				+ "             P.PRODUCT_ON_SALE, P.PRODUCT_DETAIL, C.CATEGORY_NAME \n"
-				+ "      FROM SEMI_PRODUCT P, SEMI_PRODUCT_CATEGORY C \n"
-				+ "      WHERE P.CATEGORY_NO = C.CATEGORY_NO \n"
-				+ "            AND C.CATEGORY_NAME = ?) \n"
+				+ 				orderByToSqlOrderBy(orderBy)
+				+ "				) RN, P.PRODUCT_NO, P.CATEGORY_NO, \r\n"
+				+ "             P.PRODUCT_NAME, P.PRODUCT_PRICE, P.PRODUCT_DISCOUNT_PRICE, P.PRODUCT_DISCOUNT_FROM, \r\n"
+				+ "             P.PRODUCT_DISCOUNT_TO, P.PRODUCT_CREATED_DATE, P.PRODUCT_UPDATED_DATE, \r\n"
+				+ "             P.PRODUCT_ON_SALE, P.PRODUCT_DETAIL, P.PRODUCT_TOTAL_SALE_COUNT, \r\n"
+				+ "             P.PRODUCT_TOTAL_STOCK, P.PRODUCT_AVERAGE_REVIEW_RATE, C.CATEGORY_NAME \r\n"
+				+ "      FROM SEMI_PRODUCT P, SEMI_PRODUCT_CATEGORY C \r\n"
+				+ "      WHERE P.CATEGORY_NO = C.CATEGORY_NO \r\n"
+				+ "            AND C.CATEGORY_NAME = ?) \r\n"
 				+ "WHERE RN >= ? AND RN <= ?";
 		
 		List<Product> products = new ArrayList<>();
@@ -184,6 +186,9 @@ public class ProductDao {
 			product.setUpdatedDate(rs.getDate("PRODUCT_UPDATED_DATE"));
 			product.setOnSale(rs.getString("PRODUCT_ON_SALE"));
 			product.setDetail(rs.getString("PRODUCT_DETAIL"));
+			product.setTotalSaleCount(rs.getInt("PRODUCT_TOTAL_SALE_COUNT"));
+			product.setTotalStock(rs.getInt("PRODUCT_TOTAL_STOCK"));
+			product.setAverageReviewRate(rs.getDouble("PRODUCT_AVERAGE_REVIEW_RATE"));
 			
 			productCategory.setNo(rs.getInt("CATEGORY_NO"));
 			productCategory.setName(rs.getString("CATEGORY_NAME"));
@@ -200,7 +205,7 @@ public class ProductDao {
 		return products;
 	}
 	
-	// 정렬순서를 sql문에 맞는 문법으로 변환한다.
+	// 정렬기준인 orderBy를 sql문에 맞는 문법으로 변환한다.
 	private String orderByToSqlOrderBy(String orderBy) {
 		if ("신상품".equals(orderBy)) {
 			return "P.PRODUCT_CREATED_DATE DESC";
@@ -211,16 +216,16 @@ public class ProductDao {
 		if ("높은가격".equals(orderBy)) {
 			return "P.PRODUCT_PRICE DESC";
 		}
-		// TODO 미구현
 		if ("인기상품".equals(orderBy)) {
-			return "PRODUCT_SALE_COUNT DESC";
+			return "P.PRODUCT_TOTAL_SALE_COUNT DESC";
 		}
 		// TODO 미구현
 		if ("사용후기".equals(orderBy)) {
-			return "PRODUCT_CREATED_DATE DESC";
+			return "P.PRODUCT_AVERAGE_REVIEW_RATE DESC";
 		}
 		
-		return null;
+		// 기본값은 신상품 정렬기준이다.
+		return "P.PRODUCT_CREATED_DATE DESC";
 	}
 	
 	// TODO 미구현

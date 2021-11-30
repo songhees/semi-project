@@ -5,25 +5,20 @@ import java.util.Date;
 public class Product {
 
 	private int no;
-
-	private int categoryNo;
-
+	private ProductCategory productCategory;
 	private String name;
 	private long price;
 	private long discountPrice;
 	private Date discountFrom;
 	private Date discountTo;
-
 	private Date createdDate;
 	private Date updatedDate;
 	private String onSale;
 	private String detail;
-
-	private String thumbnailUrl;
-
-	private ProductCategory productCategory;
-
-
+	private int totalSaleCount;
+	private int totalStock;
+	private double averageReviewRate;
+	
 	public Product() {}
 
 	public int getNo() {
@@ -34,15 +29,13 @@ public class Product {
 		this.no = no;
 	}
 
-
-	public int getCategoryNo() {
-		return categoryNo;
+	public ProductCategory getProductCategory() {
+		return productCategory;
 	}
 
-	public void setCategoryNo(int categoryNo) {
-		this.categoryNo = categoryNo;
+	public void setProductCategory(ProductCategory productCategory) {
+		this.productCategory = productCategory;
 	}
-
 
 	public String getName() {
 		return name;
@@ -82,7 +75,6 @@ public class Product {
 
 	public void setDiscountTo(Date discountTo) {
 		this.discountTo = discountTo;
-
 	}
 
 	public Date getCreatedDate() {
@@ -117,22 +109,38 @@ public class Product {
 		this.detail = detail;
 	}
 
-
-	public String getThumbnailUrl() {
-		return thumbnailUrl;
+	public int getTotalSaleCount() {
+		return totalSaleCount;
 	}
 
-	public void setThumbnailUrl(String thumbnailUrl) {
-		this.thumbnailUrl = thumbnailUrl;
+	public void setTotalSaleCount(int totalSaleCount) {
+		this.totalSaleCount = totalSaleCount;
 	}
+
+	public int getTotalStock() {
+		return totalStock;
+	}
+
+	public void setTotalStock(int totalStock) {
+		this.totalStock = totalStock;
+	}
+
+	public double getAverageReviewRate() {
+		return averageReviewRate;
+	}
+
+	public void setAverageReviewRate(double averageReviewRate) {
+		this.averageReviewRate = averageReviewRate;
+	}
+
+	@Override
+	public String toString() {
+		return "Product [no=" + no + ", productCategory=" + productCategory + ", name=" + name + ", price=" + price
+				+ ", discountPrice=" + discountPrice + ", discountFrom=" + discountFrom + ", discountTo=" + discountTo
+				+ ", createdDate=" + createdDate + ", updatedDate=" + updatedDate + ", onSale=" + onSale + ", detail="
+				+ detail + ", totalSaleCount=" + totalSaleCount + ", totalStock=" + totalStock + ", averageReviewRate="
+				+ averageReviewRate + "]";
+	}
+
 	
-
-	public ProductCategory getProductCategory() {
-		return productCategory;
-	}
-
-	public void setProductCategory(ProductCategory productCategory) {
-		this.productCategory = productCategory;
-	}
-
 }
