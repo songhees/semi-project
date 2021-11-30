@@ -1,3 +1,7 @@
+<%@page import="semi.criteria.ProductCriteria"%>
+<%@page import="semi.vo.Product"%>
+<%@page import="java.util.List"%>
+<%@page import="semi.dao.ProductDao"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!doctype html>
 <html lang="ko">
@@ -42,6 +46,39 @@
 </head>
 <body>
 <%@ include file="common/navbar.jsp" %>
+<%
+	ProductDao productDao = ProductDao.getInstance();
+	ProductCriteria topProductCriteria = new ProductCriteria();
+	ProductCriteria dressProductCriteria = new ProductCriteria();
+	ProductCriteria pantsProductCriteria = new ProductCriteria();
+	ProductCriteria newProductCriteria = new ProductCriteria();
+	
+	topProductCriteria.setBegin(1);
+	topProductCriteria.setEnd(8);
+	topProductCriteria.setCategory("TOP");
+	topProductCriteria.setOrderBy("인기상품");
+	
+	dressProductCriteria.setBegin(1);
+	dressProductCriteria.setEnd(8);
+	dressProductCriteria.setCategory("DRESS");
+	dressProductCriteria.setOrderBy("인기상품");
+	
+	pantsProductCriteria.setBegin(1);
+	pantsProductCriteria.setEnd(8);
+	pantsProductCriteria.setCategory("PANTS");
+	pantsProductCriteria.setOrderBy("인기상품");
+	
+	newProductCriteria.setBegin(1);
+	newProductCriteria.setEnd(8);
+	newProductCriteria.setCategory("전체상품");
+	newProductCriteria.setOrderBy("신상품");
+	
+	List<Product> topProducts = productDao.getProductListBycategory(topProductCriteria);
+	List<Product> dressProducts = productDao.getProductListBycategory(dressProductCriteria);
+	List<Product> pantsProducts = productDao.getProductListBycategory(pantsProductCriteria);
+	// TODO 24시간 신상품 미구현
+	List<Product> newProducts = productDao.getAllProductList(newProductCriteria);
+%>
 <div class="container-fluid">
 	<div id="homeBannerCarousel" class="carousel slide" data-bs-ride="carousel">
   		<div class="carousel-indicators">
@@ -119,9 +156,15 @@
 	</div>
 	<div class="row">
 		<div class="col text-center mb-5">
-    		<button type="button" class="btn btn-light mx-2" data-bs-target="#weeklyBestItemsCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"><span><small class="text-muted">TOP</small></span></button>
-    		<button type="button" class="btn btn-light mx-2" data-bs-target="#weeklyBestItemsCarousel" data-bs-slide-to="1" aria-label="Slide 2"><span><small class="text-muted">BOTTOM</small></span></button>
-    		<button type="button" class="btn btn-light mx-2" data-bs-target="#weeklyBestItemsCarousel" data-bs-slide-to="2" aria-label="Slide 3"><span><small class="text-muted">DRESS</small></span></button>
+    		<button type="button" class="btn btn-light mx-2" data-bs-target="#weeklyBestItemsCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1">
+    			<span><small class="text-muted">TOP</small></span>
+    		</button>
+    		<button type="button" class="btn btn-light mx-2" data-bs-target="#weeklyBestItemsCarousel" data-bs-slide-to="1" aria-label="Slide 2">
+    			<span><small class="text-muted">DRESS</small></span>
+    		</button>
+    		<button type="button" class="btn btn-light mx-2" data-bs-target="#weeklyBestItemsCarousel" data-bs-slide-to="2" aria-label="Slide 3">
+    			<span><small class="text-muted">PANTS</small></span>
+    		</button>
 		</div>
 	</div>
 	<div class="container">
@@ -131,143 +174,59 @@
 			  		<div class="carousel-inner">
 			    		<div class="carousel-item active">
 			      			<div class="row row-cols-4 g-2 mb-2">
-								<!-- 각 col의 div마다 id 다르게 지정해야 함 -->
+								<% 
+									int i = 1;
+									for (Product product : topProducts) {
+								%>
 								<div class="col">
-									<div id="best-item-1" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
+									<div id="best-item-<%=i %>" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
+										<!-- 이미지, 리뷰 수 미구현 -->
 										<img src="http://localhost/semi-project/resources/images/product/1000/thumbnail/1000_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>핸드메이드 벨티드 울 롱코트 3color<br><br>가격: 230,000원<br><br>리뷰 수: 4</strong></p>
+										<p class="text-over-image no-drag"><strong><%=product.getName() %><br><br>가격: <%=product.getPrice() %>원<br><br>리뷰 수: 4</strong></p>
 									</div>
 								</div>
-								<div class="col">
-									<div id="best-item-2" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<img src="http://localhost/semi-project/resources/images/product/1001/thumbnail/1001_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>덤블 크롭 무스탕 자켓 2color<br><br>가격: 57,600원<br><br>리뷰 수: 2</strong></p>
-									</div>
-								</div>
-								<div class="col">
-									<div id="best-item-3" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<img src="http://localhost/semi-project/resources/images/product/1000/thumbnail/1000_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>핸드메이드 벨티드 울 롱코트 3color<br><br>가격: 230,000원<br><br>리뷰 수: 4</strong></p>
-									</div>
-								</div>
-								<div class="col">
-									<div id="best-item-4" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<img src="http://localhost/semi-project/resources/images/product/1001/thumbnail/1001_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>덤블 크롭 무스탕 자켓 2color<br><br>가격: 57,600원<br><br>리뷰 수: 2</strong></p>
-									</div>
-								</div>
-								<div class="col">
-									<div id="best-item-5" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<img src="http://localhost/semi-project/resources/images/product/1000/thumbnail/1000_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>핸드메이드 벨티드 울 롱코트 3color<br><br>가격: 230,000원<br><br>리뷰 수: 4</strong></p>
-									</div>
-								</div>
-								<div class="col">
-									<div id="best-item-6" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<img src="http://localhost/semi-project/resources/images/product/1001/thumbnail/1001_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>덤블 크롭 무스탕 자켓 2color<br><br>가격: 57,600원<br><br>리뷰 수: 2</strong></p>
-									</div>
-								</div>
-								<div class="col">
-									<div id="best-item-7" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<img src="http://localhost/semi-project/resources/images/product/1000/thumbnail/1000_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>핸드메이드 벨티드 울 롱코트 3color<br><br>가격: 230,000원<br><br>리뷰 수: 4</strong></p>
-									</div>
-								</div>
-								<div class="col">
-									<div id="best-item-8" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<img src="http://localhost/semi-project/resources/images/product/1001/thumbnail/1001_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>덤블 크롭 무스탕 자켓 2color<br><br>가격: 57,600원<br><br>리뷰 수: 2</strong></p>
-									</div>
-								</div>
+								<%
+									i++;
+									}
+								%>
 							</div>
 			    		</div>
 			    		<div class="carousel-item">
 			      			<div class="row row-cols-4 g-2 mb-2">
-								<!-- 각 col의 div마다 id 다르게 지정해야 함 -->
+								<% 
+									i = 1;
+									for (Product product : dressProducts) {
+								%>
 								<div class="col">
-									<div id="best-item-1" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<img src="http://localhost/semi-project/resources/images/product/1002/thumbnail/1002_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>핸드메이드 벨티드 울 롱코트 3color<br><br>가격: 230,000원<br><br>리뷰 수: 4</strong></p>
-									</div>
-								</div>
-								<div class="col">
-									<div id="best-item-2" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<img src="http://localhost/semi-project/resources/images/product/1003/thumbnail/1003_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>덤블 크롭 무스탕 자켓 2color<br><br>가격: 57,600원<br><br>리뷰 수: 2</strong></p>
-									</div>
-								</div>
-								<div class="col">
-									<div id="best-item-3" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<img src="http://localhost/semi-project/resources/images/product/1002/thumbnail/1002_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>핸드메이드 벨티드 울 롱코트 3color<br><br>가격: 230,000원<br><br>리뷰 수: 4</strong></p>
-									</div>
-								</div>
-								<div class="col">
-									<div id="best-item-4" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<img src="http://localhost/semi-project/resources/images/product/1003/thumbnail/1003_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>덤블 크롭 무스탕 자켓 2color<br><br>가격: 57,600원<br><br>리뷰 수: 2</strong></p>
-									</div>
-								</div>
-								<div class="col">
-									<div id="best-item-5" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
+									<div id="best-item-<%=i %>" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
+										<!-- 이미지, 리뷰 수 미구현 -->
 										<img src="http://localhost/semi-project/resources/images/product/1000/thumbnail/1000_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>핸드메이드 벨티드 울 롱코트 3color<br><br>가격: 230,000원<br><br>리뷰 수: 4</strong></p>
+										<p class="text-over-image no-drag"><strong><%=product.getName() %><br><br>가격: <%=product.getPrice() %>원<br><br>리뷰 수: 4</strong></p>
 									</div>
 								</div>
-								<div class="col">
-									<div id="best-item-6" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<img src="http://localhost/semi-project/resources/images/product/1001/thumbnail/1001_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>덤블 크롭 무스탕 자켓 2color<br><br>가격: 57,600원<br><br>리뷰 수: 2</strong></p>
-									</div>
-								</div>
+								<%
+									i++;
+									}
+								%>
 							</div>
 			    		</div>
 			    		<div class="carousel-item">
 			      			<div class="row row-cols-4 g-2 mb-2">
-								<!-- 각 col의 div마다 id 다르게 지정해야 함 -->
+								<% 
+									i = 1;
+									for (Product product : pantsProducts) {
+								%>
 								<div class="col">
-									<div id="best-item-1" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
+									<div id="best-item-<%=i %>" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
+										<!-- 이미지, 리뷰 수 미구현 -->
 										<img src="http://localhost/semi-project/resources/images/product/1000/thumbnail/1000_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>핸드메이드 벨티드 울 롱코트 3color<br><br>가격: 230,000원<br><br>리뷰 수: 4</strong></p>
+										<p class="text-over-image no-drag"><strong><%=product.getName() %><br><br>가격: <%=product.getPrice() %>원<br><br>리뷰 수: 4</strong></p>
 									</div>
 								</div>
-								<div class="col">
-									<div id="best-item-2" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<img src="http://localhost/semi-project/resources/images/product/1001/thumbnail/1001_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>덤블 크롭 무스탕 자켓 2color<br><br>가격: 57,600원<br><br>리뷰 수: 2</strong></p>
-									</div>
-								</div>
-								<div class="col">
-									<div id="best-item-3" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<img src="http://localhost/semi-project/resources/images/product/1002/thumbnail/1002_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>핸드메이드 벨티드 울 롱코트 3color<br><br>가격: 230,000원<br><br>리뷰 수: 4</strong></p>
-									</div>
-								</div>
-								<div class="col">
-									<div id="best-item-4" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<img src="http://localhost/semi-project/resources/images/product/1003/thumbnail/1003_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>덤블 크롭 무스탕 자켓 2color<br><br>가격: 57,600원<br><br>리뷰 수: 2</strong></p>
-									</div>
-								</div>
-								<div class="col">
-									<div id="best-item-5" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<img src="http://localhost/semi-project/resources/images/product/1000/thumbnail/1000_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>핸드메이드 벨티드 울 롱코트 3color<br><br>가격: 230,000원<br><br>리뷰 수: 4</strong></p>
-									</div>
-								</div>
-								<div class="col">
-									<div id="best-item-6" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<img src="http://localhost/semi-project/resources/images/product/1001/thumbnail/1001_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>덤블 크롭 무스탕 자켓 2color<br><br>가격: 57,600원<br><br>리뷰 수: 2</strong></p>
-									</div>
-								</div>
-								<div class="col">
-									<div id="best-item-7" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<img src="http://localhost/semi-project/resources/images/product/1002/thumbnail/1002_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong>핸드메이드 벨티드 울 롱코트 3color<br><br>가격: 230,000원<br><br>리뷰 수: 4</strong></p>
-									</div>
-								</div>
+								<%
+									i++;
+									}
+								%>
 							</div>
 			    		</div>
 			  		</div>
@@ -290,67 +249,22 @@
 		</div>
 	</div>
 	<div class="row row-cols-4 g-4 mb-2">
+		<%
+			for (Product product : newProducts) {
+		%>
 		<div class="col">
 			<div class="card border-light h-100">
 				<img src="http://localhost/semi-project/resources/images/product/1002/thumbnail/1002_1.jpg" class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
 				<div class="card-body">
-					<p class="card-text">히든 단추 블라우스 셔츠 4color</p>
+					<p class="card-text"><%=product.getName() %></p>
 					<hr>
-					<p class="card-text">25,500원</p>
+					<p class="card-text"><%=product.getPrice() %>원</p>
 				</div>
 			</div>
 		</div>
-		<div class="col">
-			<div class="card border-light h-100">
-				<img src="http://localhost/semi-project/resources/images/product/1000/thumbnail/1000_1.jpg" class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
-				<div class="card-body">
-					<p class="card-text">히든 단추 블라우스 셔츠 4color</p>
-					<hr>
-					<p class="card-text">25,500원</p>
-				</div>
-			</div>
-		</div>
-		<div class="col">
-			<div class="card border-light h-100">
-				<img src="http://localhost/semi-project/resources/images/product/1002/thumbnail/1002_1.jpg" class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
-				<div class="card-body">
-					<p class="card-text">히든 단추 블라우스 셔츠 4color</p>
-					<hr>
-					<p class="card-text">25,500원</p>
-				</div>
-			</div>
-		</div>
-		<div class="col">
-			<div class="card border-light h-100">
-				<img src="http://localhost/semi-project/resources/images/product/1000/thumbnail/1000_1.jpg" class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
-				<div class="card-body">
-					<p class="card-text">히든 단추 블라우스 셔츠 4color</p>
-					<hr>
-					<p class="card-text">25,500원</p>
-				</div>
-			</div>
-		</div>
-		<div class="col">
-			<div class="card border-light h-100">
-				<img src="http://localhost/semi-project/resources/images/product/1002/thumbnail/1002_1.jpg" class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
-				<div class="card-body">
-					<p class="card-text">히든 단추 블라우스 셔츠 4color</p>
-					<hr>
-					<p class="card-text">25,500원</p>
-				</div>
-			</div>
-		</div>
-		<div class="col">
-			<div class="card border-light h-100">
-				<img src="http://localhost/semi-project/resources/images/product/1000/thumbnail/1000_1.jpg" class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
-				<div class="card-body">
-					<p class="card-text">히든 단추 블라우스 셔츠 4color</p>
-					<hr>
-					<p class="card-text">25,500원</p>
-				</div>
-			</div>
-		</div>
-		
+		<%
+			}
+		%>
 	</div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>

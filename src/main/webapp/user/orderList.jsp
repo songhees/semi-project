@@ -102,7 +102,7 @@
 
 	/* login.jsp 완성시  loginUserInfo.getId() 넣기*/
 	int totalRecords = orderDao.getTotalRecords("osh");
-	Pagination pagination = new Pagination(pageNo, totalRecords);
+	Pagination pagination = new Pagination(pageNo, totalRecords, 8, 5);
 	
 	/* 검색 조건 */
 	OrderItemCriteria criteria = new OrderItemCriteria();

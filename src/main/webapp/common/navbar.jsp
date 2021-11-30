@@ -90,7 +90,7 @@
 	        	<li class="nav-item"><a class="nav-link" href="/semi-project/product/list.jsp?category=DRESS">DRESS</a></li>
 	        	<li class="nav-item"><a class="nav-link" href="/semi-project/product/list.jsp?category=SKIRT">SKIRT</a></li>
 	        	<li class="nav-item"><a class="nav-link" href="/semi-project/product/list.jsp?category=PANTS">PANTS</a></li>
-	        	<li class="nav-item"><a class="nav-link" href="#">전체상품</a></li>
+	        	<li class="nav-item"><a class="nav-link" href="/semi-project/product/list.jsp?category=전체상품">전체상품</a></li>
 			</ul>
 			<ul class="navbar-nav mb-2 mb-lg-0">
 				<li class="nav-item dropdown">
