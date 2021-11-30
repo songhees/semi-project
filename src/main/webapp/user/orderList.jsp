@@ -1,3 +1,4 @@
+<%@page import="org.apache.tomcat.jakartaee.commons.io.output.NullOutputStream"%>
 <%@page import="semi.criteria.OrderItemCriteria"%>
 <%@page import="java.util.Calendar"%>
 <%@page import="java.text.SimpleDateFormat"%>
@@ -86,13 +87,26 @@
 <%@ include file="../common/navbar.jsp" %>
 <%
 	
-	String subMenu = request.getParameter("subMenu");
 	String pageNo = request.getParameter("pageNo");
+	OrderDao orderDao = OrderDao.getinstance();
+	OrderItemCriteria criteria = new OrderItemCriteria();
+	
+	String subMenu = request.getParameter("subMenu");
 	String startDate = request.getParameter("startDate");
 	String endDate = request.getParameter("endDate");
 	
-	OrderDao orderDao = OrderDao.getinstance();
-	OrderItemCriteria criteria = new OrderItemCriteria();
+	if (subMenu == null) {
+		subMenu = "order";
+		startDate = criteria.getPeriod(3)[0];
+		endDate = criteria.getPeriod(3)[1];
+	} else if (subMenu != null && startDate == null) {
+		startDate = criteria.getPeriod(3)[0];
+		endDate = criteria.getPeriod(3)[1];
+	}
+	System.out.println("[subMenu]" + subMenu);
+	System.out.println("[startDate]" + startDate);
+	System.out.println("[endDate]" + endDate);
+	
 	
 	/* 로그인 없이 이 페이지에 접근하는 경우 */
 /* 	if (loginUserInfo == null) {
@@ -108,7 +122,7 @@
 	criteria.setStatus(subMenu);
 	
 	/* 예외발생시 */
-	int nowYear = Calendar.getInstance().get(Calendar.YEAR);
+	int nowYear = Calendar.getInstance().get(Calendar.YEAR)-1;
 	int year = 0;
 	
 	/* "subMenu" 가 뭔지에 따라  orderDao.getOrderItemListByUserId의 매개 변수를 다르게 한다.*/
@@ -119,6 +133,7 @@
 			year = nowYear;
 		}
 		criteria.setBeginDate(year + "/01/01");
+		System.out.print("[year]" + year + "/01/01");
 		criteria.setEndDate((year+1) + "/01/01");
 	}
 	
@@ -151,7 +166,7 @@
 		<ul class="nav nav-tabs nav-justified border">
 		    <li class="nav-item"><a class="nav-link <%="order".equals(subMenu)? "active" : ""%>" href="orderList.jsp?pageNo=1&subMenu=order">주문내역조회</a></li>
 		    <!-- 주문 상태가 취소/반품/교환 인 상품의 목록으로 이동하는 버튼 -->
-		    <li class="nav-item"><a class="nav-link <%="cancel".equals(subMenu)? "active" : ""%>" href="orderList.jsp?pageNo=1&subMenu=cancel">취소/반품/교환 내역</a></li>
+		    <li class="nav-item"><a class="nav-link <%="cancel".equals(subMenu)? "active" : ""%>" href="orderList.jsp?pageNo=1&subMenu=cancel">취소/반품/교환내역</a></li>
 		    <!-- 년도별 주문내역 조회 -->
 		    <li class="nav-item"><a class="nav-link <%="history".equals(subMenu)? "active" : ""%>" href="orderList.jsp?pageNo=1&subMenu=history">과거주문내역</a></li>
 	    	<li class="nav-item"><a class="nav-link disabled" href="#"></a></li>
@@ -203,6 +218,8 @@
 	<!-- table 주문 목록 -->
 	<div>
 		<h6><small>주문 상품 정보</small></h6>
+	</div>
+	<div>
 		<table>
 			<colgroup>
 				<col width="9%">

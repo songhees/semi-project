@@ -6,11 +6,12 @@ import java.util.List;
 public class Order {
 	private int no;
 	private User user;
-	private int totalPrice;
+	private long totalPrice;
 	private int depositPoint;
 	private String status;
 	private Date createdDate;
 	private Address address;
+	private String paymentMethod;
 	private List<OrderItem> items;
 	
 	public Order() {}
@@ -31,11 +32,11 @@ public class Order {
 		this.user = user;
 	}
 
-	public int getTotalPrice() {
+	public long getTotalPrice() {
 		return totalPrice;
 	}
 
-	public void setTotalPrice(int totalPrice) {
+	public void setTotalPrice(long totalPrice) {
 		this.totalPrice = totalPrice;
 	}
 
@@ -77,6 +78,14 @@ public class Order {
 
 	public void setItems(List<OrderItem> items) {
 		this.items = items;
+	}
+
+	public String getPaymentMethod() {
+		return paymentMethod;
+	}
+
+	public void setPaymentMethod(String paymentMethod) {
+		this.paymentMethod = paymentMethod;
 	}
 
 }
