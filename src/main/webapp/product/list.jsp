@@ -1,3 +1,5 @@
+<%@page import="semi.dao.ProductItemDao"%>
+<%@page import="semi.criteria.ProductCriteria"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="semi.vo.Product"%>
 <%@page import="semi.vo.ProductItem"%>
@@ -28,19 +30,36 @@
     	.orderBy > span:hover {
     		color: #cccccc;
     	}
+    	
+    	a.page-link {
+      		border: none;
+      		color: #757575;
+      		padding: 4px 0;
+     		width: 20px;
+      		text-align: center;
+   		}
+   		li.page-item.active > a.page-link {
+      		color: #757575;
+      		background-color: white;
+      		font-weight: bold;
+   		}
+   		li.page-item.active {
+      		border-bottom: 2px solid #757575;
+   		}
+   		li.page-item {
+      		margin: 0 6px;
+   		}
     </style>
 </head>
 <body>
 <%@ include file="/common/navbar.jsp" %>
 <div class="container">
 	<%
-		// 요청 파라미터에서 선택된 카테고리를 조회한다.
+	// 요청 파라미터의 값들을 조회한다.
 		String category = request.getParameter("category");
 		String pageNo = request.getParameter("pageNo");
 		String orderBy = request.getParameter("orderBy");
-		
-		
-		
+			
 		// category가 비어있을 경우 초기값으로 TOP을 넣어준다.
 		if (category == null) {
 			category = "TOP";
@@ -55,19 +74,28 @@
 		}
 		
 		ProductDao productDao = ProductDao.getInstance();
-		
-		int totalRecords = productDao.getTotalRecords(category);
-		// TODO 테스트용 println
-		System.out.println("totalRecords: " + totalRecords);
-		Pagination pagination = new Pagination(pageNo, totalRecords);
-			
+		ProductItemDao productItemDao = ProductItemDao.getInstance();
 		List<Product> products = new ArrayList<Product>();
-		if ("BEST".equals(category)) {
-			// TODO DB에서 상품 판매량 상위 ?개를 가져온다.
-					
+		ProductCriteria productCriteria = new ProductCriteria();
+			
+		productCriteria.setCategory(category);
+		productCriteria.setOrderBy(orderBy);
+		
+		int totalRecords = productDao.getProductTotalRecords(productCriteria);
+		// TODO 테스트용 프린트
+		System.out.println("totalRecords: " + totalRecords);
+		Pagination pagination = new Pagination(pageNo, totalRecords, 8, 5);
+		int begin = pagination.getBegin();
+		int end = pagination.getEnd();
+		
+		productCriteria.setBegin(begin);
+		productCriteria.setEnd(end);
+		
+		if ("전체상품".equals(category)) {
+			products = productDao.getAllProductList(productCriteria);
 		} else {
-			// TODO 카테고리가 알맞은지 먼저 확인하고, 해당하는 상품 리스트를 가져온다.
-			products = productDao.getProductListBycategory(pagination.getBegin(), pagination.getEnd(), category, orderBy);
+		// TODO 카테고리가 알맞은지 먼저 확인하고, 해당하는 상품 리스트를 가져온다.
+			products = productDao.getProductListBycategory(productCriteria);
 		}
 	%>
 	<div class="row">
