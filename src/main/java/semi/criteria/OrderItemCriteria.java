@@ -75,6 +75,8 @@ public class OrderItemCriteria {
 		period[1] = dateFormat.format(cal.getTime());
 		
 		cal.add(Calendar.MONTH, -day);
+		cal.add(Calendar.DATE, -1);
+		
 		// 시작 날짜
 		period[0] = dateFormat.format(cal.getTime());
 		
