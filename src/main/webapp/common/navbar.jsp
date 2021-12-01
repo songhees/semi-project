@@ -80,12 +80,10 @@
 		<div class="collapse navbar-collapse justify-content-center" id="navbar-2">
 	      <!-- Left links -->
 			<ul class="navbar-nav mb-2 mb-lg-0">
-				<li class="nav-item"><a class="nav-link fw-bold" href="#">BEST</a></li>
 	      		<li class="nav-item"><a class="nav-link fw-bold" href="#">NEW<code class="text-danger">5%</code></a></li>
 	        <!-- Navbar dropdown -->
-	        	<li class="nav-item"><a class="nav-link" href="#">남녀공용</a></li>
-	        	<li class="nav-item"><a class="nav-link" href="#">베스트재진행</a></li>
 	        	<li class="nav-item"><a class="nav-link" href="/semi-project/product/list.jsp?category=OUTER">OUTER</a></li>
+	        	<li class="nav-item"><a class="nav-link" href="/semi-project/product/list.jsp?category=TOP">TOP</a></li>
 	        	<li class="nav-item"><a class="nav-link" href="/semi-project/product/list.jsp?category=SHIRT">SHIRT&amp;BLOUSE</a></li>
 	        	<li class="nav-item"><a class="nav-link" href="/semi-project/product/list.jsp?category=DRESS">DRESS</a></li>
 	        	<li class="nav-item"><a class="nav-link" href="/semi-project/product/list.jsp?category=SKIRT">SKIRT</a></li>

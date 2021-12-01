@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import semi.criteria.ProductCriteria;
@@ -166,9 +167,12 @@ public class ProductDao {
 		String sql = "SELECT PRODUCT_NO, CATEGORY_NO, PRODUCT_NAME, PRODUCT_PRICE, PRODUCT_DISCOUNT_PRICE, \r\n"
 				+ "       PRODUCT_DISCOUNT_FROM, PRODUCT_DISCOUNT_TO, PRODUCT_CREATED_DATE, PRODUCT_UPDATED_DATE, \r\n"
 				+ "       PRODUCT_ON_SALE, PRODUCT_DETAIL, PRODUCT_TOTAL_SALE_COUNT, PRODUCT_TOTAL_STOCK, \r\n"
-				+ "       PRODUCT_AVERAGE_REVIEW_RATE, CATEGORY_NAME \r\n"
+				+ "       PRODUCT_AVERAGE_REVIEW_RATE, CATEGORY_NAME, \r\n"
+				+ "       REGEXP_REPLACE((SELECT LISTAGG(I.PRODUCT_COLOR, ',') WITHIN GROUP (ORDER BY A.PRODUCT_NO) \r\n"
+				+ "                       FROM SEMI_PRODUCT_ITEM I\r\n"
+				+ "                       WHERE I.PRODUCT_NO = A.PRODUCT_NO), '([^,]+)(,\\1)+', '\\1') COLORS \r\n"
 				+ "FROM (SELECT ROW_NUMBER() OVER (ORDER BY "
-				+ 				orderByToSqlOrderBy(criteria.getOrderBy())
+				+				orderByToSqlOrderBy(criteria.getOrderBy())
 				+ "				) RN, P.PRODUCT_NO, P.CATEGORY_NO, \r\n"
 				+ "             P.PRODUCT_NAME, P.PRODUCT_PRICE, P.PRODUCT_DISCOUNT_PRICE, P.PRODUCT_DISCOUNT_FROM, \r\n"
 				+ "             P.PRODUCT_DISCOUNT_TO, P.PRODUCT_CREATED_DATE, P.PRODUCT_UPDATED_DATE, \r\n"
@@ -176,7 +180,7 @@ public class ProductDao {
 				+ "             P.PRODUCT_TOTAL_STOCK, P.PRODUCT_AVERAGE_REVIEW_RATE, C.CATEGORY_NAME \r\n"
 				+ "      FROM SEMI_PRODUCT P, SEMI_PRODUCT_CATEGORY C \r\n"
 				+ "      WHERE P.CATEGORY_NO = C.CATEGORY_NO \r\n"
-				+ "            AND C.CATEGORY_NAME = ?) \r\n"
+				+ "            AND C.CATEGORY_NAME = ?) A \r\n"
 				+ "WHERE RN >= ? AND RN <= ?";
 		
 		List<Product> products = new ArrayList<>();
@@ -196,6 +200,7 @@ public class ProductDao {
 		while (rs.next()) {
 			Product product = new Product();
 			ProductCategory productCategory = new ProductCategory();
+			List<String> colors = new ArrayList<>();
 			
 			product.setNo(rs.getInt("PRODUCT_NO"));
 			product.setName(rs.getString("PRODUCT_NAME"));
@@ -213,8 +218,11 @@ public class ProductDao {
 			
 			productCategory.setNo(rs.getInt("CATEGORY_NO"));
 			productCategory.setName(rs.getString("CATEGORY_NAME"));
+
+			colors = stringToArrayList(rs.getString("COLORS"));
 			
 			product.setProductCategory(productCategory);
+			product.setColors(colors);
 			
 			products.add(product);
 		}
@@ -226,33 +234,14 @@ public class ProductDao {
 		return products;
 	}
 	
-	// 정렬기준인 orderBy를 sql문에 맞는 문법으로 변환한다.
-	private String orderByToSqlOrderBy(String orderBy) {
-		if ("신상품".equals(orderBy)) {
-			return "P.PRODUCT_CREATED_DATE DESC";
-		}
-		if ("낮은가격".equals(orderBy)) {
-			return "P.PRODUCT_PRICE ASC";
-		}
-		if ("높은가격".equals(orderBy)) {
-			return "P.PRODUCT_PRICE DESC";
-		}
-		if ("인기상품".equals(orderBy)) {
-			return "P.PRODUCT_TOTAL_SALE_COUNT DESC";
-		}
-		if ("사용후기".equals(orderBy)) {
-			return "P.PRODUCT_AVERAGE_REVIEW_RATE DESC";
-		}
-		
-		// 기본값은 신상품 정렬기준이다.
-		return "P.PRODUCT_CREATED_DATE DESC";
-	}
-	
 	public List<Product> getAllProductList(ProductCriteria criteria) throws SQLException {
 		String sql = "SELECT PRODUCT_NO, CATEGORY_NO, PRODUCT_NAME, PRODUCT_PRICE, PRODUCT_DISCOUNT_PRICE, \r\n"
 				+ "       PRODUCT_DISCOUNT_FROM, PRODUCT_DISCOUNT_TO, PRODUCT_CREATED_DATE, PRODUCT_UPDATED_DATE, \r\n"
 				+ "       PRODUCT_ON_SALE, PRODUCT_DETAIL, PRODUCT_TOTAL_SALE_COUNT, PRODUCT_TOTAL_STOCK, \r\n"
-				+ "       PRODUCT_AVERAGE_REVIEW_RATE \r\n"
+				+ "       PRODUCT_AVERAGE_REVIEW_RATE, \r\n"
+				+ "       REGEXP_REPLACE((SELECT LISTAGG(I.PRODUCT_COLOR, ',') WITHIN GROUP (ORDER BY A.PRODUCT_NO) \r\n"
+				+ "                       FROM SEMI_PRODUCT_ITEM I\r\n"
+				+ "                       WHERE I.PRODUCT_NO = A.PRODUCT_NO), '([^,]+)(,\\1)+', '\\1') COLORS \r\n"
 				+ "FROM (SELECT ROW_NUMBER() OVER (ORDER BY "
 				+ 				orderByToSqlOrderBy(criteria.getOrderBy())
 				+ "				) RN, PRODUCT_NO, CATEGORY_NO, \r\n"
@@ -260,7 +249,7 @@ public class ProductDao {
 				+ "             PRODUCT_DISCOUNT_TO, PRODUCT_CREATED_DATE, PRODUCT_UPDATED_DATE, \r\n"
 				+ "             PRODUCT_ON_SALE, PRODUCT_DETAIL, PRODUCT_TOTAL_SALE_COUNT, \r\n"
 				+ "             PRODUCT_TOTAL_STOCK, PRODUCT_AVERAGE_REVIEW_RATE \r\n"
-				+ "      FROM SEMI_PRODUCT P) \r\n"
+				+ "      FROM SEMI_PRODUCT P) A \r\n"
 				+ "WHERE RN >= ? AND RN <= ?";
 		
 		List<Product> products = new ArrayList<>();
@@ -277,6 +266,7 @@ public class ProductDao {
 		
 		while (rs.next()) {
 			Product product = new Product();
+			List<String> colors = new ArrayList<>();
 			
 			product.setNo(rs.getInt("PRODUCT_NO"));
 			product.setName(rs.getString("PRODUCT_NAME"));
@@ -291,6 +281,9 @@ public class ProductDao {
 			product.setTotalSaleCount(rs.getInt("PRODUCT_TOTAL_SALE_COUNT"));
 			product.setTotalStock(rs.getInt("PRODUCT_TOTAL_STOCK"));
 			product.setAverageReviewRate(rs.getDouble("PRODUCT_AVERAGE_REVIEW_RATE"));
+			
+			colors = stringToArrayList(rs.getString("COLORS"));
+			product.setColors(colors);
 			
 			products.add(product);
 		}
@@ -336,4 +329,45 @@ public class ProductDao {
 		return productTotalRecords;
 	}
 	
+	/**
+	 * 정렬기준인 orderBy를 sql문에 적용할 수 있는 String으로 변환한다.
+	 * @param orderBy 정렬기준
+	 * @return sql문에 적용가능한 String
+	 */
+	private String orderByToSqlOrderBy(String orderBy) {
+		if ("신상품".equals(orderBy)) {
+			return "P.PRODUCT_CREATED_DATE DESC";
+		}
+		if ("낮은가격".equals(orderBy)) {
+			return "P.PRODUCT_PRICE ASC";
+		}
+		if ("높은가격".equals(orderBy)) {
+			return "P.PRODUCT_PRICE DESC";
+		}
+		if ("인기상품".equals(orderBy)) {
+			return "P.PRODUCT_TOTAL_SALE_COUNT DESC";
+		}
+		if ("사용후기".equals(orderBy)) {
+			return "P.PRODUCT_AVERAGE_REVIEW_RATE DESC";
+		}
+		
+		// 기본값은 신상품 정렬기준이다.
+		return "P.PRODUCT_CREATED_DATE DESC";
+	}
+
+	/**
+	 * String을 쉼표(,)로 잘라서 List에 저장한다.
+	 * @param str 자를 String
+	 * @return 자르고 나온 String들을 저장한 List
+	 */
+	private List<String> stringToArrayList(String str) {
+		List<String> result = new ArrayList<>();
+		
+		if (str == null) {
+			return result;
+		}
+		result = Arrays.asList(str.split(","));
+		
+		return result;
+	}
 }

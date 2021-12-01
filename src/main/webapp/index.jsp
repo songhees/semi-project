@@ -1,3 +1,5 @@
+<%@page import="utils.TimeUtil"%>
+<%@page import="java.util.Date"%>
 <%@page import="semi.criteria.ProductCriteria"%>
 <%@page import="semi.vo.Product"%>
 <%@page import="java.util.List"%>
@@ -256,9 +258,38 @@
 			<div class="card border-light h-100">
 				<img src="http://localhost/semi-project/resources/images/product/1002/thumbnail/1002_1.jpg" class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
 				<div class="card-body">
+					<p class="card-text my-1">
+					<%
+						for (String color : product.getColors()) {
+					%>
+					<%=color %>
+					<%
+						}
+					%>
+					</p>
 					<p class="card-text"><%=product.getName() %></p>
 					<hr>
-					<p class="card-text"><%=product.getPrice() %>원</p>
+					<%
+						// 할인기간이 남아있으면 남은 할인기간을 표시한다.
+						Date createdDate = product.getCreatedDate();
+						long currentElapsedMillisecond = TimeUtil.getCurrentElapsedMillisecond(createdDate);
+						String remainTime = TimeUtil.getRemainTimeInOneDay(currentElapsedMillisecond);
+						if (remainTime == null) {
+					%>
+					<p class="card-text mb-1"><%=product.getPrice() %>원</p>
+					<%
+						} else {
+							// 할인금액은 5%로 일의 자리에서 올림한다.
+							double discountDouble = product.getPrice()*0.05;
+							discountDouble = Math.ceil(discountDouble/10)*10;
+							long discountLong = (long)discountDouble;
+							long discountedPrice = product.getPrice() - discountLong;
+					%>
+					<p class="card-text mb-1"><del><%=product.getPrice() %>원</del>, <%=discountedPrice %>원<span class="text-danger">(<%=discountLong %>원 할인)</span></p>
+					<p class="card-text my-1">할인기간 <%=remainTime %></p>
+					<%
+						}
+					%>
 				</div>
 			</div>
 		</div>
