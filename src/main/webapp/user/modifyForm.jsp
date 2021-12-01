@@ -1,3 +1,5 @@
+<%@page import="semi.vo.Address"%>
+<%@page import="semi.dao.AddressDao"%>
 <%@page import="semi.dao.UserDao"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
@@ -32,18 +34,20 @@
   		width: 100%;
   		margin: auto;
 	} 
-	.vintable + div > button {
+	.vintable + div > div > button {
 		border-radius: 0;
 		width: 120px;
 		height: 40px;
 		font-size: 11px;
+		
 	}
-	.vintable + div>a {
+	.vintable + div > div >a {
 		padding-top: 11px;
 		border-radius: 0;
 		width: 120px;
 		height: 40px;
 		font-size: 11px;
+
 	}
 	
 	th, td {
@@ -83,10 +87,14 @@
 	} */
 
 	UserDao userDao = UserDao.getInstance();
+	AddressDao addressDao = AddressDao.getInstance();
 	
-	/* login.jsp 완성시  loginUserInfo.getId() 넣기*/
+	/* login.jsp 완성시  loginUserInfo.getId() 넣기
+		번호를얻어서 주소록을 조회한다.
+	*/
 	User userInfo = userDao.getUserById("osh");
-	
+	Address address = addressDao.getRepresentativeAddressByNo(userInfo.getNo());
+
 	String[] tel = userInfo.getTel().split("-");
 %>
 <div class="container">    
@@ -114,7 +122,7 @@
 					</colgroup>
 					<tr>
 						<th>아이디</th>
-						<td><input type="text" name="userId" value="<%=userInfo.getId() %>" disabled="disabled" readonly="readonly"><span class="px-1">(영문소문자/숫자, 4~16자)</span></td>
+						<td><input type="text" name="userId" value="<%=userInfo.getId() %>" readonly="readonly"><span class="px-1">(영문소문자/숫자, 4~16자)</span></td>
 					</tr>
 					<tr>
 						<th>비밀번호 <img src="https://img.echosting.cafe24.com/skin/base/common/ico_required_blue.gif" alt="필수"></th>
@@ -137,15 +145,15 @@
 					</tr>
 					<tr>
 						<th>이름</th>
-						<td><input type="text" name="userId" value="<%=userInfo.getName() %>" disabled="disabled" readonly="readonly"></td>
+						<td><input type="text" name="name" value="<%=userInfo.getName() %>" readonly="readonly"></td>
 					</tr>
 					<tr>
 						<th>주소</th>
 						<td>
-							<input type="text" id="postcode" placeholder="우편번호">
+							<input name="postcode" type="text" id="postcode" placeholder="우편번호" value="<%=address != null? address.getPostalCode() : "" %>">
 							<input type="button" onclick="sample6_execDaumPostcode()" value="우편번호 찾기"><br>
-							<input type="text" id="address" placeholder="주소"><br>
-							<input type="text" id="detailAddress" placeholder="상세주소">
+							<input name ="baseAddress" type="text" id="address" placeholder="주소" value="<%=address != null? address.getBaseAddress() : "" %>"><br>
+							<input name="addressDetail" type="text" id="detailAddress" placeholder="상세주소" value="<%=address != null? address.getDetail() : "" %>">
 						</td>
 					</tr>
 					<tr>
@@ -154,12 +162,16 @@
 							-
 							<input maxlength="4" type="text" name="userTel" value="<%=tel[1] %>">
 							-
-							<input maxlength="4" type="text" name="userTel" value="<%=tel[2] %>"></td>
+							<input maxlength="4" type="text" name="userTel" value="<%=tel[2] %>">
+							<div class="form-text text-danger" style="display: none;" id="error-tel">
+								휴대전화 번호를 입력해주세요.
+							</div>
+						</td>
 					</tr>
 					<tr>
 						<th>SMS 수신여부 <img src="https://img.echosting.cafe24.com/skin/base/common/ico_required_blue.gif" alt="필수"></th>
-						<td><input type="radio" value="Y" name="snsSubscription" <%="Y".equals(userInfo.getSmsSubscription())? "checked" : "" %>> 수신함
-							<input type="radio" value="N" name="snsSubscription" <%="N".equals(userInfo.getSmsSubscription())? "checked" : "" %>> 수신안함
+						<td><input type="radio" value="Y" name="smsSubscription" <%="Y".equals(userInfo.getSmsSubscription())? "checked" : "" %>> 수신함
+							<input type="radio" value="N" name="smsSubscription" <%="N".equals(userInfo.getSmsSubscription())? "checked" : "" %>> 수신안함
 							<div>
 								쇼핑몰에서 제공하는 유익한 이벤트 소식을 SMS로 받으실 수 있습니다.
 							</div>	
@@ -167,7 +179,10 @@
 					</tr>
 					<tr>
 						<th>이메일 <img src="https://img.echosting.cafe24.com/skin/base/common/ico_required_blue.gif" alt="필수"></th>
-						<td><input type="text" name="userEmail" value="<%=userInfo.getEmail() %>">
+						<td><input type="text" name="userEmail" value="<%=userInfo.getEmail() %>" id="email">
+							<div class="form-text text-danger" style="display: none;" id="error-email">
+								이메일을 입력해 주세요.
+							</div>
 						</td>
 					</tr>
 					<tr>
@@ -181,12 +196,14 @@
 					</tr>
 				</tbody>
 			</table>
-			<div class="text-center mt-1">	
-				<button class="btn btn-dark opacity-75" type="submit">회원정보수정</button>
-				<a href="../index.jsp" class="btn btn-dark opacity-50">취소</a>
-				<span class="text-end">
+			<div class="row">
+				<div class="col">	
+					<button class="btn btn-dark opacity-75" type="submit">회원정보수정</button>
+					<a href="../index.jsp" class="btn btn-dark opacity-50">취소</a>
+				</div>
+				<div class="col text-center">
 					<button class="btn btn-ourline-dark btn-sm" type="submit" onclick="">회원탈퇴</button>
-				</span>
+				</div>
 			</div>
 <!-- 				<div class="mt-5">
 					<div>
@@ -223,13 +240,18 @@
 		
 		var comparedPwd = document.getElementById("comparedPassword").value;
 		var inputPwd = document.getElementById("userPassword").value;
+		var inputEmail = document.getElementById("email").value;
+		var inputTel = document.querySelectorAll("input[name=userTel]");
 		
 		var errorMessagePwdByInput = document.getElementById("error-password");
-			
 		var errorMessagePwdBySame = document.getElementById("error-password-same");
-
+		var errorMessageEmail = document.getElementById("error-email");
+		var errorMessageTel = document.getElementById("error-tel");		
+		
 		errorMessagePwdBySame.style.display = 'none';
 		errorMessagePwdByInput.style.display = 'none';
+		errorMessageEmail.style.display = 'none';
+		errorMessageTel.style.display = 'none';
 		
 		var inValid = true;
 		if (inputPwd === '') {
@@ -243,15 +265,23 @@
 			inValid = false;
 		}
 		
+		if (inputEmail === '') {
+			errorMessageEmail.style.display = '';
+			inValid = false;
+		}
+		
+		for (var i=0; i<inputTel.length; i++) {
+			if (inputTel[i].value === '') {
+				errorMessageTel.style.display = '';
+				inValid = false;
+			}
+		}
+		
 		if (inValid) {
 			loginForm.submit();
 		}
 	}
 	
-	function isSame() {
-
-		
-	}
 </script>
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script>
