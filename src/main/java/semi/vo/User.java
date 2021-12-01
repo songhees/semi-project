@@ -12,7 +12,7 @@ public class User {
 	private String tel;
 	private String email;
 	private String emailSubscription;
-	private String snsSubscription;
+	private String smsSubscription;
 	private int point;
 	private String admin;
 	private String deleted;
@@ -86,12 +86,12 @@ public class User {
 		this.emailSubscription = emailSubscription;
 	}
 
-	public String getSnsSubscription() {
-		return snsSubscription;
+	public String getSmsSubscription() {
+		return smsSubscription;
 	}
 
-	public void setSnsSubscription(String snsSubscription) {
-		this.snsSubscription = snsSubscription;
+	public void setSmsSubscription(String smsSubscription) {
+		this.smsSubscription = smsSubscription;
 	}
 
 	public int getPoint() {

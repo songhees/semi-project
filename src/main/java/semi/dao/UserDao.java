@@ -41,7 +41,7 @@ public class UserDao {
 			user.setTel(rs.getString("user_tel"));
 			user.setEmail(rs.getString("user_email"));
 			user.setEmailSubscription(rs.getString("user_email_subscription"));
-			user.setSnsSubscription(rs.getString("user_sns_subscription"));
+			user.setSmsSubscription(rs.getString("user_sms_subscription"));
 			user.setDeleted(rs.getString("user_deleted"));
 			user.setDeletedDate(rs.getDate("user_deleted_date"));
 			user.setUpdatedDate(rs.getDate("user_updated_date"));
@@ -77,7 +77,7 @@ public class UserDao {
 			user.setTel(rs.getString("user_tel"));
 			user.setEmail(rs.getString("user_email"));
 			user.setEmailSubscription(rs.getString("user_email_subscription"));
-			user.setSnsSubscription(rs.getString("user_sns_subscription"));
+			user.setSmsSubscription(rs.getString("user_sms_subscription"));
 			user.setDeleted(rs.getString("user_deleted"));
 			user.setDeletedDate(rs.getDate("user_deleted_date"));
 			user.setUpdatedDate(rs.getDate("user_updated_date"));
