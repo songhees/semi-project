@@ -7,7 +7,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import semi.criteria.ProductCriteria;
 import semi.vo.Product;
@@ -22,6 +24,30 @@ public class ProductDao {
 	private ProductDao() {}
 	public static ProductDao getInstance() {
 		return self;
+	}
+	
+	
+	public List<String> getProductColor(int no) throws SQLException {
+		String sql = "select distinct product_color "
+				   + "from semi_product_item "
+				   + "where product_no = ? ";
+		
+		List<String> productColor = new ArrayList<>();
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, no);
+		ResultSet rs = pstmt.executeQuery();
+		while (rs.next()) {
+			productColor.add(rs.getString("product_color"));
+		}
+		
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return productColor;
+		
 	}
 	
 	public List<Integer> getProductStyleNo(int no) throws SQLException {
