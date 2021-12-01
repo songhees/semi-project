@@ -84,43 +84,45 @@ List<String> thumbnails = productDao.getProductThumbnailImage(no);
 				<div class="col-md-5">
 					<h5><%=product.getName()%></h5>
 					<hr class="mt-4 mb-3">
-					<form>
+					<form method="post" id="form-order" action="order.jsp">
 						<table class="table table-borderless">
 							<tr>
 <%
+boolean onSale = false;
+long currentPrice = product.getPrice();
+
 DecimalFormat formatter = new DecimalFormat("###,###");
 
 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 Date date = new Date();
 String today = format.format(date);
+Date todate = format.parse(today);
 
 	if (product.getDiscountFrom() != null || product.getDiscountTo() != null) {
-		Date startDate = product.getDiscountFrom();
-		Date endDate = product.getDiscountTo();
-		Date todate = format.parse(today);
-	
-		int compareTo = endDate.compareTo(todate);
-		int compareFrom = todate.compareTo(startDate);
+		int compareTo = product.getDiscountTo().compareTo(todate);
+		int compareFrom = todate.compareTo(product.getDiscountFrom());
 	
 		if (product.getDiscountPrice() != 0 && (compareTo >= 0 && compareFrom >= 0)) {
+			onSale = true;
+			currentPrice = product.getDiscountPrice();
 %>
 								<td>소비자가</td>
 								<td class="text-decoration-line-through"><%=formatter.format(product.getPrice())%>원</td>
 							</tr>
 							<tr>
 								<td>판매가</td>
-								<td><%=formatter.format(product.getDiscountPrice())%>원</td>
+								<td><%=formatter.format(currentPrice)%>원</td>
 <%
 		} else {
 %>
 								<td>판매가</td>
-								<td><%=formatter.format(product.getPrice())%>원</td>
+								<td><%=formatter.format(currentPrice)%>원</td>
 <%
 		}
 	} else {
 %>
 								<td>판매가</td>
-								<td><%=formatter.format(product.getPrice())%>원</td>
+								<td><%=formatter.format(currentPrice)%>원</td>
 <%
 	}
 %>
@@ -129,68 +131,74 @@ String today = format.format(date);
 								<td>색상</td>
 								<td>
 <%
-String color = null;
-for (ProductItem productItem : productItems) {
-	if (productItem.getColor().equals(color)) {
-		break;
-	}
+List<String> colorList = productDao.getProductColor(no);
+for (String color : colorList) {
 %>
-									<div class="form-check form-check-inline p-0 m-0">
-										<input type="radio" class="btn-check" onclick="changeColorText()" id="color btn-check-outlined<%=productItem.getNo()%>" name="color" value="<%=productItem.getColor()%>">
-										<label class="btn btn-outline-secondary" for="color btn-check-outlined<%=productItem.getNo()%>"><%=productItem.getColor()%></label>
+									<div id="color-check" class="form-check form-check-inline p-0 m-0">
+										<input type="radio" class="btn-check" id="color btn-check-outlined<%=color%>" name="color" 
+										value="<%=color%>">
+										<label class="btn btn-outline-secondary" for="color btn-check-outlined<%=color%>"><%=color %></label>
 									</div>
 <%
- 	color = productItem.getColor();
- }
+}
 %>
-									<P id="color-text">[필수] 옵션을 선택해 주세요</P>
+									<P style="display: none" id="error-message-color">[필수] 색상을 선택해 주세요</P>
 								</td>
 							<tr>
 								<td>사이즈</td>
 								<td>
-									<%
-									String size = null;
-									for (ProductItem productItem : productItems) {
-										if (productItem.getSize().equals(size)) {
-											break;
-										}
-									%>
-									<div class="form-check form-check-inline p-0 m-0">
-										<input type="radio" class="btn-check"
-											id="size btn-check-outlined<%=productItem.getNo()%>"
-											name="size" value="<%=productItem.getSize()%>"> <label
-											class="btn btn-outline-secondary"
-											for="size btn-check-outlined<%=productItem.getNo()%>"><%=productItem.getSize()%></label>
-									</div> <%
- size = productItem.getSize();
+<%
+String size = null;
+for (ProductItem productItem : productItems) {
+	if (productItem.getSize().equals(size)) {
+		break;
+	}
+%>
+									<div id="size-check" class="form-check form-check-inline p-0 m-0">
+										<input type="radio" class="btn-check" id="size btn-check-outlined<%=productItem.getNo()%>" name="size" 
+										value="<%=productItem.getSize()%>"> 
+										<label class="btn btn-outline-secondary" for="size btn-check-outlined<%=productItem.getNo()%>"><%=productItem.getSize()%></label>
+									</div>
+<%
+	size = productItem.getSize();
  }
- %>
-									<P>[필수] 옵션을 선택해 주세요</P>
+%>
+									<P style="display: none" id="error-message-size">[필수] 옵션을 선택해 주세요</P>
+								</td>
+							</tr>
+							<tr>
+								<td>수량</td>
+								<td>
+									<select name="amount" onchange="changeOrderPrice()" id="product-count" class="form-select" aria-label="Default select example">
+										<option value="1" selected>1</option>
+									    <option value="2">2</option>
+									    <option value="3">3</option>
+									    <option value="3">4</option>
+									    <option value="3">5</option>
+									</select>
 								</td>
 							</tr>
 						</table>
-					</form>
 					<hr class="mt-3">
 					<div class="d-flex justify-content-between mt-4 mb-4">
 						<div>
-							<strong>총 상품금액</strong>(수량) :
+							<strong>총 상품금액</strong> :
 						</div>
 						<div>
-							<strong>10000원</strong>(1개)
+							<strong><%=formatter.format(currentPrice) %>원</strong>
 						</div>
 					</div>
 					<div class="d-flex justify-content-end">
 						<ul class="btn_list p-0" style="list-style: none">
-							<li><button type="button" class="btn btn-secondary btn-lg"
-									type="submit">
+							<li><button type="button" onclick="goBuy()" class="btn btn-secondary btn-lg">
 									<span class="fs-6">BUY IT NOW</span>
 								</button></li>
-							<li><button type="button"
-									class="btn btn-outline-secondary btn-lg" type="submit">
+							<li><button type="button" onclick="goCart()" class="btn btn-outline-secondary btn-lg">
 									<span class="fs-6">CART</span>
 								</button></li>
 						</ul>
 					</div>
+					</form>
 				</div>
 			</div>
 		</div>
@@ -344,7 +352,7 @@ for (ProductItem productItem : productItems) {
 											</div>
 											<p align="right"><%=formatter.format(styleProduct.getPrice()) %>원</p>
 										</div>
-										<select class="form-select mb-1" aria-label="Default select example">
+										<select id="amount" class="form-select mb-1" aria-label="Default select example">
 										    <option selected disabled="disabled">수량을 선택해주세요</option>
 										    <option value="1">1</option>
 										    <option value="1">2</option>
@@ -538,13 +546,57 @@ for (ProductItem productItem : productItems) {
 	</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script type="text/javascript">
-	function changeColorText() {
-		var colorRadio = ('input[name="color"]:checked').val();
-		console.log(colorLabel);
+	function checkForm() {
+	
+		var colorElements = document.querySelectorAll("#color-check input");
+		var sizeElements = document.querySelectorAll("#size-check input");
 		
-		var el1 = document.querySelector("#color-text");
-		el.textContent = "[필수] ";
+		var colorErrorMessageElement = document.getElementById(id="error-message-color");
+		var sizeErrorMessageElement = document.getElementById(id="error-message-size");
+		
+		colorErrorMessageElement.style.display = "";
+		sizeErrorMessageElement.style.display = "";
+		
+		var isColor = false;
+		var isSize = false;
+		for (var i=0; i<colorElements.length; i++) {
+			if (colorElements[i].checked == true) {
+				isColor = true;
+			}
+		}
+		if (isColor) {
+			colorErrorMessageElement.style.display = "none";
+		} 
+		
+		for (var i=0; i<sizeElements.length; i++) {
+			if (sizeElements[i].checked == true) {
+				isSize = true;
+			}
+		}
+		if (isSize) {
+			sizeErrorMessageElement.style.display = "none";
+		}
+		
+		return isColor && isSize;
 	}
+	function goBuy() {
+		if (checkForm()) {
+			var orderForm = document.getElementById("form-order");
+			orderForm.setAttribute("action", "");
+			orderForm.submit();
+		}
+		
+		
+	}
+	function goCart() {
+		var orderForm = document.getElementById("form-order");
+		orderForm.setAttribute("action", "");
+		var isValid = checkForm();
+	}
+	
+	function changeOrderPrice() {
+		
+	}
+
 </script>
 </body>
-</html>
