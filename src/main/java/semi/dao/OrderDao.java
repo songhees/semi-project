@@ -96,7 +96,6 @@ public class OrderDao {
 		return orderItemList;
 	}
 	
-	
 	/**
 	 * 주문상태 날짜 유저아이디에 대한 주문 검색건수 조회
 	 * @param criteria 주문상태 날짜 유저아이디
@@ -146,12 +145,12 @@ public class OrderDao {
 				+ "		p.product_no, p.product_name, "
 				+ "		s.thumbnail_image_url "
 				+ "from semi_order o, semi_order_item i, semi_product_item t, semi_product p, semi_product_thumbnail_image s "
-				+ "and o.order_no = ? "
-				+ "and s.thumbnail_image_url=p.product_no || '_1.jpg' "
-				+ "and o.order_no=i.order_no "
-				+ "and i.product_item_no=t.product_item_no "
-				+ "and p.product_no=t.product_no "
-				+ "and s.product_no=p.product_no ; ";
+				+ "where o.order_no = ? "
+				+ "and s.thumbnail_image_url = p.product_no || '_1.jpg' "
+				+ "and o.order_no = i.order_no "
+				+ "and i.product_item_no = t.product_item_no "
+				+ "and p.product_no = t.product_no "
+				+ "and s.product_no = p.product_no ";
 		Connection connection = getConnection();
 		PreparedStatement pstmt = connection.prepareStatement(sql);
 		pstmt.setInt(1, orderNo);
@@ -160,7 +159,7 @@ public class OrderDao {
 		
 		while (rs.next()) {
 			OrderItemDto item = new OrderItemDto();
-			item.setOrderNo(rs.getInt("o.order_no"));
+			item.setOrderNo(rs.getInt("order_no"));
 			item.setOrderProductPrice(rs.getLong("order_product_price"));
 			item.setOrderProductQuantity(rs.getInt("order_product_quantity"));
 			item.setProductItemNo(rs.getInt("product_item_no"));

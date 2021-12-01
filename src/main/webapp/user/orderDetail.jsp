@@ -1,3 +1,4 @@
+<%@page import="java.text.DecimalFormat"%>
 <%@page import="semi.dto.OrderItemDto"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.Map"%>
@@ -18,61 +19,71 @@
 		font-size: 14px;
 	}
 	
-	.vintable tbody th, td {
-		font-size: 12px;
-	}
-	
-	.vintable tbody th {
- 		border: 1px solid #ebebeb;
-    	padding: 11px 0 10px 18px;
-   		color: #757575;
+	.vintable tbody th, #priceTable, table#vintable thead, tfoot {
     	font-weight: normal;
     	background-color: #fbfafa;
 	}
-	.vintable tbody td {
-		padding: 11px 10px 10px;
-	    border-top: 1px solid #ebebeb;
-	    color: #757575;
+	.vintable td {
+ 		border: 1px solid #ebebeb;
+	    border-right: none;
 	}	
-	.vintable th:first-child{
+	.vintable th{
+ 		border: 1px solid #ebebeb;
 	    border-left: none;
 	}
- 	
-	.vintable, #vintable{
-		border-bottom: 1px solid #ebebeb;
+	.vintable, #priceTable {
 		line-height: 180%;
   		width: 100%;
   		margin: auto;
+	} 
+	
+	table#vintable tr {
+		border-top: 1px solid #e3e3e3;
+		border-bottom: 1px solid #e3e3e3;
+	}
+	table#vintable {
+	    text-align: center;
+		width: 100%;
+		margin: auto;
+	}
+	td img {
+		width: 80px;
+		height: 100px;
 	}
 	
+	th, td {
+		padding: 11px 0 10px 18px;
+		color: #757575;
+		font-size: 13px;
+	}
+
 	div h3 {
 		font-weight: bold;
 		font-size: 13px;
 	}
-	
-	#vintable th, #vintable td {
-    	padding: 11px;
-	    color: #757575;
-    	text-align: center;
-	    font-size: 12px;
+	#priceTable {
+		border: 1px solid black;
 	}
-	#vintable tbody td, #vintable > tfoot strong {
+	#priceTable th {
+		border-right: 1px solid #e3e3e3;
+	}
+	td.price {
 		color: black;
+		font-size: 18px;
+		font-weight: bold;
 	}
-	#vintable tr {
-		border-top: 1px solid #e3e3e3;
-	}
-	#vintable thead, #vintable tfoot {
-		border-top: 1px solid #e3e3e3;
-		background-color: #fbfafa;
-	}
-	td img {
-		width: 80px;
-	}
-	#guidance h4, li, p {
+	
+	#guidance h4, #guidance li, #guidance p {
 		color: #707070;
 		font-size: 12px;
 	}
+	a.hover:hover {
+		color: #d9d7d7;
+	}
+	a.hover {
+		color: #363636;
+	}
+	
 </style>
 </head>
 <body>
@@ -85,12 +96,22 @@
 		response.sendRedirect("loginform.jsp");		
 		return;
 	} */
-
 	OrderDao orderDao = OrderDao.getinstance();
 
 	/* login.jsp 완성시  loginUserInfo.getId() 넣기*/
 	Map<String, Object> orderInfo = orderDao.getOrderInfo("osh", orderNo);
-	List<OrderItemDto> orderItemDetail = orderDao.getOrderItemDetail(orderNo);
+	List<OrderItemDto> orderItems = orderDao.getOrderItemDetail(orderNo);
+	
+	/* 상품가격으로 배송비여부 판단하기 */
+	DecimalFormat df = new DecimalFormat("##,###");
+	
+	long totalPrice = (Long)orderInfo.get("totalPrice");
+	int shippingFee = 0;
+	
+	if (totalPrice < 50000) {
+		totalPrice += 3000;
+		shippingFee = 3000;
+	}
 %>
 <div class="container">    
 	<!-- 브레드크럼 breadcrumb -->
@@ -117,7 +138,7 @@
 			<table class="vintable">
 				<tbody>
 					<colgroup>
-						<col width="20%">
+						<col width="13%">
 						<col width="*">
 					</colgroup>
 					<tr>
@@ -126,15 +147,15 @@
 					</tr>
 					<tr>
 						<th>주문일자</th>
-						<td></td>
+						<td><%=orderInfo.get("createdDate") %></td>
 					</tr>
 					<tr>
 						<th>주문자</th>
-						<td>asdasd</td>
+						<td><%=orderInfo.get("userName") %></td>
 					</tr>
 					<tr>
 						<th>주문처리상태</th>
-						<td></td>
+						<td><%=orderInfo.get("status") %></td>
 					</tr>
 				</tbody>
 			</table>
@@ -149,32 +170,28 @@
 			<table class="vintable">
 				<tbody>
 					<colgroup>
-						<col width="20%">
+						<col width="13%">
 						<col width="*">
 					</colgroup>
 					<tr>
 						<th>총 주문금액</th>
-						<td></td>
+						<td><%=df.format(orderInfo.get("totalPrice")) %>원</td>
 					</tr>
+				</tbody>
+			</table>
+			<table id="priceTable">
+				<tbody>
+					<colgroup>
+						<col width="13%">
+						<col width="*">
+					</colgroup>
 					<tr>
 						<th>총 결재금액</th>
-<%
-	int finalPrice = 0;
-	if (400 < 50000) {
-		finalPrice = 3000 + 400;
-%>
-						<td><%=finalPrice %></td>
-<%
-	} else {
-%>
-						<td></td>
-<%		
-	}
-%>
+						<td class="price"><%=df.format(totalPrice) %><small>원</small></td>
 					</tr>
-					<tr>
+					<tr style="border-top: 1px solid #e3e3e3;">
 						<th>결제수단</th>
-						<td>asdasd</td>
+						<td class="bg-white"><%=orderInfo.get("paymentMethod") %></td>
 					</tr>
 				</tbody>
 			</table>
@@ -206,25 +223,41 @@
 					</tr>
 				</thead>
 				<tbody>
+<%
+	for (OrderItemDto item : orderItems) {
+		String itemPrice = df.format(item.getOrderProductPrice());
+%>
 					<tr>
-						<td><a href="../product/detail.jsp?no=?">img</a></td>
-						<td>(빈스MADE) 에브리데이 양기모 후드집업 7color</td>
-						<td>1</td>
-						<td>48,500원</td>
+						<td>
+							<a href="../product/detail.jsp?no=<%=item.getProductNo() %>">
+								<img src="../resources/images/product/<%=item.getProductNo() %>/thumbnail/<%=item.getThumbnailUrl() %>">
+							</a>
+						</td>
+						<td style="text-align: left;">
+							<strong>
+								<a class="hover" href="../product/detail.jsp?no=<%=item.getProductNo() %>"><%=item.getProductName() %></a>
+							</strong>
+							<pre>[옵션: <%=item.getColor() %>/<%=item.getSize() %>]</pre>
+						</td>
+						<td><%=item.getOrderProductQuantity() %></td>
+						<td><strong><%=itemPrice %>원</strong></td>
 						<td>기본배송</td>
-						<td>주문완료</td>
+						<td><%=orderInfo.get("status") %></td>
 					</tr>
+<%
+	}
+%>
 				</tbody>
 				<tfoot>
 					<tr>
 						<td colspan="6">
-							<div class="d-flex justify-content-between">
+							<div class="d-flex justify-content-between p-2">
 								<div>
 									[기본배송]
 								</div>
 								<div>
-									상품구매금액 <strong>50,900</strong> + 배송비 0 = 합계 : 
-									<strong class="px-3" style="font-size: 18px;">50,900원</strong>
+									상품구매금액 <strong><%=df.format(orderInfo.get("totalPrice")) %></strong> + 배송비 <%=shippingFee %> = 합계 : 
+									<strong class="px-3" style="font-size: 18px;"><%=df.format(totalPrice) %>원</strong>
 								</div>
 							</div>
 						</td>
@@ -234,7 +267,7 @@
 		</div>
 	</div>
 	<!-- 배송지 정보 table -->
-	<div class="my-5">
+	<div class="mt-5">
 		<div>
 			<h3>배송지정보</h3>
 		</div>
@@ -242,38 +275,36 @@
 			<table class="vintable">
 				<tbody>
 					<colgroup>
-						<col width="20%">
+						<col width="13%">
 						<col width="*">
 					</colgroup>
 					<tr>
 						<th>받으시는분</th>
-						<td></td>
+						<td><%=orderInfo.get("userName") %></td>
 					</tr>
 					<tr>
 						<th>우편번호</th>
-						<td></td>
+						<td><%=orderInfo.get("postalCode") %></td>
 					</tr>
 					<tr>
 						<th>주소</th>
-						<td>asdasd</td>
+						<td><%=orderInfo.get("addressDetail") %></td>
 					</tr>
 					<tr>
 						<th>휴대전화</th>
-						<td></td>
+						<td><%=orderInfo.get("userTel") %></td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
 	</div>
-	<div>
-		<a class="btn btn-dark opacity-75 m-1"></a>
+	<div class="text-end mt-1">
+		<a class="btn btn-dark btn-sm opacity-75 m-1" href="orderList.jsp">주문목록</a>
 	</div>
 	<!-- 이용안내 메세지 -->
 	<div id="guidance" class="my-5 border">
-		<div class="m-3" style="background-color: #fbfafa;">
-			<h3>이용안내</h3>
-		</div>
-		<div class="p-3 border-top">
+		<h3 class="border-bottom p-3" style="background-color: #fbfafa;">이용안내</h3>
+		<div class="p-3">
 			<h4>신용카드매출전표 발행 안내</h4>
 			<ul style="list-style:none;">
 				<li>신용카드 결제는 사용하는 PG사 명의로 발행됩니다.</li>

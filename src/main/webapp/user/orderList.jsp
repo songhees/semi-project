@@ -24,9 +24,9 @@
 <style type="text/css">
 
 	li.breadcrumb-item, .breadcrumb-item a, a.nav-link, a.hover {
-	text-decoration: none;
-	color: #757575;
-	font-size: 14px;
+		text-decoration: none;
+		color: #757575;
+		font-size: 14px;
 	}
 	a.hover:hover {
 		color: #d9d7d7;
@@ -107,7 +107,6 @@
 	System.out.println("[startDate]" + startDate);
 	System.out.println("[endDate]" + endDate);
 	
-	
 	/* 로그인 없이 이 페이지에 접근하는 경우 */
 /* 	if (loginUserInfo == null) {
 		response.sendRedirect("loginform.jsp");		
@@ -138,7 +137,7 @@
 	}
 	
 	int totalRecords = orderDao.getTotalRecords(criteria);
-	Pagination pagination = new Pagination(pageNo, totalRecords);
+	Pagination pagination = new Pagination(pageNo, totalRecords, 5, 5);
 	
 	/* login.jsp 완성시  loginUserInfo.getId() 넣기*/
 	criteria.setBegin(pagination.getBegin());
