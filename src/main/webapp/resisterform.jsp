@@ -1,11 +1,12 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <!doctype html>
 <html lang="ko">
 <head>
    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" >
-    <title>로그인</title>
+    <title>회원가입</title>
     <style>
 		.container {
 			min-width: 992px;
@@ -41,6 +42,9 @@
 	</style>
 </head>
 <body>
+<%
+	pageContext.setAttribute("menu", "resister");
+%>
 <%@ include file="common/navbar.jsp" %>
 <div class="container-fluid">
 	<div id="homeBannerCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -52,30 +56,35 @@
   	</div>
 </div>
 <div class="container">    
-	<div id="contents">
-		<div id="loginbox">
-			<form class="border p-3 bg-white" method="post" action="login.jsp">
-				<div class="mb-3">
-					<h3>LOGIN</h3>
-					<p>가입하신 아이디와 비밀번호를 입력해주세요.</p>
-					<input id="user_id" name="id" class="inputTypeText" placeholder="아이디" type="text">
-				</div>
-				<div >
-					<input id="user_password" name="password" class="inputTypeText" placeholder="비밀번호" type="text">
-				</div>
-				<p class="security">
-					<img src="resources/images/home/security_icon.jpeg" alt="보안접속">보안접속
-					<input id="save_id" name="save_id" value="T" type="checkbox">
-					<label for="save_id">아이디 저장</label>
-				</p>
-				<button type="submit" class="btn btn-dark">로그인</button>
-			</form>
-			<form  action="resisterform.jsp">
-				<button type="submit" class="btn btn-dark">회원가입</button>
-			</form>
-		</div>
+	<div class="titleArea">
+		<h2>JOIN</h2>
 	</div>
-
+	<table border="1">
+		<colgroup>
+			<col style="width:150px;">
+			<col style="width:auto;">
+		</colgroup>
+		<tbody>
+			<tr>
+				<th scope="row">
+					아이디<img src="resources/images/home/blue_star.jpg" alt="필수">
+				</th>
+				<td>
+					<input id="user_id" name="id" class="inputTypeText" type="text">
+					(영문소문자/숫자, 4~16자)
+				</td>
+			</tr>
+			<tr>
+				<th scope="row">
+					비밀번호<img src="resources/images/home/blue_star.jpg" alt="필수">
+				</th>
+				<td>
+					<input id="user_password" name="paaword" class="inputTypeText" type="text">
+					(영문 대소문자/숫자/특수문자 중 3가지 이상 조합, 8자~16자)
+				</td>
+			</tr>
+		</tbody>
+	</table>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
