@@ -138,9 +138,18 @@
 				<!-- 이미지 미구현 -->
 				<img src="http://localhost/semi-project/resources/images/product/1000/thumbnail/1000_1.jpg" class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
 				<div class="card-body">
-					<p class="card-text"><%=product.getName() %></p>
+					<p class="card-text my-1">
+						<%
+							for (String color : product.getColors()) {
+						%>
+						<%=color %>
+						<%
+							}
+						%>
+					</p>
+					<p class="card-text">제품명: <%=product.getName() %></p>
 					<hr>
-					<p class="card-text"><%=product.getPrice() %>원, 생성일: <%=product.getCreatedDate() %>, 판매량: <%=product.getTotalSaleCount() %>, 리뷰평점: <%=product.getAverageReviewRate() %></p>
+					<p class="card-text">가격: <%=product.getPrice() %>원, 생성일: <%=product.getCreatedDate() %>, 판매량: <%=product.getTotalSaleCount() %>, 리뷰평점: <%=product.getAverageReviewRate() %></p>
 				</div>
 			</div>
 		</div>

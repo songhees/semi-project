@@ -1,6 +1,7 @@
 package semi.vo;
 
 import java.util.Date;
+import java.util.List;
 
 public class Product {
 
@@ -18,6 +19,8 @@ public class Product {
 	private int totalSaleCount;
 	private int totalStock;
 	private double averageReviewRate;
+	// 제품의 색을 담는 리스트
+	private List<String> colors;
 	
 	public Product() {}
 
@@ -133,13 +136,21 @@ public class Product {
 		this.averageReviewRate = averageReviewRate;
 	}
 
+	public List<String> getColors() {
+		return colors;
+	}
+	
+	public void setColors(List<String> colors) {
+		this.colors = colors;
+	}
+
 	@Override
 	public String toString() {
 		return "Product [no=" + no + ", productCategory=" + productCategory + ", name=" + name + ", price=" + price
 				+ ", discountPrice=" + discountPrice + ", discountFrom=" + discountFrom + ", discountTo=" + discountTo
 				+ ", createdDate=" + createdDate + ", updatedDate=" + updatedDate + ", onSale=" + onSale + ", detail="
 				+ detail + ", totalSaleCount=" + totalSaleCount + ", totalStock=" + totalStock + ", averageReviewRate="
-				+ averageReviewRate + "]";
+				+ averageReviewRate + ", colors=" + colors + "]";
 	}
 
 	
