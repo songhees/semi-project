@@ -20,7 +20,6 @@ import semi.dto.OrderItemDto;
  *
  */
 public class OrderDao {
-	
 	private static OrderDao self = new OrderDao();
 	private OrderDao() {}
 	public static OrderDao getinstance() {
@@ -95,6 +94,7 @@ public class OrderDao {
 		connection.close();
 		return orderItemList;
 	}
+	
 	
 	/**
 	 * 주문상태 날짜 유저아이디에 대한 주문 검색건수 조회
@@ -185,7 +185,7 @@ public class OrderDao {
 	 * @throws SQLException
 	 */
 	public Map<String, Object> getOrderInfo(String userId, int orderNo) throws SQLException {
-		Map<String, Object> orderDetail = new HashMap<>();
+		Map<String, Object> orderDetail = null;
 		String sql = "select u.user_id, u.user_name, u.user_tel, "
 				+ "o.order_no, o.total_price, o.order_status, o.order_created, o.payment_method, "
 				+ "o.order_postal_code, o.address_detail "
@@ -200,6 +200,7 @@ public class OrderDao {
 		
 		ResultSet rs = pstmt.executeQuery();
 		if (rs.next()) {
+			orderDetail = new HashMap<>();
 			orderDetail.put("userid", rs.getString("user_id"));
 			orderDetail.put("userName", rs.getString("user_name"));
 			orderDetail.put("userTel", rs.getString("user_tel"));

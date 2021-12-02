@@ -398,3 +398,50 @@ public class ProductDao {
 		return result;
 	}
 }
+	
+	public Map<String, Integer> getProductStock(int no, String color) throws SQLException {
+		String sql = "select product_size, product_stock "
+				   + "from semi_product_item "
+				   + "where product_no = ? "
+				   + "		and product_color = ? ";
+		
+		Map<String, Integer> productStock = new HashMap<>();
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, no);
+		pstmt.setString(2, color);
+		ResultSet rs = pstmt.executeQuery();
+		while (rs.next()) {
+			productStock.put(rs.getString("product_size"), rs.getInt("product_stock"));
+		}
+		
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return productStock;
+	}
+	
+	
+	public List<String> getProductSizeList(int no) throws SQLException {
+		String sql = "select distinct product_size "
+				   + "from semi_product_item "
+				   + "where product_no = ? ";
+		
+		List<String> productSize = new ArrayList<>();
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, no);
+		ResultSet rs = pstmt.executeQuery();
+		while (rs.next()) {
+			productSize.add(rs.getString("product_size"));
+		}
+		
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return productSize;
+	}

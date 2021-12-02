@@ -7,6 +7,7 @@ public class Address {
 	private String postalCode;
 	private String addressDefault;
 	private String detail;
+	private String baseAddress;
 	
 	public Address() {}
 
@@ -56,6 +57,14 @@ public class Address {
 
 	public void setDetail(String detail) {
 		this.detail = detail;
+	}
+
+	public String getBaseAddress() {
+		return baseAddress;
+	}
+
+	public void setBaseAddress(String baseAddress) {
+		this.baseAddress = baseAddress;
 	}
 
 }
