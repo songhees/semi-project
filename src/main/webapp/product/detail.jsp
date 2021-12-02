@@ -17,7 +17,7 @@ ProductDao productDao = ProductDao.getInstance();
 Product product = productDao.getProductDetail(no);
 List<ProductItem> productItems = productDao.getProductItemList(no);
 
-List<String> thumbnails = productDao.getProductThumbnailImage(no);
+List<String> thumbnails = productDao.getProductThumbnailImageList(no);
 %>
 <head>
 <meta charset="UTF-8">
@@ -65,16 +65,15 @@ List<String> thumbnails = productDao.getProductThumbnailImage(no);
 			<div class="row">
 				<div class="col-md-6">
 					<div class="detail_big_img">
-						<img
-							src="../resources/images/product/<%=product.getNo()%>/thumbnail/<%=thumbnails.get(0)%>"
-							alt="productImg" class="big_img img-fluid">
+						<img src="../resources/images/product/<%=product.getNo()%>/thumbnail/<%=thumbnails.get(0)%>"
+							id="big-pic" alt="productImg" class="big_img img-fluid">
 					</div>
 					<div class="thumbnail_list_img">
 						<ul class="thumb_img p-0 mt-3" style="list-style: none">
 <%
 	for (String thumbnail : thumbnails) {
 %>
-							<li><img src="../resources/images/product/<%=product.getNo()%>/thumbnail/<%=thumbnail%>" style="width: 75px" class="img-fluid" alt="productImg"></li>
+							<li><img class="small-pic" src="../resources/images/product/<%=product.getNo()%>/thumbnail/<%=thumbnail%>" style="width: 75px" alt="productImg"></li>
 <%
 	}
 %>
@@ -85,6 +84,7 @@ List<String> thumbnails = productDao.getProductThumbnailImage(no);
 					<h5><%=product.getName()%></h5>
 					<hr class="mt-4 mb-3">
 					<form method="post" id="form-order" action="order.jsp">
+						<input type="hidden"name="no" value="<%=product.getNo()%>">
 						<table class="table table-borderless">
 							<tr>
 <%
@@ -128,40 +128,48 @@ Date todate = format.parse(today);
 %>
 							</tr>
 							<tr>
+<%
+List<String> colorList = productDao.getProductColorList(no);
+if (colorList.get(0) != null) {
+%>
 								<td>색상</td>
 								<td>
 <%
-List<String> colorList = productDao.getProductColor(no);
-for (String color : colorList) {
+	for (String color : colorList) {
 %>
 									<div id="color-check" class="form-check form-check-inline p-0 m-0">
 										<input type="radio" class="btn-check" id="color btn-check-outlined<%=color%>" name="color" 
-										value="<%=color%>">
+										value="<%=color%>" onclick="sizeStockCheck()">
 										<label class="btn btn-outline-secondary" for="color btn-check-outlined<%=color%>"><%=color %></label>
+									</div>
+
+<%
+	} 
+} else {
+%>
+									<div id="color-check">
+										<input type="hidden" name="color" value="<%=colorList.get(0) %>">
 									</div>
 <%
 }
+
 %>
 									<P style="display: none" id="error-message-color">[필수] 색상을 선택해 주세요</P>
 								</td>
 							<tr>
 								<td>사이즈</td>
-								<td>
+								<td id="size-list">
 <%
-String size = null;
-for (ProductItem productItem : productItems) {
-	if (productItem.getSize().equals(size)) {
-		break;
-	}
+List<String> sizeList = productDao.getProductSizeList(no);
+for (String size : sizeList) {
 %>
 									<div id="size-check" class="form-check form-check-inline p-0 m-0">
-										<input type="radio" class="btn-check" id="size btn-check-outlined<%=productItem.getNo()%>" name="size" 
-										value="<%=productItem.getSize()%>"> 
-										<label class="btn btn-outline-secondary" for="size btn-check-outlined<%=productItem.getNo()%>"><%=productItem.getSize()%></label>
+										<input type="radio" class="btn-check" id="size btn-check-outlined<%=size%>" name="size" 
+										value="<%=size%>"> 
+										<label class="btn btn-outline-secondary" for="size btn-check-outlined<%=size%>"><%=size%></label>
 									</div>
 <%
-	size = productItem.getSize();
- }
+}
 %>
 									<P style="display: none" id="error-message-size">[필수] 옵션을 선택해 주세요</P>
 								</td>
@@ -169,12 +177,12 @@ for (ProductItem productItem : productItems) {
 							<tr>
 								<td>수량</td>
 								<td>
-									<select name="amount" onchange="changeOrderPrice()" id="product-count" class="form-select" aria-label="Default select example">
+									<select name="amount" onchange="changeOrderPrice()" id="product-amount" class="form-select" aria-label="Default select example">
 										<option value="1" selected>1</option>
 									    <option value="2">2</option>
 									    <option value="3">3</option>
-									    <option value="3">4</option>
-									    <option value="3">5</option>
+									    <option value="4">4</option>
+									    <option value="5">5</option>
 									</select>
 								</td>
 							</tr>
@@ -185,7 +193,7 @@ for (ProductItem productItem : productItems) {
 							<strong>총 상품금액</strong> :
 						</div>
 						<div>
-							<strong><%=formatter.format(currentPrice) %>원</strong>
+							<p id="total-price"><strong><%=formatter.format(currentPrice) %></strong>원</p>
 						</div>
 					</div>
 					<div class="d-flex justify-content-end">
@@ -332,7 +340,7 @@ for (ProductItem productItem : productItems) {
 						<form>
 							<ul class="p-0 d-flex justify-content-center" style="list-style: none">
 <%
-	List<Integer> styleProductNoList = productDao.getProductStyleNo(no);
+	List<Integer> styleProductNoList = productDao.getProductStyleNoList(no);
 	String styleColor = null;
 	String styleSize = null;
 	for (Integer styleProductNo : styleProductNoList) {
@@ -340,7 +348,7 @@ for (ProductItem productItem : productItems) {
 		styleSize = null;
 		Product styleProduct = productDao.getProductDetail(styleProductNo);
 		List<ProductItem> styleProductItems = productDao.getProductItemList(styleProductNo);
-		List<String> styleThumbnails = productDao.getProductThumbnailImage(styleProductNo);
+		List<String> styleThumbnails = productDao.getProductThumbnailImageList(styleProductNo);
 %>
 								<li>
 									<div class="style_list_div m-1" style="width: 186px;">
@@ -546,24 +554,42 @@ for (ProductItem productItem : productItems) {
 	</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script type="text/javascript">
-	function checkForm() {
+	var bigPic = document.querySelector("#big-pic");            
+	var smallPics = document.querySelectorAll(".small-pic");    //작은 사진(여러개)
 	
+	for(var i = 0; i < smallPics.length; i++){
+	    smallPics[i].addEventListener("click", changePic);  
+	}
+	function changePic(){   //사진 바꾸는 함수
+		var smallPicAttribute = this.getAttribute("src");
+	    bigPic.setAttribute("src", smallPicAttribute);
+	}
+
+
+	function checkForm() {
 		var colorElements = document.querySelectorAll("#color-check input");
 		var sizeElements = document.querySelectorAll("#size-check input");
 		
-		var colorErrorMessageElement = document.getElementById(id="error-message-color");
-		var sizeErrorMessageElement = document.getElementById(id="error-message-size");
+		var colorErrorMessageElement = document.getElementById("error-message-color");
+		var sizeErrorMessageElement = document.getElementById("error-message-size");
 		
 		colorErrorMessageElement.style.display = "";
 		sizeErrorMessageElement.style.display = "";
 		
 		var isColor = false;
 		var isSize = false;
-		for (var i=0; i<colorElements.length; i++) {
-			if (colorElements[i].checked == true) {
-				isColor = true;
+		
+		if (colorElements[0].value !== "null") {
+			for (var i=0; i<colorElements.length; i++) {
+				if (colorElements[i].checked == true) {
+					isColor = true;
+					break;
+				}
 			}
+		} else {
+			isColor = true;
 		}
+			
 		if (isColor) {
 			colorErrorMessageElement.style.display = "none";
 		} 
@@ -582,21 +608,29 @@ for (ProductItem productItem : productItems) {
 	function goBuy() {
 		if (checkForm()) {
 			var orderForm = document.getElementById("form-order");
-			orderForm.setAttribute("action", "");
+			orderForm.setAttribute("action", "order.jsp");
 			orderForm.submit();
 		}
-		
-		
 	}
 	function goCart() {
-		var orderForm = document.getElementById("form-order");
-		orderForm.setAttribute("action", "");
-		var isValid = checkForm();
+		if (checkForm()) {
+			var orderForm = document.getElementById("form-order");
+			orderForm.setAttribute("action", "cart.jsp");
+			orderForm.submit();
+		}
 	}
 	
 	function changeOrderPrice() {
+		var productAmount = document.getElementById("product-amount");
+		var totalPrice = document.querySelector("#total-price");
 		
+		var productAmountText = productAmount.value;
+		
+		totalPrice.textContent = productAmountText * <%=currentPrice %>;
 	}
-
+	
+	function sizeStockCheck() {
+		var selectedColor = document.querySelector('input[name="color"]:checked').value;
+	}
 </script>
 </body>
