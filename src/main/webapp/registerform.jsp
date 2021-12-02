@@ -79,8 +79,40 @@
 					비밀번호<img src="resources/images/home/blue_star.jpg" alt="필수">
 				</th>
 				<td>
-					<input id="user_password" name="paaword" class="inputTypeText" type="text">
+					<input id="user_password" name="password" class="inputTypeText" type="text">
 					(영문 대소문자/숫자/특수문자 중 3가지 이상 조합, 8자~16자)
+				</td>
+			</tr>
+			<tr>
+				<th scope="row">
+					비밀번호 확인<img src="resources/images/home/blue_star.jpg" alt="필수">
+				</th>
+				<td>
+					<input id="user_check_password" name="check_password" class="inputTypeText" type="text">
+				</td>
+			</tr>
+			<tr>
+				<th scope="row">
+					이름<img src="resources/images/home/blue_star.jpg" alt="필수">
+				</th>
+				<td>
+					<input id="user_name" name="name" class="inputTypeText" type="text">
+				</td>
+			</tr>
+			<tr>
+				<th scope="row">
+					휴대전화<img src="resources/images/home/blue_star.jpg" alt="필수">
+				</th>
+				<td>
+					<input id="user_tel" name="tel" class="inputTypeText" type="text">
+				</td>
+			</tr>
+			<tr>
+				<th scope="row">
+					이메일<img src="resources/images/home/blue_star.jpg" alt="필수">
+				</th>
+				<td>
+					<input id="user_email" name="email" class="inputTypeText" type="text">
 				</td>
 			</tr>
 		</tbody>
