@@ -9,7 +9,10 @@
     <title></title>
 </head>
 <body>
-<%@ include file="common/navbar.jsp" %>
+<%
+	pageContext.setAttribute("menu", "home");
+%>
+<%@ include file="/admin/common/navbar.jsp" %>
 	<div class="container">    
 		<h1>관리자 홈</h1>
 	</div>
