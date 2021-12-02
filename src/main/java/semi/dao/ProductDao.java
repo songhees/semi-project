@@ -29,7 +29,7 @@ public class ProductDao {
 	}
 	
 	
-	public List<String> getProductColor(int no) throws SQLException {
+	public List<String> getProductColorList(int no) throws SQLException {
 		String sql = "select distinct product_color "
 				   + "from semi_product_item "
 				   + "where product_no = ? ";
@@ -52,7 +52,7 @@ public class ProductDao {
 		
 	}
 	
-	public List<Integer> getProductStyleNo(int no) throws SQLException {
+	public List<Integer> getProductStyleNoList(int no) throws SQLException {
 		String sql = "select product_no "
 				   + "from semi_product_style "
 				   + "where product_style_no = ? ";
@@ -74,7 +74,7 @@ public class ProductDao {
 		return productNo;
 	}
 	
-	public List<String> getProductThumbnailImage(int no) throws SQLException {
+	public List<String> getProductThumbnailImageList(int no) throws SQLException {
 		String sql = "select thumbnail_image_url "
 				   + "from semi_product_thumbnail_image "
 				   + "where product_no = ? ";
@@ -397,7 +397,6 @@ public class ProductDao {
 		
 		return result;
 	}
-}
 	
 	public Map<String, Integer> getProductStock(int no, String color) throws SQLException {
 		String sql = "select product_size, product_stock "
@@ -445,3 +444,4 @@ public class ProductDao {
 		
 		return productSize;
 	}
+}
