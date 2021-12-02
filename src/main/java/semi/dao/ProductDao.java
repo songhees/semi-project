@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
 
@@ -27,55 +28,8 @@ public class ProductDao {
 		return self;
 	}
 	
-	public Map<String, Integer> getProductStock(int no, String color) throws SQLException {
-		String sql = "select product_size, product_stock "
-				   + "from semi_product_item "
-				   + "where product_no = ? "
-				   + "		and product_color = ? ";
-		
-		Map<String, Integer> productStock = new HashMap<>();
-		
-		Connection connection = getConnection();
-		PreparedStatement pstmt = connection.prepareStatement(sql);
-		pstmt.setInt(1, no);
-		pstmt.setString(2, color);
-		ResultSet rs = pstmt.executeQuery();
-		while (rs.next()) {
-			productStock.put(rs.getString("product_size"), rs.getInt("product_stock"));
-		}
-		
-		rs.close();
-		pstmt.close();
-		connection.close();
-		
-		return productStock;
-	}
 	
-	
-	public List<String> getProductSizeList(int no) throws SQLException {
-		String sql = "select distinct product_size "
-				   + "from semi_product_item "
-				   + "where product_no = ? ";
-		
-		List<String> productSize = new ArrayList<>();
-		
-		Connection connection = getConnection();
-		PreparedStatement pstmt = connection.prepareStatement(sql);
-		pstmt.setInt(1, no);
-		ResultSet rs = pstmt.executeQuery();
-		while (rs.next()) {
-			productSize.add(rs.getString("product_size"));
-		}
-		
-		rs.close();
-		pstmt.close();
-		connection.close();
-		
-		return productSize;
-	}
-	
-	
-	public List<String> getProductColorList(int no) throws SQLException {
+	public List<String> getProductColor(int no) throws SQLException {
 		String sql = "select distinct product_color "
 				   + "from semi_product_item "
 				   + "where product_no = ? ";
@@ -95,9 +49,10 @@ public class ProductDao {
 		connection.close();
 		
 		return productColor;
+		
 	}
 	
-	public List<Integer> getProductStyleNoList(int no) throws SQLException {
+	public List<Integer> getProductStyleNo(int no) throws SQLException {
 		String sql = "select product_no "
 				   + "from semi_product_style "
 				   + "where product_style_no = ? ";
@@ -119,7 +74,7 @@ public class ProductDao {
 		return productNo;
 	}
 	
-	public List<String> getProductThumbnailImageList(int no) throws SQLException {
+	public List<String> getProductThumbnailImage(int no) throws SQLException {
 		String sql = "select thumbnail_image_url "
 				   + "from semi_product_thumbnail_image "
 				   + "where product_no = ? ";
@@ -443,3 +398,50 @@ public class ProductDao {
 		return result;
 	}
 }
+	
+	public Map<String, Integer> getProductStock(int no, String color) throws SQLException {
+		String sql = "select product_size, product_stock "
+				   + "from semi_product_item "
+				   + "where product_no = ? "
+				   + "		and product_color = ? ";
+		
+		Map<String, Integer> productStock = new HashMap<>();
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, no);
+		pstmt.setString(2, color);
+		ResultSet rs = pstmt.executeQuery();
+		while (rs.next()) {
+			productStock.put(rs.getString("product_size"), rs.getInt("product_stock"));
+		}
+		
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return productStock;
+	}
+	
+	
+	public List<String> getProductSizeList(int no) throws SQLException {
+		String sql = "select distinct product_size "
+				   + "from semi_product_item "
+				   + "where product_no = ? ";
+		
+		List<String> productSize = new ArrayList<>();
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, no);
+		ResultSet rs = pstmt.executeQuery();
+		while (rs.next()) {
+			productSize.add(rs.getString("product_size"));
+		}
+		
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return productSize;
+	}

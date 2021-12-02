@@ -19,6 +19,11 @@
 		.container {
 			min-width: 992px;
 		}
+		
+		a:link { color: black; text-decoration: none;}
+ 		a:visited { color: black; text-decoration: none;}
+ 		a:hover { color: black; text-decoration: none;}
+ 		a:active { color: black; text-decoration: none;}
     	
     	span {
     		color: #a5a5a5;
@@ -135,8 +140,10 @@
 		%>
 		<div class="col">
 			<div class="card border-light h-100">
-				<!-- 이미지 미구현 -->
-				<img src="http://localhost/semi-project/resources/images/product/1000/thumbnail/1000_1.jpg" class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
+				<a href="/semi-project/product/detail.jsp?no=<%=product.getNo() %>">
+					<img src="/semi-project/resources/images/product/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>/thumbnail/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>_1.jpg" 
+				 	 class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
+				</a>
 				<div class="card-body">
 					<p class="card-text my-1">
 						<%
@@ -149,7 +156,24 @@
 					</p>
 					<p class="card-text">제품명: <%=product.getName() %></p>
 					<hr>
-					<p class="card-text">가격: <%=product.getPrice() %>원, 생성일: <%=product.getCreatedDate() %>, 판매량: <%=product.getTotalSaleCount() %>, 리뷰평점: <%=product.getAverageReviewRate() %></p>
+					<%
+						// 제품의 할인기간이 끝나지 않았으면 할인가격과 남은 할인기간을 표시한다.
+						String remainTime = product.getRemainTimeInOneDay();
+						if (remainTime == null) {
+					%>
+					<p class="card-text mb-1"><%=product.getPrice() %>원</p>
+					<%
+						} else {
+							
+					%>
+					<p class="card-text mb-1">
+						<del><%=product.getPrice() %>원</del>, <%=product.getPrice() - product.getDiscountAmount() %>원<span class="text-danger">(<%=product.getDiscountAmount() %>원 할인)</span>
+					</p>
+					<p class="card-text my-1">할인기간 <%=remainTime %></p>
+					<%
+						}
+					%>
+					<p class="card-text my-1">생성일: <%=product.getCreatedDate() %>, 판매량: <%=product.getTotalSaleCount() %>, 리뷰평점: <%=product.getAverageReviewRate() %></p>
 				</div>
 			</div>
 		</div>

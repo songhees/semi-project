@@ -21,6 +21,12 @@
 			-ms-user-select: none; -moz-user-select: -moz-none; -webkit-user-select: none; -khtml-user-select: none; user-select:none;
 		}
 		
+		a:link {color: black; text-decoration: none;}
+ 		a:visited {color: black; text-decoration: none;}
+ 		a:hover {color: black; text-decoration: none;}
+ 		a:active {color: black; text-decoration: none;}
+ 		a:hover:first-child {color: black; text-decoration: none;}
+		
 		#best-item {
 			background-color: #f6f4f3;
 		}
@@ -78,7 +84,6 @@
 	List<Product> topProducts = productDao.getProductListBycategory(topProductCriteria);
 	List<Product> dressProducts = productDao.getProductListBycategory(dressProductCriteria);
 	List<Product> pantsProducts = productDao.getProductListBycategory(pantsProductCriteria);
-	// TODO 24시간 신상품 미구현
 	List<Product> newProducts = productDao.getAllProductList(newProductCriteria);
 %>
 <div class="container-fluid">
@@ -114,31 +119,45 @@
 		<div class="col">
 			<div class="card-group">
 				<div class="card border-light h-100">
-					<img src="resources/images/home/banner/1.jpg" class="card-img-top">
+					<a href="/semi-project/product/list.jsp?category='전체상품'&orderBy='인기상품'">
+						<img src="resources/images/home/banner/1.jpg" class="card-img-top">
+					</a>
 					<div class="card-body text-center">
-						<h6 class="card-text"><strong>BEST ITEMS</strong></h6>
-						<h6 class="text-muted"><small>사랑받고 있는 인기상품*.*</small></h6>
+						<a href="/semi-project/product/list.jsp?category=전체상품&orderBy=인기상품">
+							<span class="card-text"><strong>BEST ITEMS</strong></span><br>
+							<span class="text-muted"><small>사랑받고 있는 인기상품*.*</small></span>
+						</a>
 					</div>
 				</div>
 				<div class="card border-light h-100">
-					<img src="resources/images/home/banner/2.jpg" class="card-img-top">
+					<a href="/semi-project/product/list.jsp?category=TOP">
+						<img src="resources/images/home/banner/2.jpg" class="card-img-top">
+					</a>
 					<div class="card-body text-center">
-						<h6 class="card-text"><strong>TOP</strong></h6>
-						<h6 class="text-muted"><small>빈스데이만의 특별한 상의</small></h6>
+						<a href="/semi-project/product/list.jsp?category=TOP">
+							<span class="card-text"><strong>TOP</strong></span><br>
+							<span class="text-muted"><small>빈스데이만의 특별한 상의</small></span>
+						</a>
 					</div>
 				</div>
 				<div class="card border-light h-100">
-					<img src="resources/images/home/banner/3.jpg" class="card-img-top">
+					<a href="/semi-project/product/list.jsp?category=DRESS">
+						<img src="resources/images/home/banner/3.jpg" class="card-img-top">
+					</a>
 					<div class="card-body text-center">
-						<h6 class="card-text"><strong>DRESS</strong></h6>
-						<h6 class="text-muted"><small>특별한 날, 더욱 특별하게!</small></h6>
+						<a href="/semi-project/product/list.jsp?category=DRESS">
+							<span class="card-text"><strong>DRESS</strong></span><br>
+							<span class="text-muted"><small>특별한 날, 더욱 특별하게!</small></span>
+						</a>
 					</div>
 				</div>
 				<div class="card border-light h-100">
 					<img src="resources/images/home/banner/4.jpg" class="card-img-top">
 					<div class="card-body text-center">
-						<h6 class="card-text"><strong>REVIEW</strong></h6>
-						<h6 class="text-muted"><small>리뷰 작성하고 쿠폰 받아가자</small></h6>
+						<a href="">
+							<span class="card-text"><strong>REVIEW</strong></span><br>
+							<span class="text-muted"><small>리뷰 작성하고 쿠폰 받아가자</small></span>
+						</a>
 					</div>
 				</div>
 			</div>
@@ -182,9 +201,15 @@
 								%>
 								<div class="col">
 									<div id="best-item-<%=i %>" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<!-- 이미지, 리뷰 수 미구현 -->
-										<img src="http://localhost/semi-project/resources/images/product/1000/thumbnail/1000_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong><%=product.getName() %><br><br>가격: <%=product.getPrice() %>원<br><br>리뷰 수: 4</strong></p>
+										<!-- 리뷰 수 미구현 -->
+										<a href="/semi-project/product/detail.jsp?no=<%=product.getNo() %>">
+											<img src="/semi-project/resources/images/product/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>/thumbnail/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>_1.jpg" class="img-fluid">
+										</a>
+										<p class="text-over-image no-drag">
+											<a href="/semi-project/product/detail.jsp?no=<%=product.getNo() %>">
+												<strong><%=product.getName() %><br><br>가격: <%=product.getPrice() %>원<br><br>리뷰 수: 4</strong>
+											</a>
+										</p>
 									</div>
 								</div>
 								<%
@@ -196,14 +221,19 @@
 			    		<div class="carousel-item">
 			      			<div class="row row-cols-4 g-2 mb-2">
 								<% 
-									i = 1;
 									for (Product product : dressProducts) {
 								%>
 								<div class="col">
 									<div id="best-item-<%=i %>" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<!-- 이미지, 리뷰 수 미구현 -->
-										<img src="http://localhost/semi-project/resources/images/product/1000/thumbnail/1000_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong><%=product.getName() %><br><br>가격: <%=product.getPrice() %>원<br><br>리뷰 수: 4</strong></p>
+										<!-- 리뷰 수 미구현 -->
+										<a href="/semi-project/product/detail.jsp?no=<%=product.getNo() %>">
+											<img src="/semi-project/resources/images/product/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>/thumbnail/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>_1.jpg" class="img-fluid">
+										</a>
+										<p class="text-over-image no-drag">
+											<a href="/semi-project/product/detail.jsp?no=<%=product.getNo() %>">
+												<strong><%=product.getName() %><br><br>가격: <%=product.getPrice() %>원<br><br>리뷰 수: 4</strong>
+											</a>
+										</p>
 									</div>
 								</div>
 								<%
@@ -215,14 +245,19 @@
 			    		<div class="carousel-item">
 			      			<div class="row row-cols-4 g-2 mb-2">
 								<% 
-									i = 1;
 									for (Product product : pantsProducts) {
 								%>
 								<div class="col">
 									<div id="best-item-<%=i %>" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
-										<!-- 이미지, 리뷰 수 미구현 -->
-										<img src="http://localhost/semi-project/resources/images/product/1000/thumbnail/1000_1.jpg" class="img-fluid">
-										<p class="text-over-image no-drag"><strong><%=product.getName() %><br><br>가격: <%=product.getPrice() %>원<br><br>리뷰 수: 4</strong></p>
+										<!-- 리뷰 수 미구현 -->
+										<a href="/semi-project/product/detail.jsp?no=<%=product.getNo() %>">
+											<img src="/semi-project/resources/images/product/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>/thumbnail/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>_1.jpg" class="img-fluid">
+										</a>
+										<p class="text-over-image no-drag">
+											<a href="/semi-project/product/detail.jsp?no=<%=product.getNo() %>">
+												<strong><%=product.getName() %><br><br>가격: <%=product.getPrice() %>원<br><br>리뷰 수: 4</strong>
+											</a>
+										</p>
 									</div>
 								</div>
 								<%
@@ -256,7 +291,10 @@
 		%>
 		<div class="col">
 			<div class="card border-light h-100">
-				<img src="http://localhost/semi-project/resources/images/product/1002/thumbnail/1002_1.jpg" class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
+				<a href="/semi-project/product/detail.jsp?no=<%=product.getNo() %>">
+					<img src="/semi-project/resources/images/product/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>/thumbnail/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>_1.jpg"
+				 	 class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
+				</a>
 				<div class="card-body">
 					<p class="card-text my-1">
 					<%
@@ -270,22 +308,18 @@
 					<p class="card-text"><%=product.getName() %></p>
 					<hr>
 					<%
-						// 할인기간이 남아있으면 남은 할인기간을 표시한다.
-						Date createdDate = product.getCreatedDate();
-						long currentElapsedMillisecond = TimeUtil.getCurrentElapsedMillisecond(createdDate);
-						String remainTime = TimeUtil.getRemainTimeInOneDay(currentElapsedMillisecond);
+						// 제품의 할인기간이 끝나지 않았으면 할인가격과 남은 할인기간을 표시한다.
+						String remainTime = product.getRemainTimeInOneDay();
 						if (remainTime == null) {
 					%>
 					<p class="card-text mb-1"><%=product.getPrice() %>원</p>
 					<%
 						} else {
-							// 할인금액은 5%로 일의 자리에서 올림한다.
-							double discountDouble = product.getPrice()*0.05;
-							discountDouble = Math.ceil(discountDouble/10)*10;
-							long discountLong = (long)discountDouble;
-							long discountedPrice = product.getPrice() - discountLong;
+							
 					%>
-					<p class="card-text mb-1"><del><%=product.getPrice() %>원</del>, <%=discountedPrice %>원<span class="text-danger">(<%=discountLong %>원 할인)</span></p>
+					<p class="card-text mb-1">
+						<del><%=product.getPrice() %>원</del>, <%=product.getPrice() - product.getDiscountAmount() %>원<span class="text-danger">(<%=product.getDiscountAmount() %>원 할인)</span>
+					</p>
 					<p class="card-text my-1">할인기간 <%=remainTime %></p>
 					<%
 						}
