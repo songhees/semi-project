@@ -1,84 +1,42 @@
-<%@page import="semi.dao.ProductItemDao"%>
+<%@page import="org.apache.commons.lang3.StringUtils"%>
+<%@page import="semi.vo.Product"%>
+<%@page import="semi.vo.Pagination"%>
 <%@page import="semi.criteria.ProductCriteria"%>
 <%@page import="java.util.ArrayList"%>
-<%@page import="semi.vo.Product"%>
-<%@page import="semi.vo.ProductItem"%>
 <%@page import="java.util.List"%>
+<%@page import="semi.dao.ProductItemDao"%>
 <%@page import="semi.dao.ProductDao"%>
-<%@page import="semi.vo.Pagination"%>
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!doctype html>
 <html lang="ko">
-<%
-	//요청 파라미터의 값들을 조회한다.
-	String category = request.getParameter("category");
-	String pageNo = request.getParameter("pageNo");
-	String orderBy = request.getParameter("orderBy");
-			
-	// category가 비어있을 경우 초기값으로 TOP을 넣어준다.
-	if (category == null) {
-		category = "TOP";
-	}
-	// category가 SHIRT일 경우 SHIRT&BLOUSE로 바꿔준다.
-	if ("SHIRT".equals(category)) {
-		category = "SHIRT&BLOUSE";
-	}
-	// pageNo가 비어있을 경우 초기값으로 1을 넣어준다.
-	if (pageNo == null) {
-		pageNo = "1";
-	}
-%>
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" >
-    <title><%=category %> - 빈스데이</title>
-    <style type="text/css">
+	<title>빈스데이</title>
+	<style type="text/css">
 		.container {
-			min-width: 992px;
+			min-width: 960px;
 		}
-		
-		a:link { color: black; text-decoration: none;}
- 		a:visited { color: black; text-decoration: none;}
- 		a:hover { color: black; text-decoration: none;}
- 		a:active { color: black; text-decoration: none;}
-    	
-    	span {
-    		color: #a5a5a5;
-    		font-size: 0.8em;
-    	}
-    	.orderBy {
-    		text-decoration: none;
-    	}
-    	.orderBy > span:hover {
-    		color: #cccccc;
-    	}
-    	
-    	a.page-link {
-      		border: none;
-      		color: #757575;
-      		padding: 4px 0;
-     		width: 20px;
-      		text-align: center;
-   		}
-   		li.page-item.active > a.page-link {
-      		color: #757575;
-      		background-color: white;
-      		font-weight: bold;
-   		}
-   		li.page-item.active {
-      		border-bottom: 2px solid #757575;
-   		}
-   		li.page-item {
-      		margin: 0 6px;
-   		}
-    </style>
+	</style>
 </head>
 <body>
 <%@ include file="/common/navbar.jsp" %>
-<div class="container">
 	<%
+		//요청 파라미터의 값들을 조회한다.
+		String pageNo = StringUtils.defaultString(request.getParameter("pageNo"), "1");
+		String category = StringUtils.defaultString(request.getParameter("category"), "");
+		String orderBy = StringUtils.defaultString(request.getParameter("orderBy"), "");
+		
+		// category가 비어있을 경우 초기값으로 TOP을 넣어준다.
+		if (category == null) {
+			category = "TOTAL";
+		}
+		// category가 SHIRT일 경우 SHIRT&BLOUSE로 바꿔준다.
+		if ("SHIRT".equals(category)) {
+			category = "SHIRT&BLOUSE";
+		}
+		
 		ProductDao productDao = ProductDao.getInstance();
 		ProductItemDao productItemDao = ProductItemDao.getInstance();
 		List<Product> products = new ArrayList<Product>();
@@ -104,9 +62,73 @@
 			products = productDao.getProductListBycategory(productCriteria);
 		}
 	%>
+<div class="container">    
 	<div class="row">
-		<div class="col my-4 text-center">
-			<h4><%=category %></h4>
+		<div class="col m-5 text-center">
+			<h5><strong>SEARCH</strong></h5>
+		</div>
+	</div>
+	<div class="row justify-content-center border p-3">
+		<div class="col-6 mt-5">
+			<form id="form-search" method="get" action="search.jsp">
+				<input type="hidden" id="page-field" name="pageNo" value="1">
+				<div class="row mb-2">
+					<label class="col-2 col-form-label" style="font-size: 0.75em;">
+						<strong>상품분류</strong>
+					</label>
+					<div class="col-10">
+						<select class="form-select" name="category" style="font-size: 0.75em;">
+  							<option value="" selected>상품분류 선택</option>
+							<option value="NEW">NEW</option>
+							<option value="OUTER">OUTER</option>
+							<option value="TOP">TOP</option>
+							<option value="SHIRT">SHIRT&amp;BLOUSE</option>
+							<option value="DRESS">DRESS</option>
+							<option value="SKIRT">SKIRT</option>
+							<option value="PANTS">PANTS</option>
+							<option value="전체상품">전체상품</option>
+						</select>
+					</div>
+				</div>
+				<div class="row mb-2">
+					<label class="col-2 col-form-label" style="font-size: 0.75em;">
+						<strong>상품명</strong>
+					</label>
+					<div class="col-10">
+						<input type="text" name="nameKeyword" class="form-control" style="font-size: 0.75em;">
+					</div>
+				</div>
+				<div class="row mb-2">
+					<label class="col-2 col-form-label" style="font-size: 0.75em;">
+						<strong>판매가격대</strong>
+					</label>
+					<div class="col-10">
+						<input type="number" name="priceRangeFrom" class="form-control" style="font-size: 0.75em; width: 47%; display: inline;">
+						<label style="font-size: 0.75em; width: 6%; display: inline;">~</label>
+						<input type="number" name="priceRangeTo" class="form-control" style="font-size: 0.75em;  width: 47%; display: inline;">
+					</div>
+				</div>
+				<div class="row mb-2">
+					<label class="col-2 col-form-label" style="font-size: 0.75em;">
+						<strong>검색정렬기준</strong>
+					</label>
+					<div class="col-10">
+						<select class="form-select" name="orderBy" style="font-size: 0.75em;">
+  							<option value="" selected>::: 기준선택 :::</option>
+							<option value="신상품">신상품</option>
+							<option value="낮은가격">낮은가격</option>
+							<option value="높은가격">높은가격</option>
+							<option value="인기상품">인기상품</option>
+							<option value="사용후기">사용후기</option>
+						</select>
+					</div>
+				</div>
+				<div class="row mb-2 mt-4">
+					<div class="d-grid">
+						<button class="btn btn-secondary" type="button" onclick="searchProducts(1)">검색</button>
+					</div>
+				</div>
+			</form>
 		</div>
 	</div>
 	<div class="row">
@@ -213,6 +235,12 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script type="text/javascript">
+	function searchProducts(pageNo) {
+		document.getElementById("page-field").value = pageNo;
+		var form = document.getElementById("form-search");
+		form.submit();
+	}
+	
 	// 이미지의 경로에서 확장자를 제외한 마지막 문자를 imgNumber로 변경한다.
 	function changeImage(el, imgNumber) {
 		var oldSrc = el.src;

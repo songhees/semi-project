@@ -322,6 +322,10 @@ public class ProductDao {
 		return products;
 	}
 	
+	public List<Product> searchProductsByCriteria(ProductCriteria criteria) throws SQLException {
+		return null;
+	}
+	
 	/**
 	 * 검색조건에 따른 상품의 총 개수를 구한다.
 	 * @param criteria 검색조건
@@ -397,7 +401,7 @@ public class ProductDao {
 		
 		return result;
 	}
-}
+
 	
 	public Map<String, Integer> getProductStock(int no, String color) throws SQLException {
 		String sql = "select product_size, product_stock "
@@ -445,3 +449,4 @@ public class ProductDao {
 		
 		return productSize;
 	}
+}
