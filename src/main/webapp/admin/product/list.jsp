@@ -1,6 +1,6 @@
-<%@page import="vo.Product"%>
+<%@page import="semi.vo.Product"%>
 <%@page import="java.util.List"%>
-<%@page import="service.AdminService"%>
+<%@page import="semi.service.AdminService"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!doctype html>
