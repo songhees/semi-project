@@ -1,5 +1,6 @@
 package semi.vo;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -21,6 +22,8 @@ public class Product {
 	private double averageReviewRate;
 	// 제품의 색을 담는 리스트
 	private List<String> colors;
+	// 신상품의 할인율
+	private final double newProductDiscountRate = 0.05;
 	
 	public Product() {}
 
@@ -153,5 +156,51 @@ public class Product {
 				+ averageReviewRate + ", colors=" + colors + "]";
 	}
 
+	/**
+	 * 할인기간이 하루일 때의 남은 시간을 구한다.
+	 * createdDate(상품이 DB에 입력된 시간)가 현재 시간 이후일 경우 null을 반환한다.
+	 * 할인기간이 끝났을 경우 null을 반환한다.
+	 * @param millisecond 경과된 millisecond
+	 * @return 남은 시간을 "5일 12:05:30"와 같은 String으로 반환된다.
+	 */
+	public String getRemainTimeInOneDay() throws ParseException {
+//		long oneDayMillisecond = 24*60*60*1000;
+		// TODO 테스트용 기간
+		long oneDayMillisecond = 2*24*60*60*1000;
+		
+		Date currentDate = new Date();
+		
+		long elapsedMillisecond = currentDate.getTime() - this.createdDate.getTime();
+		if (elapsedMillisecond < 0 || elapsedMillisecond > oneDayMillisecond) {
+			return null;
+		}
+
+		long remainTime = oneDayMillisecond - elapsedMillisecond;
+		
+		long day = remainTime/(1000*60*60*24);
+		long hour = remainTime%(1000*60*60*24)/(1000*60*60);
+		long minute = remainTime%(1000*60*60)/(1000*60);
+		long second = remainTime%(1000*60)/(1000);
+		
+		String result = day + "일 "
+						+ String.format("%02d", hour) + ":"
+						+ String.format("%02d", minute) + ":"
+						+ String.format("%02d", second);
+		
+		return result;
+	}
 	
+	/**
+	 * 할인기간의 할인금액을 계산한다.
+	 * 할인금액은 일의 자리에서 올림한다.
+	 * @return 할인금액
+	 */
+	public long getDiscountAmount() {
+		long result = 0;
+		
+		double discountDouble = this.price*this.newProductDiscountRate;
+		result = (long)(Math.ceil(discountDouble/10)*10);
+		
+		return result;
+	}
 }

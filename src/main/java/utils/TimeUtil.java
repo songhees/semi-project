@@ -3,6 +3,7 @@ package utils;
 import java.text.ParseException;
 import java.util.Date;
 
+// 현재 쓰이지 않는 클래스
 public class TimeUtil {
 
 	/**
