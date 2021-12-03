@@ -1,3 +1,7 @@
+<%@page import="semi.dao.ReviewDao"%>
+<%@page import="semi.vo.Pagination"%>
+<%@page import="semi.dto.InquiryDto"%>
+<%@page import="semi.dao.InquiryDao"%>
 <%@page import="semi.vo.ProductItem"%>
 <%@page import="java.text.DecimalFormat"%>
 <%@page import="java.text.SimpleDateFormat"%>
@@ -483,53 +487,35 @@ for (String size : sizeList) {
 								id="reviewTextArea" style="height: 120px"></textarea>
 							<label for="reviewTextArea">리뷰를 남겨주세요.</label>
 						</div>
-						
-						<div class="row mt-1 row justify-content-between">
-							<div class="col-10">
-							    <div class="col-sm-1 m-0">
-							       <label for="photo">사진 추가</label>
-							    </div>
-							    <div class="col-sm-3">
-							        <input type="file" class="form-control" id="photo" name="reviewImage">
-							    </div>
-							    <div class="col-sm-4">
-							        <select name="reviewRate" class="form-select col-sm" aria-label="Default select example">
-										<option value="5" selected>아주 좋아요</option>
-										<option value="4">맘에 들어요</option>
-										<option value="3">보통이에요</option>
-										<option value="2">그냥 그래요</option>
-										<option value="1">별로에요</option>
-									</select>
-							    </div>
-							</div>
-							<div class="col-2">
-							    <div class="col-sm">
-							     	<button class="btn btn-secondary" type="submit">
-									<span class="fs-6">리뷰 등록하기</span></button>
-						     	</div>
+						<div class="row mt-1 p-0">
+						    <div class="col-sm-1 m-0">
+						       <label for="photo">사진 추가</label>
+						    </div>
+						    <div class="col-sm-3 p-0 pe-1">
+						        <input type="file" class="form-control" id="photo" name="reviewImage">
+						    </div>
+						    <div class="col-sm-4 p-0">
+						        <select name="reviewRate" class="form-select col-sm" aria-label="Default select example">
+									<option value="5" selected>아주 좋아요</option>
+									<option value="4">맘에 들어요</option>
+									<option value="3">보통이에요</option>
+									<option value="2">그냥 그래요</option>
+									<option value="1">별로에요</option>
+								</select>
+						    </div>
+						    <div class="col-sm-2 p-0 ps-4 end">
+						     	<button class="btn btn-secondary" type="submit">
+								<span class="fs-6">리뷰 등록하기</span></button>
 					     	</div>
 					    </div>
 					</form>
 				</div>
 			</div>
 		</div>
-		<div class="row border">
-			<div class="row pt-2">
-				<div class="col-2 pt-1 pb-1 m-2">
-					<div class="border pt-3 pb-3 bg-dark text-white">
-						<h1 align="center">5.0</h1>
-					</div>
-					<p align="center">85개 리뷰 평점</p>
-				</div>
-				<div class="col-7"></div>
-				<div class="col-3"></div>
-			</div>
-			<p>99%의 구매자들이 이 상품을 좋아합니다. (85명 중 84명)</p>
-		</div>
 
 		<div class="row">
 			<div class="col">
-				<div class="d-flex justify-content-between mt-5 mb-4 p-0">
+				<div class="d-flex justify-content-between mt-5 mb-3 p-0">
 					<div>
 						<p>
 							<strong>추천순</strong> 리뷰 (85) | 최신순 | 평점순
@@ -539,9 +525,16 @@ for (String size : sizeList) {
 						<span>리뷰 정렬 기준 ⓘ</span>
 					</div>
 				</div>
+				<hr>
 			</div>
 		</div>
-
+<%
+	String pageNo = request.getParameter("pageNo");
+	ReviewDao reviewDao = ReviewDao.getInstance();
+	int totalRecords = reviewDao.getTotalRecords();
+	Pagination pagination = new Pagination(pageNo, totalRecords);
+	
+%>
 
 		<div class="row mb-5 pb-3">
 			<div class="col">
@@ -561,14 +554,21 @@ for (String size : sizeList) {
 				</div>
 			</div>
 		</div>
-		<div class="row mb-5 pb-5">
+		<div class="row">
 			<div class="col">
 				<h6 align="center">
 					<strong>Q&amp;A</strong>
 				</h6>
 				<h6 align="center">상품에 대해 궁금한 점을 해결해 드립니다.</h6>
 				<div class="d-flex justify-content-center mt-5 mb-4">
-					<table class="table">
+					<table class="table text-center">
+						<colgroup>
+							<col width="5%">
+							<col width="20%">
+							<col width="50%">
+							<col width="10%">
+							<col width="15%">
+						</colgroup>		
 						<thead class="table-light">
 							<tr>
 								<th>번호</th>
@@ -579,17 +579,63 @@ for (String size : sizeList) {
 							</tr>
 						</thead>
 						<tbody>
+<%
+InquiryDao inquiryDao = InquiryDao.getInstance();
+List<InquiryDto> inquiryDtoList = inquiryDao.getInquiryDtoByProductNo(no);
+int inquiryRowNum = 0;
+for (InquiryDto inquiryDto : inquiryDtoList) {
+	if (inquiryDto.getInquiryDeleted().equals("N")) {
+		inquiryRowNum += 1;
+	} else {
+		continue;
+	}
+	if ((inquiryDto.getReplyNo() != 0) && (inquiryDto.getReplyDeleted().equals("N"))) {
+		inquiryRowNum += 1;
+	}
+}
+for (InquiryDto inquiryDto : inquiryDtoList) {
+	if (inquiryDto.getInquiryDeleted().equals("N")) {
+%>
 							<tr>
-								<td>209</td>
-								<td>교환/반품/취소문의</td>
-								<td>아직 반품 물품 회수가 안됐어요</td>
-								<td>한**</td>
-								<td>2017-11-19</td>
+								<td><%=inquiryRowNum %></td>
+								<td><%=inquiryDto.getCategoryName() %></td>
+								<td class="text-start"><%=inquiryDto.getTitle() %></td>
+								<td><%=inquiryDto.getUserName() %></td>
+								<td><%=inquiryDto.getInquiryCreatedDate() %></td>
 							</tr>
+<%
+		inquiryRowNum -= 1;
+	} else {
+		continue;
+	}
+	if ((inquiryDto.getReplyNo() != 0) && (inquiryDto.getReplyDeleted().equals("N"))) {
+%>
+							<tr>
+								<td><%=inquiryRowNum %></td>
+								<td><%=inquiryDto.getCategoryName() %></td>
+								<td class="text-start">└ <%=inquiryDto.getTitle() %></td>
+								<td></td>
+								<td><%=inquiryDto.getReplyCreatedDate() %></td>
+							</tr>
+<%
+		inquiryRowNum -= 1;
+	}
+}
+%>
 						</tbody>
 					</table>
 				</div>
 			</div>
+		</div>
+		<div class="d-flex justify-content-end">
+			<ul class="btn_list p-0" style="list-style: none">
+				<li><a href="inquiry.jsp?no=<%=product.getNo()%>"><button type="button" class="btn btn-secondary">
+						<span class="fs-6">상품 문의하기</span>
+					</button></a></li>
+				<li><a href="inquiry.jsp"><button type="button" class="btn btn-outline-secondary">
+						<span class="fs-6">모두 보기</span>
+					</button></a></li>
+			</ul>
 		</div>
 	</div>
 	<script
