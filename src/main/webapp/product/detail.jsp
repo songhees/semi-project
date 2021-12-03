@@ -62,7 +62,7 @@ List<String> thumbnails = productDao.getProductThumbnailImageList(no);
 								<li class="breadcrumb-item"><a
 									href="/semi-prodject/index.jsp"
 									style="text-decoration: none; color: gray;">Home</a></li>
-								<li class="breadcrumb-item active" aria-current="page"><%=product.getProductCategory().getName() %></li>
+								<li class="breadcrumb-item active" aria-current="page"><%=product.getProductCategory().getName()%></li>
 							</ol>
 						</nav>
 					</div>
@@ -79,14 +79,14 @@ List<String> thumbnails = productDao.getProductThumbnailImageList(no);
 						<div class="thumbnail_list_img">
 							<ul class="thumb_img p-0 mt-3" style="list-style: none">
 								<%
-	for (String thumbnail : thumbnails) {
-%>
+								for (String thumbnail : thumbnails) {
+								%>
 								<li><img class="small-pic"
 									src="../resources/images/product/<%=product.getNo()%>/thumbnail/<%=thumbnail%>"
 									style="width: 75px" alt="productImg"></li>
 								<%
-	}
-%>
+								}
+								%>
 							</ul>
 						</div>
 					</div>
@@ -97,24 +97,24 @@ List<String> thumbnails = productDao.getProductThumbnailImageList(no);
 						<table class="table table-borderless">
 							<tr>
 								<%
-boolean onSale = false;
-long currentPrice = product.getPrice();
+								boolean onSale = false;
+														long currentPrice = product.getPrice();
 
-DecimalFormat formatter = new DecimalFormat("###,###");
+														DecimalFormat formatter = new DecimalFormat("###,###");
 
-SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-Date date = new Date();
-String today = format.format(date);
-Date todate = format.parse(today);
+														SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+														Date date = new Date();
+														String today = format.format(date);
+														Date todate = format.parse(today);
 
-	if (product.getDiscountFrom() != null || product.getDiscountTo() != null) {
-		int compareTo = product.getDiscountTo().compareTo(todate);
-		int compareFrom = todate.compareTo(product.getDiscountFrom());
-	
-		if (product.getDiscountPrice() != 0 && (compareTo >= 0 && compareFrom >= 0)) {
-			onSale = true;
-			currentPrice = product.getDiscountPrice();
-%>
+															if (product.getDiscountFrom() != null || product.getDiscountTo() != null) {
+																int compareTo = product.getDiscountTo().compareTo(todate);
+																int compareFrom = todate.compareTo(product.getDiscountFrom());
+															
+																if (product.getDiscountPrice() != 0 && (compareTo >= 0 && compareFrom >= 0)) {
+															onSale = true;
+															currentPrice = product.getDiscountPrice();
+								%>
 								<td>소비자가</td>
 								<td class="text-decoration-line-through"><%=formatter.format(product.getPrice())%>원</td>
 							</tr>
@@ -122,48 +122,47 @@ Date todate = format.parse(today);
 								<td>판매가</td>
 								<td><%=formatter.format(currentPrice)%>원</td>
 								<%
-		} else {
-%>
+								} else {
+								%>
 								<td>판매가</td>
 								<td><%=formatter.format(currentPrice)%>원</td>
 								<%
-		}
-	} else {
-%>
+								}
+															} else {
+								%>
 								<td>판매가</td>
 								<td><%=formatter.format(currentPrice)%>원</td>
 								<%
-	}
-%>
+								}
+								%>
 							</tr>
 							<tr>
 								<%
-List<String> colorList = productDao.getProductColorList(no);
-if (colorList.get(0) != null) {
-%>
+								List<String> colorList = productDao.getProductColorList(no);
+														if (colorList.get(0) != null) {
+								%>
 								<td>색상</td>
 								<td>
 									<%
-	for (String color : colorList) {
-%>
+									for (String color : colorList) {
+									%>
 									<div id="color-check"
 										class="form-check form-check-inline p-0 m-0">
 										<input type="radio" class="btn-check"
 											id="color btn-check-outlined<%=color%>" name="color"
 											value="<%=color%>" onclick="sizeStockCheck()"> <label
 											class="btn btn-outline-secondary"
-											for="color btn-check-outlined<%=color%>"><%=color %></label>
+											for="color btn-check-outlined<%=color%>"><%=color%></label>
 									</div> <%
-	} 
-} else {
-%>
+ } 
+  } else {
+ %>
 									<div id="color-check">
 										<input type="hidden" name="color"
-											value="<%=colorList.get(0) %>">
+											value="<%=colorList.get(0)%>">
 									</div> <%
-}
-
-%>
+ }
+ %>
 									<P style="display: none" id="error-message-color">[필수] 색상을
 										선택해 주세요</P>
 								</td>
@@ -171,9 +170,9 @@ if (colorList.get(0) != null) {
 								<td>사이즈</td>
 								<td id="size-list">
 									<%
-List<String> sizeList = productDao.getProductSizeList(no);
-for (String size : sizeList) {
-%>
+									List<String> sizeList = productDao.getProductSizeList(no);
+																for (String size : sizeList) {
+									%>
 									<div id="size-check"
 										class="form-check form-check-inline p-0 m-0">
 										<input type="radio" class="btn-check"
@@ -182,8 +181,8 @@ for (String size : sizeList) {
 											class="btn btn-outline-secondary"
 											for="size btn-check-outlined<%=size%>"><%=size%></label>
 									</div> <%
-}
-%>
+ }
+ %>
 									<P style="display: none" id="error-message-size">[필수] 옵션을
 										선택해 주세요</P>
 								</td>
@@ -207,7 +206,7 @@ for (String size : sizeList) {
 								<strong>총 상품금액</strong> :
 							</div>
 							<div>
-								<p id="total-price"><%=formatter.format(currentPrice) %></p>
+								<p id="total-price"><%=formatter.format(currentPrice)%></p>
 								<span>원</span>
 							</div>
 						</div>
@@ -255,16 +254,16 @@ for (String size : sizeList) {
 							<p><%=product.getDetail()%></p>
 						</div>
 						<%
-					for (String thumbnail : thumbnails) {
-					%>
+						for (String thumbnail : thumbnails) {
+						%>
 						<div class="p-2 bd-highlight d-flex justify-content-center">
 							<img
 								src="../resources/images/product/<%=product.getNo()%>/thumbnail/<%=thumbnail%>"
 								alt="productimg" class="big_img img-fluid">
 						</div>
 						<%
-					}
-					%>
+						}
+						%>
 					</div>
 				</div>
 			</div>
@@ -361,7 +360,7 @@ for (String size : sizeList) {
 							<ul class="p-0 d-flex justify-content-center"
 								style="list-style: none">
 <%
-	List<Integer> styleProductNoList = productDao.getProductStyleNoList(no);
+List<Integer> styleProductNoList = productDao.getProductStyleNoList(no);
 	for (Integer styleProductNo : styleProductNoList) {
 		Product styleProduct = productDao.getProductDetail(styleProductNo);
 		List<String> styleThumbnails = productDao.getProductThumbnailImageList(styleProductNo);

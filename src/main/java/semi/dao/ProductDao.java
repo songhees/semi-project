@@ -199,7 +199,7 @@ public class ProductDao {
 				+ "                       FROM SEMI_PRODUCT_ITEM I\r\n"
 				+ "                       WHERE I.PRODUCT_NO = A.PRODUCT_NO), '([^,]+)(,\\1)+', '\\1') COLORS \r\n"
 				+ "FROM (SELECT ROW_NUMBER() OVER (ORDER BY "
-				+				orderByToSqlOrderBy(criteria.getOrderBy())
+				+				toSqlOrderBy(criteria.getOrderBy())
 				+ "				) RN, P.PRODUCT_NO, P.CATEGORY_NO, \r\n"
 				+ "             P.PRODUCT_NAME, P.PRODUCT_PRICE, P.PRODUCT_DISCOUNT_PRICE, P.PRODUCT_DISCOUNT_FROM, \r\n"
 				+ "             P.PRODUCT_DISCOUNT_TO, P.PRODUCT_CREATED_DATE, P.PRODUCT_UPDATED_DATE, \r\n"
@@ -225,31 +225,7 @@ public class ProductDao {
 		ResultSet rs = pstmt.executeQuery();
 		
 		while (rs.next()) {
-			Product product = new Product();
-			ProductCategory productCategory = new ProductCategory();
-			List<String> colors = new ArrayList<>();
-			
-			product.setNo(rs.getInt("PRODUCT_NO"));
-			product.setName(rs.getString("PRODUCT_NAME"));
-			product.setPrice(rs.getLong("PRODUCT_PRICE"));
-			product.setDiscountPrice(rs.getLong("PRODUCT_DISCOUNT_PRICE"));
-			product.setDiscountFrom(rs.getDate("PRODUCT_DISCOUNT_FROM"));
-			product.setDiscountTo(rs.getDate("PRODUCT_DISCOUNT_TO"));
-			product.setCreatedDate(rs.getDate("PRODUCT_CREATED_DATE"));
-			product.setUpdatedDate(rs.getDate("PRODUCT_UPDATED_DATE"));
-			product.setOnSale(rs.getString("PRODUCT_ON_SALE"));
-			product.setDetail(rs.getString("PRODUCT_DETAIL"));
-			product.setTotalSaleCount(rs.getInt("PRODUCT_TOTAL_SALE_COUNT"));
-			product.setTotalStock(rs.getInt("PRODUCT_TOTAL_STOCK"));
-			product.setAverageReviewRate(rs.getDouble("PRODUCT_AVERAGE_REVIEW_RATE"));
-			
-			productCategory.setNo(rs.getInt("CATEGORY_NO"));
-			productCategory.setName(rs.getString("CATEGORY_NAME"));
-
-			colors = stringToArrayList(rs.getString("COLORS"));
-			
-			product.setProductCategory(productCategory);
-			product.setColors(colors);
+			Product product = toProductVo(rs);
 			
 			products.add(product);
 		}
@@ -270,7 +246,7 @@ public class ProductDao {
 				+ "                       FROM SEMI_PRODUCT_ITEM I\r\n"
 				+ "                       WHERE I.PRODUCT_NO = A.PRODUCT_NO), '([^,]+)(,\\1)+', '\\1') COLORS \r\n"
 				+ "FROM (SELECT ROW_NUMBER() OVER (ORDER BY "
-				+ 				orderByToSqlOrderBy(criteria.getOrderBy())
+				+ 				toSqlOrderBy(criteria.getOrderBy())
 				+ "				) RN, PRODUCT_NO, CATEGORY_NO, \r\n"
 				+ "             PRODUCT_NAME, PRODUCT_PRICE, PRODUCT_DISCOUNT_PRICE, PRODUCT_DISCOUNT_FROM, \r\n"
 				+ "             PRODUCT_DISCOUNT_TO, PRODUCT_CREATED_DATE, PRODUCT_UPDATED_DATE, \r\n"
@@ -309,7 +285,7 @@ public class ProductDao {
 			product.setTotalStock(rs.getInt("PRODUCT_TOTAL_STOCK"));
 			product.setAverageReviewRate(rs.getDouble("PRODUCT_AVERAGE_REVIEW_RATE"));
 			
-			colors = stringToArrayList(rs.getString("COLORS"));
+			colors = toArrayList(rs.getString("COLORS"));
 			product.setColors(colors);
 			
 			products.add(product);
@@ -323,7 +299,118 @@ public class ProductDao {
 	}
 	
 	public List<Product> searchProductsByCriteria(ProductCriteria criteria) throws SQLException {
-		return null;
+		String sql = "SELECT PRODUCT_NO, CATEGORY_NO, PRODUCT_NAME, PRODUCT_PRICE, PRODUCT_DISCOUNT_PRICE, \r\n"
+				+ "       PRODUCT_DISCOUNT_FROM, PRODUCT_DISCOUNT_TO, PRODUCT_CREATED_DATE, PRODUCT_UPDATED_DATE, \r\n"
+				+ "       PRODUCT_ON_SALE, PRODUCT_DETAIL, PRODUCT_TOTAL_SALE_COUNT, PRODUCT_TOTAL_STOCK, \r\n"
+				+ "       PRODUCT_AVERAGE_REVIEW_RATE, CATEGORY_NAME, \r\n"
+				+ "       REGEXP_REPLACE((SELECT LISTAGG(I.PRODUCT_COLOR, ',') WITHIN GROUP (ORDER BY A.PRODUCT_NO) \r\n"
+				+ "                       FROM SEMI_PRODUCT_ITEM I \r\n"
+				+ "                       WHERE I.PRODUCT_NO = A.PRODUCT_NO), '([^,]+)(,\\1)+', '\\1') COLORS \r\n"
+				+ "FROM (SELECT ROW_NUMBER() OVER (ORDER BY "
+				+ 				toSqlOrderBy(criteria.getOrderBy())
+				+ "				) RN, P.PRODUCT_NO, P.CATEGORY_NO, \r\n"
+				+ "             P.PRODUCT_NAME, P.PRODUCT_PRICE, P.PRODUCT_DISCOUNT_PRICE, P.PRODUCT_DISCOUNT_FROM, \r\n"
+				+ "             P.PRODUCT_DISCOUNT_TO, P.PRODUCT_CREATED_DATE, P.PRODUCT_UPDATED_DATE, \r\n"
+				+ "             P.PRODUCT_ON_SALE, P.PRODUCT_DETAIL, P.PRODUCT_TOTAL_SALE_COUNT, \r\n"
+				+ "             P.PRODUCT_TOTAL_STOCK, P.PRODUCT_AVERAGE_REVIEW_RATE, C.CATEGORY_NAME \r\n"
+				+ "      FROM SEMI_PRODUCT P, SEMI_PRODUCT_CATEGORY C \r\n"
+				+ "      WHERE P.CATEGORY_NO = C.CATEGORY_NO \r\n";
+		if (!criteria.getCategory().isEmpty()) {
+			sql += "            AND C.CATEGORY_NAME = ? \r\n";
+		}
+		if (!criteria.getNameKeyword().isEmpty()) {
+			sql	+= "            AND P.PRODUCT_NAME LIKE '%' || ? || '%' \r\n";
+		}
+		if (criteria.getPriceRangeTo() != 0L) {
+			sql += " 			AND P.PRODUCT_PRICE <= ? \r\n";
+		}
+			sql	+= "            AND P.PRODUCT_PRICE >= ?) A "
+				+ "WHERE RN >= ? AND RN <= ?";
+		System.out.println(sql);
+		List<Product> products = new ArrayList<>();
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		setPstmt(pstmt, criteria);
+		ResultSet rs = pstmt.executeQuery();
+		
+		while (rs.next()) {
+			Product product = toProductVo(rs);
+			
+			products.add(product);
+		}
+		
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return products;
+	}
+	
+	private PreparedStatement setPstmt(PreparedStatement pstmt, ProductCriteria criteria) throws SQLException {
+		String category = criteria.getCategory();
+		String nameKeyword = criteria.getNameKeyword();
+		long priceRangeTo = criteria.getPriceRangeTo();
+		if (!isEmpty(category) && !isEmpty(nameKeyword) && !isZero(priceRangeTo)) {
+			pstmt.setString(1, criteria.getCategory());
+			pstmt.setString(2, criteria.getNameKeyword());
+			pstmt.setLong(3, criteria.getPriceRangeTo());
+			pstmt.setLong(4, criteria.getPriceRangeFrom());
+			pstmt.setInt(5, criteria.getBegin());
+			pstmt.setInt(6, criteria.getEnd());
+			return pstmt;
+		} else if (!isEmpty(category) && !isEmpty(nameKeyword) && isZero(priceRangeTo)) {
+			pstmt.setString(1, criteria.getCategory());
+			pstmt.setString(2, criteria.getNameKeyword());
+			pstmt.setLong(3, criteria.getPriceRangeFrom());
+			pstmt.setInt(4, criteria.getBegin());
+			pstmt.setInt(5, criteria.getEnd());
+			return pstmt;
+		} else if (!isEmpty(category) && isEmpty(nameKeyword) && isZero(priceRangeTo)) {
+			pstmt.setString(1, criteria.getCategory());
+			pstmt.setLong(2, criteria.getPriceRangeFrom());
+			pstmt.setInt(3, criteria.getBegin());
+			pstmt.setInt(4, criteria.getEnd());
+			return pstmt;
+		} else if (!isEmpty(category) && isEmpty(nameKeyword) && !isZero(priceRangeTo)) {
+			pstmt.setString(1, criteria.getCategory());
+			pstmt.setLong(2, criteria.getPriceRangeTo());
+			pstmt.setLong(3, criteria.getPriceRangeFrom());
+			pstmt.setInt(4, criteria.getBegin());
+			pstmt.setInt(5, criteria.getEnd());
+			return pstmt;
+		} else if (isEmpty(category) && !isEmpty(nameKeyword) && !isZero(priceRangeTo)) {
+			pstmt.setString(1, criteria.getNameKeyword());
+			pstmt.setLong(2, criteria.getPriceRangeTo());
+			pstmt.setLong(3, criteria.getPriceRangeFrom());
+			pstmt.setInt(4, criteria.getBegin());
+			pstmt.setInt(5, criteria.getEnd());
+			return pstmt;
+		} else if (isEmpty(category) && !isEmpty(nameKeyword) && isZero(priceRangeTo)) {
+			pstmt.setString(1, criteria.getNameKeyword());
+			pstmt.setLong(2, criteria.getPriceRangeFrom());
+			pstmt.setInt(3, criteria.getBegin());
+			pstmt.setInt(4, criteria.getEnd());
+			return pstmt;
+		} else if (isEmpty(category) && isEmpty(nameKeyword) && !isZero(priceRangeTo)) {
+			pstmt.setLong(1, criteria.getPriceRangeTo());
+			pstmt.setLong(2, criteria.getPriceRangeFrom());
+			pstmt.setInt(3, criteria.getBegin());
+			pstmt.setInt(4, criteria.getEnd());
+			return pstmt;
+		} else {
+			pstmt.setLong(1, criteria.getPriceRangeFrom());
+			pstmt.setInt(2, criteria.getBegin());
+			pstmt.setInt(3, criteria.getEnd());
+			return pstmt;
+		}
+	}
+
+	private boolean isEmpty(String nameKeyword) {
+		return nameKeyword.isEmpty();
+	}
+	private boolean isZero(long priceRangeTo) {
+		return priceRangeTo == 0L;
 	}
 	
 	/**
@@ -359,49 +446,6 @@ public class ProductDao {
 		
 		return productTotalRecords;
 	}
-	
-	/**
-	 * 정렬기준인 orderBy를 sql문에 적용할 수 있는 String으로 변환한다.
-	 * @param orderBy 정렬기준
-	 * @return sql문에 적용가능한 String
-	 */
-	private String orderByToSqlOrderBy(String orderBy) {
-		if ("신상품".equals(orderBy)) {
-			return "P.PRODUCT_CREATED_DATE DESC";
-		}
-		if ("낮은가격".equals(orderBy)) {
-			return "P.PRODUCT_PRICE ASC";
-		}
-		if ("높은가격".equals(orderBy)) {
-			return "P.PRODUCT_PRICE DESC";
-		}
-		if ("인기상품".equals(orderBy)) {
-			return "P.PRODUCT_TOTAL_SALE_COUNT DESC";
-		}
-		if ("사용후기".equals(orderBy)) {
-			return "P.PRODUCT_AVERAGE_REVIEW_RATE DESC";
-		}
-		
-		// 기본값은 신상품 정렬기준이다.
-		return "P.PRODUCT_CREATED_DATE DESC";
-	}
-
-	/**
-	 * String을 쉼표(,)로 잘라서 List에 저장한다.
-	 * @param str 자를 String
-	 * @return 자르고 나온 String들을 저장한 List
-	 */
-	private List<String> stringToArrayList(String str) {
-		List<String> result = new ArrayList<>();
-		
-		if (str == null) {
-			return result;
-		}
-		result = Arrays.asList(str.split(","));
-		
-		return result;
-	}
-
 	
 	public Map<String, Integer> getProductStock(int no, String color) throws SQLException {
 		String sql = "select product_size, product_stock "
@@ -449,7 +493,81 @@ public class ProductDao {
 		
 		return productSize;
 	}
-  public List<Product> searchProductsByCriteria(ProductCriteria criteria) throws SQLException {
-      return null;
-  }
+	
+	/**
+	 * 정렬기준인 orderBy를 sql문에 적용할 수 있는 String으로 변환한다.
+	 * @param orderBy 정렬기준
+	 * @return sql문에 적용가능한 String
+	 */
+	private String toSqlOrderBy(String orderBy) {
+		if ("신상품".equals(orderBy)) {
+			return "P.PRODUCT_CREATED_DATE DESC";
+		}
+		if ("낮은가격".equals(orderBy)) {
+			return "P.PRODUCT_PRICE ASC";
+		}
+		if ("높은가격".equals(orderBy)) {
+			return "P.PRODUCT_PRICE DESC";
+		}
+		if ("인기상품".equals(orderBy)) {
+			return "P.PRODUCT_TOTAL_SALE_COUNT DESC";
+		}
+		if ("사용후기".equals(orderBy)) {
+			return "P.PRODUCT_AVERAGE_REVIEW_RATE DESC";
+		}
+		
+		// 기본값은 신상품 정렬기준이다.
+		return "P.PRODUCT_CREATED_DATE DESC";
+	}
+
+	/**
+	 * String을 쉼표(,)로 잘라서 List에 저장한다.
+	 * @param str 자를 String
+	 * @return 자르고 나온 String들을 저장한 List
+	 */
+	private List<String> toArrayList(String str) {
+		List<String> result = new ArrayList<>();
+		
+		if (str == null) {
+			return result;
+		}
+		result = Arrays.asList(str.split(","));
+		
+		return result;
+	}
+	
+	/**
+	 * ResultSet에서 데이터를 꺼내 productVo에 저장해서 반환한다.
+	 * @param rs product 정보가 들어있는 ResultSet
+	 * @return product 정보가 들어있는 productVo
+	 * @throws SQLException
+	 */
+	private Product toProductVo(ResultSet rs) throws SQLException {
+		Product product = new Product();
+		ProductCategory productCategory = new ProductCategory();
+		List<String> colors = new ArrayList<>();
+		
+		product.setNo(rs.getInt("PRODUCT_NO"));
+		product.setName(rs.getString("PRODUCT_NAME"));
+		product.setPrice(rs.getLong("PRODUCT_PRICE"));
+		product.setDiscountPrice(rs.getLong("PRODUCT_DISCOUNT_PRICE"));
+		product.setDiscountFrom(rs.getDate("PRODUCT_DISCOUNT_FROM"));
+		product.setDiscountTo(rs.getDate("PRODUCT_DISCOUNT_TO"));
+		product.setCreatedDate(rs.getDate("PRODUCT_CREATED_DATE"));
+		product.setUpdatedDate(rs.getDate("PRODUCT_UPDATED_DATE"));
+		product.setOnSale(rs.getString("PRODUCT_ON_SALE"));
+		product.setDetail(rs.getString("PRODUCT_DETAIL"));
+		product.setTotalSaleCount(rs.getInt("PRODUCT_TOTAL_SALE_COUNT"));
+		product.setTotalStock(rs.getInt("PRODUCT_TOTAL_STOCK"));
+		product.setAverageReviewRate(rs.getDouble("PRODUCT_AVERAGE_REVIEW_RATE"));
+		
+		productCategory.setNo(rs.getInt("CATEGORY_NO"));
+		productCategory.setName(rs.getString("CATEGORY_NAME"));
+
+		colors = toArrayList(rs.getString("COLORS"));
+		
+		product.setProductCategory(productCategory);
+		product.setColors(colors);
+		return product;
+	}
 }
