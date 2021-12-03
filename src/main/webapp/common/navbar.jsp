@@ -63,8 +63,8 @@
 		</div>
 		<!-- right side bar-->
 		<div style="overflow: hidden;">
-			<form class="d-none d-md-flex mt-2"  style="float: left;">
-				<input class="form-control form-control-sm" type="search" aria-label="Search">
+			<form class="d-none d-md-flex mt-2" style="float: left;" method="get" action="/semi-project/product/search.jsp">
+				<input class="form-control form-control-sm" type="search" aria-label="Search" name="nameKeyword">
 			    <button class="btn btn-secondary btn-sm opacity-75" type="submit"><i class="bi bi-search"></i></button>
    			</form>
    			<a href="#">

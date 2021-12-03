@@ -119,7 +119,7 @@
 		<div class="col">
 			<div class="card-group">
 				<div class="card border-light h-100">
-					<a href="/semi-project/product/list.jsp?category='전체상품'&orderBy='인기상품'">
+					<a href="/semi-project/product/list.jsp?category=전체상품&orderBy=인기상품">
 						<img src="resources/images/home/banner/1.jpg" class="card-img-top">
 					</a>
 					<div class="card-body text-center">

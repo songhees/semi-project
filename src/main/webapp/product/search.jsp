@@ -64,8 +64,8 @@
 		String category = StringUtils.defaultString(request.getParameter("category"), "");
 		String orderBy = StringUtils.defaultString(request.getParameter("orderBy"), "");
 		String nameKeyword = StringUtils.defaultString(request.getParameter("nameKeyword"), "");
-		String priceRangeFrom = request.getParameter("priceRangeFrom");
-		String priceRangeTo = request.getParameter("priceRangeTo");
+		String priceRangeFrom = StringUtils.defaultString(request.getParameter("priceRangeFrom"), "");
+		String priceRangeTo = StringUtils.defaultString(request.getParameter("priceRangeTo"), "");
 		
 		// Criteria에 저장되어 ProductDao에 보내질 priceRangeFrom과 priceRangeTo
 		long priceRangeFromInCriteria;
@@ -112,12 +112,10 @@
 		productCriteria.setPriceRangeFrom(priceRangeFromInCriteria);
 		productCriteria.setPriceRangeTo(priceRangeToInCriteria);
 		
-		//int totalRecords = productDao.getProductTotalRecords(productCriteria);
-		// TODO 임시 totalRecords
-		int totalRecords = 100;
+		int totalRecords = productDao.getProductTotalRecords2(productCriteria);
 		// TODO 테스트용 프린트
 		System.out.println("totalRecords: " + totalRecords);
-		Pagination pagination = new Pagination(pageNo, totalRecords, 8, 5);
+		Pagination pagination = new Pagination(pageNo, totalRecords, 4, 5);
 		int begin = pagination.getBegin();
 		int end = pagination.getEnd();
 		
@@ -162,7 +160,7 @@
 						<strong>상품명</strong>
 					</label>
 					<div class="col-10">
-						<input type="text" name="nameKeyword" class="form-control" style="font-size: 0.75em;" value="<%=nameKeyword%>">
+						<input type="search" name="nameKeyword" class="form-control" style="font-size: 0.75em;" value="<%=nameKeyword%>">
 					</div>
 				</div>
 				<div class="row mb-2">
@@ -180,7 +178,7 @@
 						<strong>검색정렬기준</strong>
 					</label>
 					<div class="col-10">
-						<select class="form-select" name="orderBy" style="font-size: 0.75em;">
+						<select id="orderBy-select" class="form-select" name="orderBy" style="font-size: 0.75em;">
   							<option value="" <%=orderBy.isEmpty() ? "selected" : ""%>>::: 기준선택 :::</option>
 							<option value="신상품" <%="신상품".equals(orderBy) ? "selected" : ""%>>신상품</option>
 							<option value="낮은가격" <%="낮은가격".equals(orderBy) ? "selected" : ""%>>낮은가격</option>
@@ -198,39 +196,39 @@
 			</form>
 		</div>
 	</div>
+<% 
+	if (products.isEmpty()) { 
+%>
+		<h5 class="text-center">조회된 상품이 없습니다.</h5>
+<% 
+	} else {
+%>
 	<div class="row">
 		<div class="col d-flex justify-content-start">
 			<p style="font-size: 0.8em;">TOTAL <strong><%=totalRecords %></strong> PRODUCT</p>
 		</div>
 		<div class="col d-flex justify-content-end">
-			<a class="orderBy" href="list.jsp?category=<%=category %>&orderBy=신상품">
+			<a class="orderBy" href="" onclick="clickOrderBy('신상품')">
 				<span><%="신상품".equals(orderBy) ? "<strong>" : "" %>신상품<%="신상품".equals(orderBy) ? "</strong>" : "" %></span>
 			</a>
 			<span class="px-3">|</span>
-			<a class="orderBy" href="list.jsp?category=<%=category %>&orderBy=낮은가격">
+			<a class="orderBy" href="" onclick="clickOrderBy('낮은가격')">
 				<span><%="낮은가격".equals(orderBy) ? "<strong>" : "" %>낮은가격<%="낮은가격".equals(orderBy) ? "</strong>" : "" %></span>
 			</a>
 			<span class="px-3">|</span>
-			<a class="orderBy" href="list.jsp?category=<%=category %>&orderBy=높은가격">
+			<a class="orderBy" href="" onclick="clickOrderBy('높은가격')">
 				<span><%="높은가격".equals(orderBy) ? "<strong>" : "" %>높은가격<%="높은가격".equals(orderBy) ? "</strong>" : "" %></span>
 			</a>
 			<span class="px-3">|</span>
-			<a class="orderBy" href="list.jsp?category=<%=category %>&orderBy=인기상품">
+			<a class="orderBy" href="" onclick="clickOrderBy('인기상품')">
 				<span><%="인기상품".equals(orderBy) ? "<strong>" : "" %>인기상품<%="인기상품".equals(orderBy) ? "</strong>" : "" %></span>
 			</a>
 			<span class="px-3">|</span>
-			<a class="orderBy" href="list.jsp?category=<%=category %>&orderBy=상품후기">
-				<span><%="상품후기".equals(orderBy) ? "<strong>" : "" %>상품후기<%="상품후기".equals(orderBy) ? "</strong>" : "" %></span>
+			<a class="orderBy" href="" onclick="clickOrderBy('사용후기')">
+				<span><%="사용후기".equals(orderBy) ? "<strong>" : "" %>사용후기<%="사용후기".equals(orderBy) ? "</strong>" : "" %></span>
 			</a>
 		</div>
 	</div>
-		<% 
-			if (products.isEmpty()) { 
-		%>
-		<h5 class="text-center">조회된 상품이 없습니다.</h5>
-		<% 
-			} 
-		%>
 	<div class="row row-cols-4 g-4 my-4">
 		<%
 			for (Product product : products) {
@@ -286,13 +284,13 @@
 						Pagination객체가 제공하는 isExistPrev()는 이전 블록이 존재하는 경우 true를 반환한다.
 						Pagination객체가 제공하는 getPrevPage()는 이전 블록의 마지막 페이지값을 반환한다.
 					 -->
-					<li class="page-item <%=!pagination.isExistPrev() ? "disabled" : "" %>"><a class="page-link" href="list.jsp?pageNo=1&category=<%=category %>&orderBy=<%=orderBy %>" >&#60;&#60;</a></li>
-					<li class="page-item <%=!pagination.isExistPrev() ? "disabled" : "" %>"><a class="page-link" href="list.jsp?pageNo=<%=pagination.getPrevPage()%>&category=<%=category %>&orderBy=<%=orderBy %>" >&#60;</a></li>
+					<li class="page-item <%=!pagination.isExistPrev() ? "disabled" : "" %>"><a class="page-link" href="" onclick="movePageTo(event, 1)">&#60;&#60;</a></li>
+					<li class="page-item <%=!pagination.isExistPrev() ? "disabled" : "" %>"><a class="page-link" href="" onclick="movePageTo(event, <%=pagination.getPrevPage()%>)" >&#60;</a></li>
 					<%
 						// Pagination 객체로부터 해당 페이지 블록의 시작 페이지번호와 끝 페이지번호만큼 페이지내비게이션 정보를 표시한다.
 						for (int num = pagination.getBeginPage(); num <= pagination.getEndPage(); num++) {
 					%>					
-					<li class="page-item <%=pagination.getPageNo() == num ? "active" : "" %>"><a class="page-link" href="list.jsp?pageNo=<%=num%>&category=<%=category %>&orderBy=<%=orderBy %>"><%=num %></a></li>
+					<li class="page-item <%=pagination.getPageNo() == num ? "active" : "" %>"><a class="page-link" href="" onclick="movePageTo(event, <%=num%>)"><%=num%></a></li>
 					<%
 						}
 					%>					
@@ -300,26 +298,39 @@
 						Pagination객체가 제공하는 isExistNext()는 다음 블록이 존재하는 경우 true를 반환한다.
 						Pagination객체가 제공하는 getNexPage()는 다음 블록의 첫 페이지값을 반환한다.
 					 -->
-					<li class="page-item <%=!pagination.isExistNext() ? "disabled" :"" %>"><a class="page-link" href="list.jsp?pageNo=<%=pagination.getNextPage()%>&category=<%=category %>&orderBy=<%=orderBy %>" >&#62;</a></li>
-					<li class="page-item <%=!pagination.isExistNext() ? "disabled" :"" %>"><a class="page-link" href="list.jsp?pageNo=<%=pagination.getTotalPages()%>&category=<%=category %>&orderBy=<%=orderBy %>" >&#62;&#62;</a></li>
+					<li class="page-item <%=!pagination.isExistNext() ? "disabled" :"" %>"><a class="page-link" href="" onclick="movePageTo(event, <%=pagination.getNextPage()%>)">&#62;</a></li>
+					<li class="page-item <%=!pagination.isExistNext() ? "disabled" :"" %>"><a class="page-link" href="" onclick="movePageTo(event, <%=pagination.getTotalPages()%>)">&#62;&#62;</a></li>
 				</ul>
 			</nav>
 		</div>
 	</div>
+<%
+	}
+%>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script type="text/javascript">
-	// 검색버튼을 클릭했을 때 실행되며 form-search 내부의 값들이 search.jsp로 전달된다.
+	// 검색버튼을 클릭했을 때 실행된다.
+	// form-search 내부의 값들이 search.jsp로 전달된다.
 	function searchProducts(pageNo) {
 		document.getElementById("page-field").value = pageNo;
 		var form = document.getElementById("form-search");
 		form.submit();
 	}
 	
-	// 페이지번호를 클릭했을 때 실행되며 기존 이벤트가 멈추고 searchProducts(pageNo) 함수가 실행된다.
+	// 페이지번호를 클릭했을 때 실행된다.
+	// 기존 이벤트가 멈추고 searchProducts(pageNo) 함수가 실행된다.
 	function movePageTo(event, pageNo) {
 		event.preventDefault();
 		searchProducts(pageNo);
+	}
+	
+	// 정렬기준을 클릭했을 때 실행되는 함수이다.
+	// 기존 이벤트가 멈추고 searchProducts(1) 함수가 실행된다.
+	function clickOrderBy(orderBy) {
+		event.preventDefault();
+		document.getElementById("orderBy-select").value = orderBy;
+		searchProducts(1);
 	}
 	
 	// 이미지의 경로에서 확장자를 제외한 마지막 문자를 imgNumber로 변경한다.
