@@ -52,11 +52,12 @@
 		font-weight: bold;
 		font-size: 13px;
 	}
-	a.btn-sm {
+	a.small, button.small {
 		font-size: 11px;
 		width: 40px;
 		border: 1px solid #e3e3e3;
 		color: #757575;
+		border-radius: 0;
 	}
 </style>
 </head>
@@ -68,14 +69,25 @@
 	response.sendRedirect("loginform.jsp");		
 	return;
 } */
+	String error = request.getParameter("error");
 
 	AddressDao addressDao = AddressDao.getInstance();
 /* 검색 조건 */
 /* login.jsp 완성시  loginUserInfo.getNo() 넣기*/
-	List<Address> addressList = addressDao.getAllAddressByNo(10000);
+	List<Address> addressList = addressDao.getAllAddressByUserNo(10000);
 	StringBuffer str = new StringBuffer();
 %>
 <div class="container">    
+<%
+	/* 경고창구현하기 */
+	if ("deny-delete".equals(error)) {
+%>
+		<div class="alert alert-danger">
+			<small>사용자가 다른 주소록 입니다.</small>
+		</div>
+<%
+	}
+%>
 	<div class="row">
 		<div class="col">
 			<!-- 브레드크럼 breadcrumb -->
@@ -126,18 +138,18 @@
 <%
 		if ("Y".equals(address.getAddressDefault())) {
 %>
-							<td><button class="btn btn-sm" type="button" onclick="unlock()">해제</button></td>
+							<td><a class="small btn btn-sm" href="default.jsp?menu=release&no=<%=address.getAddressNo() %>">해제</a></td>
 <%
 		} else {
 %>
-							<td><button class="btn btn-sm" type="button" onclick="lock()">고정</button></td>
+							<td><a class="small btn btn-sm btn-secondary" href="default.jsp?menu=fix&no=<%=address.getAddressNo() %>" style="color: white;">고정</a></td>
 <%
 		}
 %>
 							<td><%=address.getAddressName() %></td>
 							<td><%="오송희" /*=loginUserInfo.getName  */ %></td>
-							<td><%=str.append(address.getPostalCode()).append(address.getBaseAddress()).append(address.getDetail()) %></td>
-							<td><a class="btn btn-sm" href="addressForm.jsp?no=<%=address.getAddressNo() %>">수정</a></td>
+							<td class="text-start"><%=str.append("(").append(address.getPostalCode()).append(")").append(address.getBaseAddress()).append(" ").append(address.getDetail()) %></td>
+							<td><a class="small btn btn-sm" href="addressForm.jsp?no=<%=address.getAddressNo() %>">수정</a></td>
 						</tr>
 	<%
 			str.setLength(0);
@@ -147,10 +159,10 @@
 				</table>
 				<div class="row mt-2">
 					<div class="col">
-						<button class="button btn btn-outline-dark">선택 주소록 삭제</button>
+						<button class="button btn btn-outline-dark" >선택 주소록 삭제</button>
 					</div>
 					<div class="col text-end">
-						<a class="button btn btn-dark opacity-75">배송지 등록</a>
+						<a href="addressForm.jsp" class="button btn btn-dark opacity-75">배송지 등록</a>
 					</div>
 				</div>
 			</form>
