@@ -1,4 +1,3 @@
-<%@page import="semi.dao.ProductItemDao"%>
 <%@page import="semi.criteria.ProductCriteria"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="semi.vo.Product"%>
@@ -43,6 +42,7 @@
  		a:visited { color: black; text-decoration: none;}
  		a:hover { color: black; text-decoration: none;}
  		a:active { color: black; text-decoration: none;}
+ 		a:hover:first-child {color: black; text-decoration: none;}
     	
     	span {
     		color: #a5a5a5;
@@ -80,7 +80,6 @@
 <div class="container">
 	<%
 		ProductDao productDao = ProductDao.getInstance();
-		ProductItemDao productItemDao = ProductItemDao.getInstance();
 		List<Product> products = new ArrayList<Product>();
 		ProductCriteria productCriteria = new ProductCriteria();
 			
@@ -100,7 +99,6 @@
 		if ("전체상품".equals(category)) {
 			products = productDao.getAllProductList(productCriteria);
 		} else {
-		// TODO 카테고리가 알맞은지 먼저 확인하고, 해당하는 상품 리스트를 가져온다.
 			products = productDao.getProductListBycategory(productCriteria);
 		}
 	%>
@@ -142,7 +140,7 @@
 		<div class="col">
 			<div class="card border-light h-100">
 				<a href="/semi-project/product/detail.jsp?no=<%=product.getNo() %>">
-					<img src="/semi-project/resources/images/product/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>/thumbnail/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>_1.jpg" 
+					<img src="/semi-project/resources/images/product/<%=productDao.getProductThumbnailImageList(product.getNo()).isEmpty() ? 1000 : product.getNo()%>/thumbnail/<%=productDao.getProductThumbnailImageList(product.getNo()).isEmpty() ? 1000 : product.getNo()%>_1.jpg" 
 				 	 class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
 				</a>
 				<div class="card-body">
