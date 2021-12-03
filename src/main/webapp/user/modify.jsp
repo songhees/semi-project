@@ -40,7 +40,7 @@
 	AddressDao addressDao = AddressDao.getInstance();
 	// 가저온 유저정보의 번호에 해당하는 대표 주소를 가져온다.
 	Address address = null;
-	address = addressDao.getRepresentativeAddressByNo(user.getNo());
+	address = addressDao.getRepresentativeAddressByUserNo(user.getNo());
 	
 	String postCode = request.getParameter("postcode");
 	String baseAddress = request.getParameter("baseAddress");
@@ -50,6 +50,7 @@
 		address.setPostalCode(postCode);
 		address.setBaseAddress(baseAddress);
 		address.setDetail(addressDetail);
+		// 유저 정보의 번호에 해당하는 대표 주소의 번호를 통해 수정한다.
 		addressDao.updateAddress(address);
 	} else {
 		// 기존에 없던 주소면 insert하여 넣는다.

@@ -94,7 +94,7 @@
 		번호를얻어서 주소록을 조회한다.
 	*/
 	User userInfo = userDao.getUserById("osh");
-	Address address = addressDao.getRepresentativeAddressByNo(userInfo.getNo());
+	Address address = addressDao.getRepresentativeAddressByUserNo(userInfo.getNo());
 
 	String[] tel = userInfo.getTel().split("-");
 %>
@@ -125,7 +125,7 @@
 							</colgroup>
 							<tr>
 								<th>아이디</th>
-								<td><input type="text" name="userId" value="<%=userInfo.getId() %>" readonly="readonly"><span class="px-1">(영문소문자/숫자, 4~16자)</span></td>
+								<td><input type="text" name="userId" value="<%=userInfo.getId() %>" readonly="readonly" ><span class="px-1">(영문소문자/숫자, 4~16자)</span></td>
 							</tr>
 							<tr>
 								<th>비밀번호 <img src="https://img.echosting.cafe24.com/skin/base/common/ico_required_blue.gif" alt="필수"></th>

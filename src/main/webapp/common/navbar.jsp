@@ -99,7 +99,7 @@
 			            <li><a class="dropdown-item" href="#">REVIEW</a></li>
 			        </ul>
 				</li>
-			</ul>
+			</ul>	
 	      <!-- Left links -->
 		</div>
     <!-- Collapsible wrapper -->
