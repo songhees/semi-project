@@ -1,10 +1,10 @@
+<%@page import="org.apache.commons.lang3.math.NumberUtils"%>
 <%@page import="org.apache.commons.lang3.StringUtils"%>
 <%@page import="semi.vo.Product"%>
 <%@page import="semi.vo.Pagination"%>
 <%@page import="semi.criteria.ProductCriteria"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
-<%@page import="semi.dao.ProductItemDao"%>
 <%@page import="semi.dao.ProductDao"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!doctype html>
@@ -18,6 +18,42 @@
 		.container {
 			min-width: 960px;
 		}
+		
+		a:link { color: black; text-decoration: none;}
+ 		a:visited { color: black; text-decoration: none;}
+ 		a:hover { color: black; text-decoration: none;}
+ 		a:active { color: black; text-decoration: none;}
+ 		a:hover:first-child {color: black; text-decoration: none;}
+    	
+    	span {
+    		color: #a5a5a5;
+    		font-size: 0.8em;
+    	}
+    	.orderBy {
+    		text-decoration: none;
+    	}
+    	.orderBy > span:hover {
+    		color: #cccccc;
+    	}
+    	
+    	a.page-link {
+      		border: none;
+      		color: #757575;
+      		padding: 4px 0;
+     		width: 20px;
+      		text-align: center;
+   		}
+   		li.page-item.active > a.page-link {
+      		color: #757575;
+      		background-color: white;
+      		font-weight: bold;
+   		}
+   		li.page-item.active {
+      		border-bottom: 2px solid #757575;
+   		}
+   		li.page-item {
+      		margin: 0 6px;
+   		}
 	</style>
 </head>
 <body>
@@ -27,25 +63,58 @@
 		String pageNo = StringUtils.defaultString(request.getParameter("pageNo"), "1");
 		String category = StringUtils.defaultString(request.getParameter("category"), "");
 		String orderBy = StringUtils.defaultString(request.getParameter("orderBy"), "");
+		String nameKeyword = StringUtils.defaultString(request.getParameter("nameKeyword"), "");
+		String priceRangeFrom = request.getParameter("priceRangeFrom");
+		String priceRangeTo = request.getParameter("priceRangeTo");
 		
-		// category가 비어있을 경우 초기값으로 TOP을 넣어준다.
-		if (category == null) {
-			category = "TOTAL";
+		// Criteria에 저장되어 ProductDao에 보내질 priceRangeFrom과 priceRangeTo
+		long priceRangeFromInCriteria;
+		long priceRangeToInCriteria;
+		
+		if (priceRangeFrom.isEmpty()) {
+			priceRangeFromInCriteria = 0L;
+		} else {
+			priceRangeFromInCriteria = Long.parseLong(priceRangeFrom);
 		}
-		// category가 SHIRT일 경우 SHIRT&BLOUSE로 바꿔준다.
-		if ("SHIRT".equals(category)) {
-			category = "SHIRT&BLOUSE";
+		if (priceRangeTo.isEmpty()) {
+			priceRangeToInCriteria = 0L;
+		} else {
+			priceRangeToInCriteria = Long.parseLong(priceRangeTo);
 		}
+		
+		// Criteria에 저장되어 ProductDao에 보내질 category
+		String categoryInCriteria;
+
+		if ("전체상품".equals(category)) {
+			categoryInCriteria = "";
+		} else if ("SHIRT".equals(category)) {
+			categoryInCriteria = "SHIRT&BLOUSE";
+		} else {
+			categoryInCriteria = category;
+		}
+		
+		// TODO 테스트용 프린트
+		System.out.println("pageNo: " + pageNo);
+		System.out.println("category: " + category);
+		System.out.println("categoryInCriteria: " + categoryInCriteria);
+		System.out.println("orderBy: " + orderBy);
+		System.out.println("nameKeyword: " + nameKeyword);
+		System.out.println("priceRangeFrom: " + priceRangeFrom);
+		System.out.println("priceRangeTo: " + priceRangeTo);
 		
 		ProductDao productDao = ProductDao.getInstance();
-		ProductItemDao productItemDao = ProductItemDao.getInstance();
 		List<Product> products = new ArrayList<Product>();
 		ProductCriteria productCriteria = new ProductCriteria();
-			
-		productCriteria.setCategory(category);
-		productCriteria.setOrderBy(orderBy);
 		
-		int totalRecords = productDao.getProductTotalRecords(productCriteria);
+		productCriteria.setCategory(categoryInCriteria);
+		productCriteria.setOrderBy(orderBy);
+		productCriteria.setNameKeyword(nameKeyword);
+		productCriteria.setPriceRangeFrom(priceRangeFromInCriteria);
+		productCriteria.setPriceRangeTo(priceRangeToInCriteria);
+		
+		//int totalRecords = productDao.getProductTotalRecords(productCriteria);
+		// TODO 임시 totalRecords
+		int totalRecords = 100;
 		// TODO 테스트용 프린트
 		System.out.println("totalRecords: " + totalRecords);
 		Pagination pagination = new Pagination(pageNo, totalRecords, 8, 5);
@@ -55,12 +124,7 @@
 		productCriteria.setBegin(begin);
 		productCriteria.setEnd(end);
 		
-		if ("전체상품".equals(category)) {
-			products = productDao.getAllProductList(productCriteria);
-		} else {
-		// TODO 카테고리가 알맞은지 먼저 확인하고, 해당하는 상품 리스트를 가져온다.
-			products = productDao.getProductListBycategory(productCriteria);
-		}
+		products = productDao.searchProductsByCriteria(productCriteria);
 	%>
 <div class="container">    
 	<div class="row">
@@ -68,7 +132,7 @@
 			<h5><strong>SEARCH</strong></h5>
 		</div>
 	</div>
-	<div class="row justify-content-center border p-3">
+	<div class="row justify-content-center border p-3 mb-5">
 		<div class="col-6 mt-5">
 			<form id="form-search" method="get" action="search.jsp">
 				<input type="hidden" id="page-field" name="pageNo" value="1">
@@ -78,15 +142,18 @@
 					</label>
 					<div class="col-10">
 						<select class="form-select" name="category" style="font-size: 0.75em;">
-  							<option value="" selected>상품분류 선택</option>
-							<option value="NEW">NEW</option>
-							<option value="OUTER">OUTER</option>
-							<option value="TOP">TOP</option>
-							<option value="SHIRT">SHIRT&amp;BLOUSE</option>
-							<option value="DRESS">DRESS</option>
-							<option value="SKIRT">SKIRT</option>
-							<option value="PANTS">PANTS</option>
-							<option value="전체상품">전체상품</option>
+  							<option value="" <%=category.isEmpty() ? "selected" : ""%>>상품분류 선택</option>
+							<!-- 
+								미구현 
+								<option value="NEW">NEW</option>
+							-->
+							<option value="OUTER" <%="OUTER".equals(category) ? "selected" : ""%>>OUTER</option>
+							<option value="TOP" <%="TOP".equals(category) ? "selected" : ""%>>TOP</option>
+							<option value="SHIRT" <%="SHIRT".equals(category) ? "selected" : ""%>>SHIRT&amp;BLOUSE</option>
+							<option value="DRESS" <%="DRESS".equals(category) ? "selected" : ""%>>DRESS</option>
+							<option value="SKIRT" <%="SKIRT".equals(category) ? "selected" : ""%>>SKIRT</option>
+							<option value="PANTS" <%="PANTS".equals(category) ? "selected" : ""%>>PANTS</option>
+							<option value="전체상품" <%="전체상품".equals(category) ? "selected" : ""%>>전체상품</option>
 						</select>
 					</div>
 				</div>
@@ -95,7 +162,7 @@
 						<strong>상품명</strong>
 					</label>
 					<div class="col-10">
-						<input type="text" name="nameKeyword" class="form-control" style="font-size: 0.75em;">
+						<input type="text" name="nameKeyword" class="form-control" style="font-size: 0.75em;" value="<%=nameKeyword%>">
 					</div>
 				</div>
 				<div class="row mb-2">
@@ -103,9 +170,9 @@
 						<strong>판매가격대</strong>
 					</label>
 					<div class="col-10">
-						<input type="number" name="priceRangeFrom" class="form-control" style="font-size: 0.75em; width: 47%; display: inline;">
+						<input type="number" name="priceRangeFrom" class="form-control" style="font-size: 0.75em; width: 47%; display: inline;" value="<%=priceRangeFrom%>">
 						<label style="font-size: 0.75em; width: 6%; display: inline;">~</label>
-						<input type="number" name="priceRangeTo" class="form-control" style="font-size: 0.75em;  width: 47%; display: inline;">
+						<input type="number" name="priceRangeTo" class="form-control" style="font-size: 0.75em;  width: 47%; display: inline;" value="<%=priceRangeTo%>">
 					</div>
 				</div>
 				<div class="row mb-2">
@@ -114,12 +181,12 @@
 					</label>
 					<div class="col-10">
 						<select class="form-select" name="orderBy" style="font-size: 0.75em;">
-  							<option value="" selected>::: 기준선택 :::</option>
-							<option value="신상품">신상품</option>
-							<option value="낮은가격">낮은가격</option>
-							<option value="높은가격">높은가격</option>
-							<option value="인기상품">인기상품</option>
-							<option value="사용후기">사용후기</option>
+  							<option value="" <%=orderBy.isEmpty() ? "selected" : ""%>>::: 기준선택 :::</option>
+							<option value="신상품" <%="신상품".equals(orderBy) ? "selected" : ""%>>신상품</option>
+							<option value="낮은가격" <%="낮은가격".equals(orderBy) ? "selected" : ""%>>낮은가격</option>
+							<option value="높은가격" <%="높은가격".equals(orderBy) ? "selected" : ""%>>높은가격</option>
+							<option value="인기상품" <%="인기상품".equals(orderBy) ? "selected" : ""%>>인기상품</option>
+							<option value="사용후기" <%="사용후기".equals(orderBy) ? "selected" : ""%>>사용후기</option>
 						</select>
 					</div>
 				</div>
@@ -157,6 +224,13 @@
 			</a>
 		</div>
 	</div>
+		<% 
+			if (products.isEmpty()) { 
+		%>
+		<h5 class="text-center">조회된 상품이 없습니다.</h5>
+		<% 
+			} 
+		%>
 	<div class="row row-cols-4 g-4 my-4">
 		<%
 			for (Product product : products) {
@@ -164,7 +238,7 @@
 		<div class="col">
 			<div class="card border-light h-100">
 				<a href="/semi-project/product/detail.jsp?no=<%=product.getNo() %>">
-					<img src="/semi-project/resources/images/product/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>/thumbnail/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>_1.jpg" 
+					<img src="/semi-project/resources/images/product/<%=productDao.getProductThumbnailImageList(product.getNo()).isEmpty() ? 1000 : product.getNo() %>/thumbnail/<%=productDao.getProductThumbnailImageList(product.getNo()).isEmpty() ? 1000 : product.getNo() %>_1.jpg" 
 				 	 class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
 				</a>
 				<div class="card-body">
@@ -235,10 +309,17 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script type="text/javascript">
+	// 검색버튼을 클릭했을 때 실행되며 form-search 내부의 값들이 search.jsp로 전달된다.
 	function searchProducts(pageNo) {
 		document.getElementById("page-field").value = pageNo;
 		var form = document.getElementById("form-search");
 		form.submit();
+	}
+	
+	// 페이지번호를 클릭했을 때 실행되며 기존 이벤트가 멈추고 searchProducts(pageNo) 함수가 실행된다.
+	function movePageTo(event, pageNo) {
+		event.preventDefault();
+		searchProducts(pageNo);
 	}
 	
 	// 이미지의 경로에서 확장자를 제외한 마지막 문자를 imgNumber로 변경한다.

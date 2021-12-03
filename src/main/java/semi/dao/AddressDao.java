@@ -106,8 +106,7 @@ public class AddressDao {
 		String sql = "select address_no, user_no, address_name, postal_code, address_default, "
 				+ "address_detail, base_address "
 				+ "from semi_user_address "
-				+ "where address_no = ? "
-				+ "and address_default = 'Y' ";
+				+ "where address_no = ? ";
 		Connection connection = getConnection();
 		PreparedStatement pstmt = connection.prepareStatement(sql);
 		pstmt.setInt(1, no);

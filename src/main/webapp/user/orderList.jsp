@@ -1,3 +1,5 @@
+<%@page import="org.apache.commons.lang3.math.NumberUtils"%>
+<%@page import="org.apache.commons.lang3.StringUtils"%>
 <%@page import="java.text.DecimalFormat"%>
 <%@page import="org.apache.tomcat.jakartaee.commons.io.output.NullOutputStream"%>
 <%@page import="semi.criteria.OrderItemCriteria"%>
@@ -88,23 +90,12 @@
 <%@ include file="../common/navbar.jsp" %>
 <%
 	
-	String pageNo = request.getParameter("pageNo");
+	String pageNo = StringUtils.defaultString(request.getParameter("pageNo"), "1");
+	String subMenu = StringUtils.defaultString(request.getParameter("subMenu"), "order");
+	int period = NumberUtils.toInt(request.getParameter("period"), 3);
+	
 	OrderDao orderDao = OrderDao.getinstance();
 	OrderItemCriteria criteria = new OrderItemCriteria();
-	
-	String subMenu = request.getParameter("subMenu");
-	String startDate = request.getParameter("startDate");
-	String endDate = request.getParameter("endDate");
-	
-	if (subMenu == null) {
-		subMenu = "order";
-		startDate = criteria.getPeriod(3)[0];
-		endDate = criteria.getPeriod(3)[1];
-	} else if (subMenu != null && startDate == null) {
-		startDate = criteria.getPeriod(3)[0];
-		endDate = criteria.getPeriod(3)[1];
-	}
-	
 	/* 로그인 없이 이 페이지에 접근하는 경우 */
 /* 	if (loginUserInfo == null) {
 		response.sendRedirect("loginform.jsp");		
@@ -114,8 +105,8 @@
 	/* 검색 조건 */
 	/* login.jsp 완성시  loginUserInfo.getId() 넣기*/
 	criteria.setUserId("osh");
-	criteria.setBeginDate(startDate);
-	criteria.setEndDate(endDate);
+	criteria.setBeginDate(criteria.getPeriod(period)[0]);
+	criteria.setEndDate(criteria.getPeriod(period)[1]);
 	criteria.setStatus(subMenu);
 	
 	/* 예외발생시 */
@@ -139,7 +130,8 @@
 	/* login.jsp 완성시  loginUserInfo.getId() 넣기*/
 	criteria.setBegin(pagination.getBegin());
 	criteria.setEnd(pagination.getEnd());
-
+	
+	/* user의 아이디로 검색할건지 번호를 검색할 건지 나중에 정하기 */
 	List<OrderItemDto> itemList = orderDao.getOrderItemListByUserId(criteria);
 %>
 <div class="container">    
@@ -195,10 +187,10 @@
 		<div class="btn-group btn-group-sm p-3">
 			<!-- <form id="form-search" method="get" action="orderList.jsp">
 					<input type="button" onclick="" name="period">오늘 -->
-		  	<a class="btn btn-outline-secondary" href="orderList.jsp?pageNo=1&subMenu=<%=subMenu %>&startDate=<%=criteria.getPeriod(0)[0] %>&endDate=<%=criteria.getPeriod(0)[1] %>">오늘</a>
-			<a class="btn btn-outline-secondary" href="orderList.jsp?pageNo=1&subMenu=<%=subMenu %>&startDate=<%=criteria.getPeriod(1)[0] %>&endDate=<%=criteria.getPeriod(1)[1] %>">1개월</a>
-			<a class="btn btn-outline-secondary" href="orderList.jsp?pageNo=1&subMenu=<%=subMenu %>&startDate=<%=criteria.getPeriod(3)[0] %>&endDate=<%=criteria.getPeriod(3)[1] %>">3개월</a>
-			<a class="btn btn-outline-secondary" href="orderList.jsp?pageNo=1&subMenu=<%=subMenu %>&startDate=<%=criteria.getPeriod(6)[0] %>&endDate=<%=criteria.getPeriod(6)[1] %>">6개월</a>
+		  	<a class="btn btn-outline-secondary" href="orderList.jsp?pageNo=1&subMenu=<%=subMenu %>&period=0">오늘</a>
+			<a class="btn btn-outline-secondary" href="orderList.jsp?pageNo=1&subMenu=<%=subMenu %>&period=1">1개월</a>
+			<a class="btn btn-outline-secondary" href="orderList.jsp?pageNo=1&subMenu=<%=subMenu %>&period=3">3개월</a>
+			<a class="btn btn-outline-secondary" href="orderList.jsp?pageNo=1&subMenu=<%=subMenu %>&period=6">6개월</a>
 		</div>
 <%
 	}
@@ -297,19 +289,19 @@
 			<nav aria-label="Page navigation example">
 				<ul class="pagination justify-content-center">
 					<li class="page-item <%=pagination.isExistPrev()? "" : "disabled" %>">
-					    <a class="page-link" href="orderList.jsp?pageNo=<%=pagination.getPrevPage() %>&subMenu=order" aria-label="Previous">
+					    <a class="page-link" href="orderList.jsp?pageNo=<%=pagination.getPrevPage() %>&subMenu=<%=subMenu %>&period=<%=period %>" aria-label="Previous">
 					    	<span aria-hidden="true">&laquo;</span>
 					    </a>
 				    </li>
 	<%
 		for (int i = pagination.getBeginPage() ; i <= pagination.getEndPage() ; i++) {
 	%>				    
-					<li class="page-item <%=pagination.getPageNo() == i ? "active" : "" %>"><a class="page-link" href="orderList.jsp?pageNo=<%=i %>&subMenu=<%=subMenu %>&startDate=<%=startDate %>&endDate=<%=endDate %>"><%=i %></a></li>
+					<li class="page-item <%=pagination.getPageNo() == i ? "active" : "" %>"><a class="page-link" href="orderList.jsp?pageNo=<%=i %>&subMenu=<%=subMenu %>&period=<%=period %>"><%=i %></a></li>
 	<%
 		}
 	%>
 				    <li class="page-item <%=pagination.isExistNext()? "" : "disabled" %>">
-					    <a class="page-link" href="orderList.jsp?pageNo=<%=pagination.getNextPage() %>&subMenu=order" aria-label="Next">
+					    <a class="page-link" href="orderList.jsp?pageNo=<%=pagination.getNextPage() %>&subMenu=<%=subMenu %>&period=<%=period %>" aria-label="Next">
 					    	<span aria-hidden="true">&raquo;</span>
 					    </a>
 				    </li>

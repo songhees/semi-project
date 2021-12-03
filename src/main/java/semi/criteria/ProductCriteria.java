@@ -2,10 +2,13 @@ package semi.criteria;
 
 public class ProductCriteria {
 
-	private int begin;
-	private int end;
-	private String category;
-	private String orderBy;
+	private int begin;				// 현재 페이지번호에 해당하는 데이터 조회 시작 순번
+	private int end;				// 현재 페이지번호에 해당하는 데이터 조회 끝 순번
+	private String category;		// 카테고리 이름
+	private String orderBy;			// 정렬기준
+	private String nameKeyword;		// 검색할 상품 이름
+	private long priceRangeFrom;	// 가격 범위의 시작
+	private long priceRangeTo;		// 가격 범위의 끝
 	
 	public ProductCriteria() {}
 
@@ -41,10 +44,35 @@ public class ProductCriteria {
 		this.orderBy = orderBy;
 	}
 
+	public String getNameKeyword() {
+		return nameKeyword;
+	}
+
+	public void setNameKeyword(String nameKeyword) {
+		this.nameKeyword = nameKeyword;
+	}
+
+	public long getPriceRangeFrom() {
+		return priceRangeFrom;
+	}
+
+	public void setPriceRangeFrom(long priceRangeFrom) {
+		this.priceRangeFrom = priceRangeFrom;
+	}
+
+	public long getPriceRangeTo() {
+		return priceRangeTo;
+	}
+
+	public void setPriceRangeTo(long priceRangeTo) {
+		this.priceRangeTo = priceRangeTo;
+	}
+
 	@Override
 	public String toString() {
-		return "GetProductListBycategoryCritetia [begin=" + begin + ", end=" + end + ", category=" + category
-				+ ", orderBy=" + orderBy + "]";
+		return "ProductCriteria [begin=" + begin + ", end=" + end + ", category=" + category + ", orderBy=" + orderBy
+				+ ", nameKeyword=" + nameKeyword + ", priceRangeFrom=" + priceRangeFrom + ", priceRangeTo="
+				+ priceRangeTo + "]";
 	}
 	
 	
