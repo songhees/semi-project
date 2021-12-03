@@ -351,6 +351,7 @@ public class ProductDao {
 		String category = criteria.getCategory();
 		String nameKeyword = criteria.getNameKeyword();
 		long priceRangeTo = criteria.getPriceRangeTo();
+		
 		if (!isEmpty(category) && !isEmpty(nameKeyword) && !isZero(priceRangeTo)) {
 			pstmt.setString(1, criteria.getCategory());
 			pstmt.setString(2, criteria.getNameKeyword());
@@ -445,6 +446,88 @@ public class ProductDao {
 		connection.close();
 		
 		return productTotalRecords;
+	}
+	
+	/**
+	 * 검색조건에 따른 상품의 총 개수를 구한다.
+	 * searchProductsByCriteria 메소드를 위해 따로 만들었다.
+	 * @param criteria 검색조건
+	 * @return 검색조건에 따른 상품의 총 개수
+	 * @throws SQLException
+	 */
+	public int getProductTotalRecords2(ProductCriteria criteria) throws SQLException {
+		String sql = "SELECT COUNT(*) CN \r\n"
+				+ "FROM SEMI_PRODUCT P, SEMI_PRODUCT_CATEGORY C \r\n"
+				+ "WHERE P.CATEGORY_NO = C.CATEGORY_NO \r\n"
+				+ "		 AND P.PRODUCT_PRICE >= ? \r\n";
+		if (!criteria.getCategory().isEmpty()) {
+			sql += "      AND C.CATEGORY_NAME = ? \r\n";
+		}
+		if (!criteria.getNameKeyword().isEmpty()) {
+			sql += "      AND P.PRODUCT_NAME LIKE '%' || ? || '%' \r\n";
+		}
+		if (criteria.getPriceRangeTo() != 0L) {
+			sql += "      AND P.PRODUCT_PRICE <= ?";
+		}
+		
+		int productTotalRecords = 0;
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setLong(1, criteria.getPriceRangeFrom());
+		setPstmt2(pstmt, criteria);
+		ResultSet rs = pstmt.executeQuery();
+		
+		rs.next();
+		productTotalRecords = rs.getInt("CN");
+		
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return productTotalRecords;
+	}
+	
+	private PreparedStatement setPstmt2(PreparedStatement pstmt, ProductCriteria criteria) throws SQLException {
+		String category = criteria.getCategory();
+		String nameKeyword = criteria.getNameKeyword();
+		long priceRangeTo = criteria.getPriceRangeTo();
+		
+		if (!isEmpty(category) && !isEmpty(nameKeyword) && !isZero(priceRangeTo)) {
+			pstmt.setString(2, criteria.getCategory());
+			pstmt.setString(3, criteria.getNameKeyword());
+			pstmt.setLong(4, criteria.getPriceRangeTo());
+			return pstmt;
+		} else if (!isEmpty(category) && !isEmpty(nameKeyword) && isZero(priceRangeTo)) {
+			pstmt.setString(2, criteria.getCategory());
+			pstmt.setString(3, criteria.getNameKeyword());
+			return pstmt;
+		} else if (!isEmpty(category) && isEmpty(nameKeyword) && isZero(priceRangeTo)) {
+			pstmt.setString(2, criteria.getCategory());
+			return pstmt;
+		} else if (!isEmpty(category) && isEmpty(nameKeyword) && !isZero(priceRangeTo)) {
+			pstmt.setString(2, criteria.getCategory());
+			pstmt.setLong(3, criteria.getPriceRangeTo());
+			return pstmt;
+		} else if (isEmpty(category) && !isEmpty(nameKeyword) && !isZero(priceRangeTo)) {
+			pstmt.setString(2, criteria.getNameKeyword());
+			pstmt.setLong(3, criteria.getPriceRangeTo());
+			return pstmt;
+		} else if (isEmpty(category) && !isEmpty(nameKeyword) && isZero(priceRangeTo)) {
+			pstmt.setString(2, criteria.getNameKeyword());
+			return pstmt;
+		} else if (isEmpty(category) && isEmpty(nameKeyword) && !isZero(priceRangeTo)) {
+			pstmt.setLong(2, criteria.getPriceRangeTo());
+			return pstmt;
+		} else {
+			return pstmt;
+		}
+	}
+	
+	public List<Product> getNewProductList(ProductCriteria criteria) throws SQLException {
+		String sql = "";
+		
+		return null;
 	}
 	
 	public Map<String, Integer> getProductStock(int no, String color) throws SQLException {
