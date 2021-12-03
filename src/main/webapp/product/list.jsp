@@ -89,7 +89,7 @@
 		int totalRecords = productDao.getProductTotalRecords(productCriteria);
 		// TODO 테스트용 프린트
 		System.out.println("totalRecords: " + totalRecords);
-		Pagination pagination = new Pagination(pageNo, totalRecords, 8, 5);
+		Pagination pagination = new Pagination(pageNo, totalRecords, 4, 5);
 		int begin = pagination.getBegin();
 		int end = pagination.getEnd();
 		
@@ -128,8 +128,8 @@
 				<span><%="인기상품".equals(orderBy) ? "<strong>" : "" %>인기상품<%="인기상품".equals(orderBy) ? "</strong>" : "" %></span>
 			</a>
 			<span class="px-3">|</span>
-			<a class="orderBy" href="list.jsp?category=<%=category %>&orderBy=상품후기">
-				<span><%="상품후기".equals(orderBy) ? "<strong>" : "" %>상품후기<%="상품후기".equals(orderBy) ? "</strong>" : "" %></span>
+			<a class="orderBy" href="list.jsp?category=<%=category %>&orderBy=사용후기">
+				<span><%="사용후기".equals(orderBy) ? "<strong>" : "" %>사용후기<%="사용후기".equals(orderBy) ? "</strong>" : "" %></span>
 			</a>
 		</div>
 	</div>

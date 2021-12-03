@@ -1,3 +1,4 @@
+<%@page import="org.apache.commons.lang3.math.NumberUtils"%>
 <%@page import="java.util.List"%>
 <%@page import="semi.vo.Address"%>
 <%@page import="semi.dao.AddressDao"%>
@@ -89,16 +90,16 @@
 <body>
 <%@ include file="../../common/navbar.jsp" %>
 <%
-	int addressNo = Integer.parseInt(request.getParameter("no"));
+	int addressNo = NumberUtils.toInt(request.getParameter("no"), 0);
 /* 로그인 없이 이 페이지에 접근하는 경우 */
 /* 	if (loginUserInfo == null) {
 		response.sendRedirect("loginform.jsp");		
 		return;
 	}
 */
-
 	AddressDao addressDao = AddressDao.getInstance();
 	Address address = addressDao.getAddressByNo(addressNo);
+
 	/*
 		if (loginUserInfo.getNo() != address.getUser().getNo()) {
 			response.sendRedirect("index.jsp");		
@@ -129,7 +130,8 @@
 	<div class="row">
 		<!-- 주문정보 table -->
 		<div class="col my-5">
-			<form id="loginForm" action="modify.jsp" method="post" onsubmit="checkInputField(event)">
+			<form id="loginForm" action="register.jsp" method="post" onsubmit="checkInputField(event)">
+				<input type="hidden" name="no" value="<%=addressNo %>">
 				<table class="vintable">
 					<tbody>
 						<colgroup>
@@ -138,7 +140,7 @@
 						</colgroup>
 						<tr>
 							<th>배송지명 <img src="https://img.echosting.cafe24.com/skin/base/common/ico_required_blue.gif" alt="필수"></th>
-							<td><input type="text" name="addressName" id="name" value="<%=address.getAddressName() %>">
+							<td><input type="text" name="addressName" id="name" value="<%=address!=null? address.getAddressName() : "" %>">
 							<div class="form-text text-danger" style="display: none;" id="error-name">
 								배송지명은 필수 입력항목입니다.
 							</div>
@@ -153,22 +155,35 @@
 						<tr>
 							<th>주소 <img src="https://img.echosting.cafe24.com/skin/base/common/ico_required_blue.gif" alt="필수"></th>
 							<td>
-								<input name="postcode" type="text" id="postcode" placeholder="우편번호" value="<%=address.getPostalCode() %>">
+								<input name="postcode" type="text" id="postcode" placeholder="우편번호" value="<%=address!=null? address.getPostalCode() : "" %>">
 								<input type="button" onclick="sample6_execDaumPostcode()" value="우편번호 찾기"><br>
-								<input name ="baseAddress" type="text" id="address" placeholder="주소" value="<%=address.getBaseAddress() %>"><br>
-								<input name="addressDetail" type="text" id="detailAddress" placeholder="상세주소" value="<%=address.getDetail() %>">
+								<input name ="baseAddress" type="text" id="address" placeholder="주소" value="<%=address!=null? address.getBaseAddress() : "" %>"><br>
+								<input name="addressDetail" type="text" id="detailAddress" placeholder="상세주소" value="<%=address!=null? address.getDetail() : "" %>">
 								<div class="form-text text-danger" style="display: none;" id="error-address">
 									주소은 필수 입력항목입니다.
 								</div>
 							</td>
 						</tr>
 						<tr class="text-end">
-							<td class="p-1" colspan="2" style="border-left: none;"><input class="m-1" type="checkbox">기본배송지로저장</td>
+							<td class="p-1" colspan="2" style="border-left: none;">
+								<input name="isDefault" class="m-1" type="checkbox" <%=address!=null? ("Y".equals(address.getAddressDefault()) ? "checked" : "") : "" %>>
+								기본배송지로저장
+							</td>
 						</tr>
 					</tbody>
 				</table>
 				<div class="text-end mt-2">
+<%
+	if (addressNo == 0) {
+%>
+					<button type="submit" class="btn btn-dark opacity-50">등록</button>
+<%		
+	} else {
+%>
 					<button type="submit" class="btn btn-dark opacity-50">수정</button>
+<%		
+	}
+%>
 					<a href="../../index.jsp" class="btn btn-outline-secondary" >취소</a>
 				</div>
 			</form>
