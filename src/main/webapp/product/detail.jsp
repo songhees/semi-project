@@ -47,6 +47,9 @@ List<String> thumbnails = productDao.getProductThumbnailImageList(no);
 	font-weight: bold;
 	display: inline;
 }
+#review-add {
+	display: inline;
+}
 </style>
 <body>
 
@@ -471,31 +474,42 @@ for (String size : sizeList) {
 		<div class="row mt-5 pt-3 mb-5">
 			<div class="col p-0">
 				<div>
-					<p style="font-size: small; color: gray; margin-bottom: 0">
-						<strong>REVIEW</strong> | 문의글 혹은 악의적인 비방글은 무통보 삭제된다는 점 유의해주세요^^
-					</p>
-					<div class="form-floating">
-						<textarea class="form-control" placeholder="Leave a comment here"
-							id="floatingTextarea2" style="height: 120px"></textarea>
-						<label for="floatingTextarea2">리뷰를 남겨주세요.</label>
-					</div>
-
-					<div class="d-flex justify-content-between pt-1">
-						<div class="col-3">
-							<select class="form-select" aria-label="Default select example">
-								<option value="5" selected>아주 좋아요</option>
-								<option value="4">맘에 들어요</option>
-								<option value="3">보통이에요</option>
-								<option value="2">그냥 그래요</option>
-								<option value="1">별로에요</option>
-							</select>
+					<form method="post" action="review.jsp" enctype="multipart/form-data">
+						<p style="font-size: small; color: gray; margin-bottom: 0">
+							<strong>REVIEW</strong> | 문의글 혹은 악의적인 비방글은 무통보 삭제된다는 점 유의해주세요^^
+						</p>
+						<div class="form-floating">
+							<textarea class="form-control" placeholder="Leave a comment here" name="reviewContent"
+								id="reviewTextArea" style="height: 120px"></textarea>
+							<label for="reviewTextArea">리뷰를 남겨주세요.</label>
 						</div>
-						<div>
-							<button type="button" class="btn btn-secondary" type="submit">
-								<span class="fs-6">리뷰 등록하기</span>
-							</button>
-						</div>
-					</div>
+						
+						<div class="row mt-1 row justify-content-between">
+							<div class="col-10">
+							    <div class="col-sm-1 m-0">
+							       <label for="photo">사진 추가</label>
+							    </div>
+							    <div class="col-sm-3">
+							        <input type="file" class="form-control" id="photo" name="reviewImage">
+							    </div>
+							    <div class="col-sm-4">
+							        <select name="reviewRate" class="form-select col-sm" aria-label="Default select example">
+										<option value="5" selected>아주 좋아요</option>
+										<option value="4">맘에 들어요</option>
+										<option value="3">보통이에요</option>
+										<option value="2">그냥 그래요</option>
+										<option value="1">별로에요</option>
+									</select>
+							    </div>
+							</div>
+							<div class="col-2">
+							    <div class="col-sm">
+							     	<button class="btn btn-secondary" type="submit">
+									<span class="fs-6">리뷰 등록하기</span></button>
+						     	</div>
+					     	</div>
+					    </div>
+					</form>
 				</div>
 			</div>
 		</div>
@@ -529,7 +543,7 @@ for (String size : sizeList) {
 		</div>
 
 
-		<div class="row">
+		<div class="row mb-5 pb-3">
 			<div class="col">
 				<div class="d-flex justify-content-center mt-5 mb-4" id="inquiry">
 					<ul class="nav nav-tabs">
@@ -547,7 +561,7 @@ for (String size : sizeList) {
 				</div>
 			</div>
 		</div>
-		<div class="row">
+		<div class="row mb-5 pb-5">
 			<div class="col">
 				<h6 align="center">
 					<strong>Q&amp;A</strong>
