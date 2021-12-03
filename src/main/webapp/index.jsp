@@ -119,7 +119,7 @@
 		<div class="col">
 			<div class="card-group">
 				<div class="card border-light h-100">
-					<a href="/semi-project/product/list.jsp?category='전체상품'&orderBy='인기상품'">
+					<a href="/semi-project/product/list.jsp?category=전체상품&orderBy=인기상품">
 						<img src="resources/images/home/banner/1.jpg" class="card-img-top">
 					</a>
 					<div class="card-body text-center">
@@ -203,7 +203,7 @@
 									<div id="best-item-<%=i %>" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
 										<!-- 리뷰 수 미구현 -->
 										<a href="/semi-project/product/detail.jsp?no=<%=product.getNo() %>">
-											<img src="/semi-project/resources/images/product/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>/thumbnail/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>_1.jpg" class="img-fluid">
+											<img src="/semi-project/resources/images/product/<%=productDao.getProductThumbnailImageList(product.getNo()).isEmpty() ? 1000 : product.getNo() %>/thumbnail/<%=productDao.getProductThumbnailImageList(product.getNo()).isEmpty() ? 1000 : product.getNo() %>_1.jpg" class="img-fluid">
 										</a>
 										<p class="text-over-image no-drag">
 											<a href="/semi-project/product/detail.jsp?no=<%=product.getNo() %>">
@@ -227,7 +227,7 @@
 									<div id="best-item-<%=i %>" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
 										<!-- 리뷰 수 미구현 -->
 										<a href="/semi-project/product/detail.jsp?no=<%=product.getNo() %>">
-											<img src="/semi-project/resources/images/product/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>/thumbnail/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>_1.jpg" class="img-fluid">
+											<img src="/semi-project/resources/images/product/<%=productDao.getProductThumbnailImageList(product.getNo()).isEmpty() ? 1000 : product.getNo() %>/thumbnail/<%=productDao.getProductThumbnailImageList(product.getNo()).isEmpty() ? 1000 : product.getNo() %>_1.jpg" class="img-fluid">
 										</a>
 										<p class="text-over-image no-drag">
 											<a href="/semi-project/product/detail.jsp?no=<%=product.getNo() %>">
@@ -251,7 +251,7 @@
 									<div id="best-item-<%=i %>" class="image" onmouseenter="changeInnerImage(this, 2)" onmouseleave="changeInnerImage(this, 1)">
 										<!-- 리뷰 수 미구현 -->
 										<a href="/semi-project/product/detail.jsp?no=<%=product.getNo() %>">
-											<img src="/semi-project/resources/images/product/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>/thumbnail/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>_1.jpg" class="img-fluid">
+											<img src="/semi-project/resources/images/product/<%=productDao.getProductThumbnailImageList(product.getNo()).isEmpty() ? 1000 : product.getNo() %>/thumbnail/<%=productDao.getProductThumbnailImageList(product.getNo()).isEmpty() ? 1000 : product.getNo() %>_1.jpg" class="img-fluid">
 										</a>
 										<p class="text-over-image no-drag">
 											<a href="/semi-project/product/detail.jsp?no=<%=product.getNo() %>">
@@ -292,7 +292,7 @@
 		<div class="col">
 			<div class="card border-light h-100">
 				<a href="/semi-project/product/detail.jsp?no=<%=product.getNo() %>">
-					<img src="/semi-project/resources/images/product/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>/thumbnail/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>_1.jpg"
+					<img src="/semi-project/resources/images/product/<%=productDao.getProductThumbnailImageList(product.getNo()).isEmpty() ? 1000 : product.getNo() %>/thumbnail/<%=productDao.getProductThumbnailImageList(product.getNo()).isEmpty() ? 1000 : product.getNo() %>_1.jpg"
 				 	 class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
 				</a>
 				<div class="card-body">

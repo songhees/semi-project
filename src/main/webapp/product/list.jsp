@@ -1,4 +1,3 @@
-<%@page import="semi.dao.ProductItemDao"%>
 <%@page import="semi.criteria.ProductCriteria"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="semi.vo.Product"%>
@@ -10,11 +9,30 @@
     pageEncoding="UTF-8"%>
 <!doctype html>
 <html lang="ko">
+<%
+	//요청 파라미터의 값들을 조회한다.
+	String category = request.getParameter("category");
+	String pageNo = request.getParameter("pageNo");
+	String orderBy = request.getParameter("orderBy");
+			
+	// category가 비어있을 경우 초기값으로 TOP을 넣어준다.
+	if (category == null) {
+		category = "TOP";
+	}
+	// category가 SHIRT일 경우 SHIRT&BLOUSE로 바꿔준다.
+	if ("SHIRT".equals(category)) {
+		category = "SHIRT&BLOUSE";
+	}
+	// pageNo가 비어있을 경우 초기값으로 1을 넣어준다.
+	if (pageNo == null) {
+		pageNo = "1";
+	}
+%>
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" >
-    <title>OUTER - 빈스데이</title>
+    <title><%=category %> - 빈스데이</title>
     <style type="text/css">
 		.container {
 			min-width: 992px;
@@ -24,6 +42,7 @@
  		a:visited { color: black; text-decoration: none;}
  		a:hover { color: black; text-decoration: none;}
  		a:active { color: black; text-decoration: none;}
+ 		a:hover:first-child {color: black; text-decoration: none;}
     	
     	span {
     		color: #a5a5a5;
@@ -60,26 +79,7 @@
 <%@ include file="/common/navbar.jsp" %>
 <div class="container">
 	<%
-	// 요청 파라미터의 값들을 조회한다.
-		String category = request.getParameter("category");
-		String pageNo = request.getParameter("pageNo");
-		String orderBy = request.getParameter("orderBy");
-			
-		// category가 비어있을 경우 초기값으로 TOP을 넣어준다.
-		if (category == null) {
-			category = "TOP";
-		}
-		// category가 SHIRT일 경우 SHIRT&BLOUSE로 바꿔준다.
-		if ("SHIRT".equals(category)) {
-			category = "SHIRT&BLOUSE";
-		}
-		// pageNo가 비어있을 경우 초기값으로 1을 넣어준다.
-		if (pageNo == null) {
-			pageNo = "1";
-		}
-		
 		ProductDao productDao = ProductDao.getInstance();
-		ProductItemDao productItemDao = ProductItemDao.getInstance();
 		List<Product> products = new ArrayList<Product>();
 		ProductCriteria productCriteria = new ProductCriteria();
 			
@@ -89,7 +89,7 @@
 		int totalRecords = productDao.getProductTotalRecords(productCriteria);
 		// TODO 테스트용 프린트
 		System.out.println("totalRecords: " + totalRecords);
-		Pagination pagination = new Pagination(pageNo, totalRecords, 8, 5);
+		Pagination pagination = new Pagination(pageNo, totalRecords, 4, 5);
 		int begin = pagination.getBegin();
 		int end = pagination.getEnd();
 		
@@ -99,7 +99,6 @@
 		if ("전체상품".equals(category)) {
 			products = productDao.getAllProductList(productCriteria);
 		} else {
-		// TODO 카테고리가 알맞은지 먼저 확인하고, 해당하는 상품 리스트를 가져온다.
 			products = productDao.getProductListBycategory(productCriteria);
 		}
 	%>
@@ -129,8 +128,8 @@
 				<span><%="인기상품".equals(orderBy) ? "<strong>" : "" %>인기상품<%="인기상품".equals(orderBy) ? "</strong>" : "" %></span>
 			</a>
 			<span class="px-3">|</span>
-			<a class="orderBy" href="list.jsp?category=<%=category %>&orderBy=상품후기">
-				<span><%="상품후기".equals(orderBy) ? "<strong>" : "" %>상품후기<%="상품후기".equals(orderBy) ? "</strong>" : "" %></span>
+			<a class="orderBy" href="list.jsp?category=<%=category %>&orderBy=사용후기">
+				<span><%="사용후기".equals(orderBy) ? "<strong>" : "" %>사용후기<%="사용후기".equals(orderBy) ? "</strong>" : "" %></span>
 			</a>
 		</div>
 	</div>
@@ -141,7 +140,7 @@
 		<div class="col">
 			<div class="card border-light h-100">
 				<a href="/semi-project/product/detail.jsp?no=<%=product.getNo() %>">
-					<img src="/semi-project/resources/images/product/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>/thumbnail/<%=productDao.getProductThumbnailImage(product.getNo()).isEmpty() ? 1000 : product.getNo() %>_1.jpg" 
+					<img src="/semi-project/resources/images/product/<%=productDao.getProductThumbnailImageList(product.getNo()).isEmpty() ? 1000 : product.getNo()%>/thumbnail/<%=productDao.getProductThumbnailImageList(product.getNo()).isEmpty() ? 1000 : product.getNo()%>_1.jpg" 
 				 	 class="card-img-top" onmouseenter="changeImage(this, 2)" onmouseleave="changeImage(this, 1)">
 				</a>
 				<div class="card-body">
