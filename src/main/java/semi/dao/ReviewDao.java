@@ -19,14 +19,16 @@ public class ReviewDao {
 		return self;
 	}
 	
-	public int getTotalRecords() throws SQLException {
+	public int getTotalRecordsByProductNo(int no) throws SQLException {
 		String sql = "select count(*) cnt "
-				   + "from semi_product_review ";
+				   + "from semi_product_review "
+				   + "where product_no = ? ";
 		
 		int totalRecords = 0;
 		
 		Connection connection = getConnection();
 		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, no);
 		ResultSet rs = pstmt.executeQuery();
 		rs.next();
 		totalRecords = rs.getInt("cnt");
@@ -37,13 +39,121 @@ public class ReviewDao {
 		return totalRecords;
 	}
 	
-	public List<Review> getReviewList(int begin, int end) throws SQLException {
+	public List<Review> getReviewList(int no, int begin, int end, String reviewOrderBy) throws SQLException {
 		String sql = "";
+		if (reviewOrderBy == "최신순") {
+			sql = "select review_no, user_no, review_rate, review_content, review_created_date "
+			    + "from (select row_number() over (order by review_no desc) rn, "
+			    + "      review_no, user_no, review_rate, review_content, review_created_date "
+			    + "      from semi_product_review"
+			    + "      where product_no = ? "
+			    + "      and review_deleted = 'N') "
+			    + "where rn >= ? and rn <= ? "
+			    + "order by rn ";
+		} else {
+			sql = "select review_no, user_no, review_rate, review_content, review_created_date "
+			    + "from (select row_number() over (order by review_rate desc) rn, "
+			    + "      review_no, user_no, review_rate, review_content, review_created_date "
+			    + "      from semi_product_review"
+			    + "      where product_no = ? "
+			    + "      and review_deleted = 'N') "
+			    + "where rn >= ? and rn <= ? "
+			    + "order by rn ";
+		}
 		
 		List<Review> reviewList = new ArrayList<>();
-		
+
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, no);
+		pstmt.setInt(2, begin);
+		pstmt.setInt(3, end);
+		ResultSet rs = pstmt.executeQuery();
+		while (rs.next()) {
+			Review review = new Review();
+			review.setNo(rs.getInt("review_no"));
+			review.setUserNo(rs.getInt("user_no"));
+			review.setRate(rs.getInt("review_rate"));
+			review.setContent(rs.getString("review_content"));
+			review.setCreatedDate(rs.getDate("review_created_date"));
+			reviewList.add(review);
+		}
+		rs.close();
+		pstmt.close();
+		connection.close();
 		
 		return reviewList;
+	}
+	
+	public List<String> getReviewImageNameListByReviewNo(int reviewNo) throws SQLException {
+		String sql = "select review_image_name "
+				   + "from semi_review_image "
+				   + "where review_no = ? ";
+		
+		List<String> reviewImageNameList = new ArrayList<>();
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, reviewNo);
+		ResultSet rs = pstmt.executeQuery();
+		while (rs.next()) {
+			reviewImageNameList.add(rs.getString("review_image_name"));
+		}
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return reviewImageNameList;
+	}
+	
+	public int getReviewNo() throws SQLException {
+		String sql = "select review_seq.nextval seq from dual";
+		
+		int reviewNo = 0;
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		ResultSet rs = pstmt.executeQuery();
+		rs.next();
+		reviewNo = rs.getInt("seq");
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return reviewNo;
+	}
+	
+	public void insertProductReview(Review review) throws SQLException {
+		String sql = "insert into semi_product_review "
+				   + "(review_no, user_no, product_no, review_content, review_rate) "
+				   + "values (?, ?, ?, ?, ?) ";
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, review.getNo());
+		pstmt.setInt(2, review.getUserNo());
+		pstmt.setInt(3, review.getProductNo());
+		pstmt.setString(4, review.getContent());
+		pstmt.setInt(5, review.getRate());
+		pstmt.executeUpdate();
+		
+		pstmt.close();
+		connection.close();
+	}
+	
+	public void insertReviewImage(Review review) throws SQLException {
+		String sql = "insert into semi_review_image "
+				   + "(review_no, review_image_name) "
+				   + "values (?, ?) ";
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, review.getNo());
+		pstmt.setString(2, review.getFilename());
+		pstmt.executeUpdate();
+		
+		pstmt.close();
+		connection.close();
 	}
 
 }

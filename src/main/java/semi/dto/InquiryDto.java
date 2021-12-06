@@ -7,6 +7,7 @@ public class InquiryDto {
 	private int inquiryNo;
 	private String title;
 	private String password;
+	private int productNo;
 	private String inquiryContent;
 	private Date inquiryCreatedDate;
 	private String inquiryDeleted;
@@ -47,6 +48,14 @@ public class InquiryDto {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public int getProductNo() {
+		return productNo;
+	}
+
+	public void setProductNo(int productNo) {
+		this.productNo = productNo;
 	}
 
 	public String getInquiryContent() {

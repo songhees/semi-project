@@ -1,3 +1,5 @@
+<%@page import="semi.dao.UserDao"%>
+<%@page import="semi.vo.Review"%>
 <%@page import="semi.dao.ReviewDao"%>
 <%@page import="semi.vo.Pagination"%>
 <%@page import="semi.dto.InquiryDto"%>
@@ -16,6 +18,11 @@
 <html lang="ko">
 <%
 int no = Integer.parseInt(request.getParameter("no"));
+String reviewOrderBy = request.getParameter("reviewOrderBy");
+
+if (reviewOrderBy == null) {
+	reviewOrderBy = "최신순";
+}
 
 ProductDao productDao = ProductDao.getInstance();
 Product product = productDao.getProductDetail(no);
@@ -54,6 +61,14 @@ List<String> thumbnails = productDao.getProductThumbnailImageList(no);
 #review-add {
 	display: inline;
 }
+
+.review-rate ul li {
+	display: inline;
+}
+#reviewImage {
+	width: 128px;
+	height: 128px;
+}
 </style>
 <body>
 
@@ -69,7 +84,7 @@ List<String> thumbnails = productDao.getProductThumbnailImageList(no);
 								<li class="breadcrumb-item"><a
 									href="/semi-prodject/index.jsp"
 									style="text-decoration: none; color: gray;">Home</a></li>
-								<li class="breadcrumb-item active" aria-current="page"><%=product.getProductCategory().getName() %></li>
+								<li class="breadcrumb-item active" aria-current="page"><%=product.getProductCategory().getName()%></li>
 							</ol>
 						</nav>
 					</div>
@@ -86,14 +101,14 @@ List<String> thumbnails = productDao.getProductThumbnailImageList(no);
 						<div class="thumbnail_list_img">
 							<ul class="thumb_img p-0 mt-3" style="list-style: none">
 								<%
-	for (String thumbnail : thumbnails) {
-%>
+								for (String thumbnail : thumbnails) {
+								%>
 								<li><img class="small-pic"
 									src="../resources/images/product/<%=product.getNo()%>/thumbnail/<%=thumbnail%>"
 									style="width: 75px" alt="productImg"></li>
 								<%
-	}
-%>
+								}
+								%>
 							</ul>
 						</div>
 					</div>
@@ -104,24 +119,24 @@ List<String> thumbnails = productDao.getProductThumbnailImageList(no);
 						<table class="table table-borderless">
 							<tr>
 								<%
-boolean onSale = false;
-long currentPrice = product.getPrice();
+								boolean onSale = false;
+								long currentPrice = product.getPrice();
 
-DecimalFormat formatter = new DecimalFormat("###,###");
+								DecimalFormat formatter = new DecimalFormat("###,###");
 
-SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-Date date = new Date();
-String today = format.format(date);
-Date todate = format.parse(today);
+								SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+								Date date = new Date();
+								String today = format.format(date);
+								Date todate = format.parse(today);
 
-	if (product.getDiscountFrom() != null || product.getDiscountTo() != null) {
-		int compareTo = product.getDiscountTo().compareTo(todate);
-		int compareFrom = todate.compareTo(product.getDiscountFrom());
-	
-		if (product.getDiscountPrice() != 0 && (compareTo >= 0 && compareFrom >= 0)) {
-			onSale = true;
-			currentPrice = product.getDiscountPrice();
-%>
+									if (product.getDiscountFrom() != null || product.getDiscountTo() != null) {
+										int compareTo = product.getDiscountTo().compareTo(todate);
+										int compareFrom = todate.compareTo(product.getDiscountFrom());
+									
+										if (product.getDiscountPrice() != 0 && (compareTo >= 0 && compareFrom >= 0)) {
+									onSale = true;
+									currentPrice = product.getDiscountPrice();
+								%>
 								<td>소비자가</td>
 								<td class="text-decoration-line-through"><%=formatter.format(product.getPrice())%>원</td>
 							</tr>
@@ -129,48 +144,47 @@ Date todate = format.parse(today);
 								<td>판매가</td>
 								<td><%=formatter.format(currentPrice)%>원</td>
 								<%
-		} else {
-%>
+								} else {
+								%>
 								<td>판매가</td>
 								<td><%=formatter.format(currentPrice)%>원</td>
 								<%
-		}
-	} else {
-%>
+								}
+									} else {
+								%>
 								<td>판매가</td>
 								<td><%=formatter.format(currentPrice)%>원</td>
 								<%
-	}
-%>
+								}
+								%>
 							</tr>
 							<tr>
 								<%
-List<String> colorList = productDao.getProductColorList(no);
-if (colorList.get(0) != null) {
-%>
+								List<String> colorList = productDao.getProductColorList(no);
+								if (colorList.get(0) != null) {
+								%>
 								<td>색상</td>
 								<td>
 									<%
-	for (String color : colorList) {
-%>
+									for (String color : colorList) {
+									%>
 									<div id="color-check"
 										class="form-check form-check-inline p-0 m-0">
 										<input type="radio" class="btn-check"
 											id="color btn-check-outlined<%=color%>" name="color"
-											value="<%=color%>" onclick="sizeStockCheck()"> <label
+											value="<%=color%>"> <label
 											class="btn btn-outline-secondary"
-											for="color btn-check-outlined<%=color%>"><%=color %></label>
+											for="color btn-check-outlined<%=color%>"><%=color%></label>
 									</div> <%
-	} 
-} else {
-%>
+ } 
+ } else {
+ %>
 									<div id="color-check">
 										<input type="hidden" name="color"
-											value="<%=colorList.get(0) %>">
+											value="<%=colorList.get(0)%>">
 									</div> <%
-}
-
-%>
+ }
+ %>
 									<P style="display: none" id="error-message-color">[필수] 색상을
 										선택해 주세요</P>
 								</td>
@@ -178,9 +192,9 @@ if (colorList.get(0) != null) {
 								<td>사이즈</td>
 								<td id="size-list">
 									<%
-List<String> sizeList = productDao.getProductSizeList(no);
-for (String size : sizeList) {
-%>
+									List<String> sizeList = productDao.getProductSizeList(no);
+									for (String size : sizeList) {
+									%>
 									<div id="size-check"
 										class="form-check form-check-inline p-0 m-0">
 										<input type="radio" class="btn-check"
@@ -189,8 +203,8 @@ for (String size : sizeList) {
 											class="btn btn-outline-secondary"
 											for="size btn-check-outlined<%=size%>"><%=size%></label>
 									</div> <%
-}
-%>
+ }
+ %>
 									<P style="display: none" id="error-message-size">[필수] 옵션을
 										선택해 주세요</P>
 								</td>
@@ -214,7 +228,7 @@ for (String size : sizeList) {
 								<strong>총 상품금액</strong> :
 							</div>
 							<div>
-								<p id="total-price"><%=formatter.format(currentPrice) %></p>
+								<p id="total-price"><%=formatter.format(currentPrice)%></p>
 								<span>원</span>
 							</div>
 						</div>
@@ -262,16 +276,16 @@ for (String size : sizeList) {
 							<p><%=product.getDetail()%></p>
 						</div>
 						<%
-					for (String thumbnail : thumbnails) {
-					%>
+						for (String thumbnail : thumbnails) {
+						%>
 						<div class="p-2 bd-highlight d-flex justify-content-center">
 							<img
 								src="../resources/images/product/<%=product.getNo()%>/thumbnail/<%=thumbnail%>"
 								alt="productimg" class="big_img img-fluid">
 						</div>
 						<%
-					}
-					%>
+						}
+						%>
 					</div>
 				</div>
 			</div>
@@ -368,7 +382,7 @@ for (String size : sizeList) {
 							<ul class="p-0 d-flex justify-content-center"
 								style="list-style: none">
 <%
-	List<Integer> styleProductNoList = productDao.getProductStyleNoList(no);
+List<Integer> styleProductNoList = productDao.getProductStyleNoList(no);
 	for (Integer styleProductNo : styleProductNoList) {
 		Product styleProduct = productDao.getProductDetail(styleProductNo);
 		List<String> styleThumbnails = productDao.getProductThumbnailImageList(styleProductNo);
@@ -376,23 +390,23 @@ for (String size : sizeList) {
 								<li>
 									<div class="style_list_div m-1" style="width: 186px;">
 										<div style="height: 251px;">
-											<a href="detail.jsp?no=<%=styleProduct.getNo() %>"> <img
-												src="../resources/images/product/<%=styleProduct.getNo() %>/thumbnail/<%=styleThumbnails.get(0)%>"
+											<a href="detail.jsp?no=<%=styleProduct.getNo()%>"> <img
+												src="../resources/images/product/<%=styleProduct.getNo()%>/thumbnail/<%=styleThumbnails.get(0)%>"
 												class="img-fluid" alt="productImg">
 											</a>
 											<div class="form-check">
 												<input onclick="withProductSelect(this)"
-													class="form-check-input" type="checkbox" name="withNo"
-													value="<%=styleProduct.getNo() %>" id="withSelect">
-												<label class="form-check-label" for="flexCheckDefault"><strong><%=styleProduct.getName() %>
+													class="form-check-input" type="checkbox" name="no"
+													value="<%=styleProduct.getNo()%>" id="withSelect">
+												<label class="form-check-label" for="flexCheckDefault"><strong><%=styleProduct.getName()%>
 												</strong></label>
 											</div>
-											<p align="right"><%=formatter.format(styleProduct.getPrice()) %>원
+											<p align="right"><%=formatter.format(styleProduct.getPrice())%>원
 											</p>
 										</div>
-										<select id="withAmount<%=styleProduct.getNo() %>"
+										<select id="withAmount<%=styleProduct.getNo()%>"
 											disabled="disabled" class="form-select mb-1"
-											aria-label="Default select example" name="withAmount">
+											aria-label="Default select example" name="amount">
 											<option selected disabled="disabled" value="null">수량을 선택해주세요</option>
 											<option value="1">1</option>
 											<option value="2">2</option>
@@ -401,45 +415,45 @@ for (String size : sizeList) {
 											<option value="5">5</option>
 										</select>
 <%
-		List<String> styleProductColorList = productDao.getProductColorList(styleProductNo);
+List<String> styleProductColorList = productDao.getProductColorList(styleProductNo);
 		if (styleProductColorList.get(0) != null) {
 %>
-										<select id="withColor<%=styleProduct.getNo() %>"
+										<select id="withColor<%=styleProduct.getNo()%>"
 										disabled="disabled" class="form-select mb-1"
-										aria-label="Default select example" name="withColor">
+										aria-label="Default select example" name="color">
 											<option selected disabled="disabled" value="null">색상을 선택해주세요</option>
 <%
-			for (String styleProductColor : styleProductColorList) {
+for (String styleProductColor : styleProductColorList) {
 %>			
-											<option value="<%=styleProductColor %>"><%=styleProductColor %></option>
+											<option value="<%=styleProductColor%>"><%=styleProductColor%></option>
 <%
-		 	}
+}
 %>
 										</select>
 <%
-		} else {
+} else {
 %>
-											<input type="hidden" name="withColor" value="<%=styleProductColorList.get(0) %>">
+											<input type="hidden" name="color" value="<%=styleProductColorList.get(0)%>">
 <%
-		}
+}
 %>
-										<select id="withSize<%=styleProduct.getNo() %>"
+										<select id="withSize<%=styleProduct.getNo()%>"
 											disabled="disabled" class="form-select mb-1"
-											aria-label="Default select example" name="withSize">
+											aria-label="Default select example" name="size">
 											<option selected disabled="disabled" value="null">사이즈를 선택해주세요</option>
 <%
-		List<String> styleProductSizeList = productDao.getProductSizeList(styleProductNo);
+List<String> styleProductSizeList = productDao.getProductSizeList(styleProductNo);
 		for (String styleProductSize : styleProductSizeList) {
 %>
-											<option value="<%=styleProductSize %>"><%=styleProductSize %></option>
+											<option value="<%=styleProductSize%>"><%=styleProductSize%></option>
 <%
-		}
+}
 %>
 										</select>
 									</div>
 								</li>
 <%
-	}
+}
 %>
 							</ul>
 						</div>
@@ -478,13 +492,16 @@ for (String size : sizeList) {
 		<div class="row mt-5 pt-3 mb-5">
 			<div class="col p-0">
 				<div>
-					<form method="post" action="review.jsp" enctype="multipart/form-data">
+					<form method="post" action="reviewregister.jsp" id="form-review" enctype="multipart/form-data">
+						<input type="hidden" name="from" value="detail">
+						<!-- user_no session에서 가져오기 hidden으로 -->
+						<input type="hidden" name="productNo" value="<%=product.getNo()%>">
 						<p style="font-size: small; color: gray; margin-bottom: 0">
 							<strong>REVIEW</strong> | 문의글 혹은 악의적인 비방글은 무통보 삭제된다는 점 유의해주세요^^
 						</p>
 						<div class="form-floating">
-							<textarea class="form-control" placeholder="Leave a comment here" name="reviewContent"
-								id="reviewTextArea" style="height: 120px"></textarea>
+							<textarea onchange="textAreaChange()" class="form-control" placeholder="리뷰를 남겨주세요." name="reviewContent"
+								id="review-area" style="height: 120px"></textarea>
 							<label for="reviewTextArea">리뷰를 남겨주세요.</label>
 						</div>
 						<div class="row mt-1 p-0">
@@ -504,7 +521,7 @@ for (String size : sizeList) {
 								</select>
 						    </div>
 						    <div class="col-sm-2 p-0 ps-4 end">
-						     	<button class="btn btn-secondary" type="submit">
+						     	<button onclick="reviewRegister(event)" class="btn btn-secondary" type="submit">
 								<span class="fs-6">리뷰 등록하기</span></button>
 					     	</div>
 					    </div>
@@ -512,29 +529,246 @@ for (String size : sizeList) {
 				</div>
 			</div>
 		</div>
-
+<%
+String pageNo = request.getParameter("reviewPageNo");
+	UserDao userDao = UserDao.getInstance();
+	ReviewDao reviewDao = ReviewDao.getInstance();
+	int totalRecords = reviewDao.getTotalRecordsByProductNo(no);
+	Pagination pagination = new Pagination(pageNo, totalRecords, 5, 5);
+	List<Review> reviewList = reviewDao.getReviewList(no, pagination.getBegin(), pagination.getEnd(), reviewOrderBy);
+%>
 		<div class="row">
 			<div class="col">
-				<div class="d-flex justify-content-between mt-5 mb-3 p-0">
+				<div class="d-flex justify-content-start mt-5 mb-3 p-0">
 					<div>
 						<p>
-							<strong>추천순</strong> 리뷰 (85) | 최신순 | 평점순
+							<span><strong>리뷰(<%=totalRecords%>)</strong></span>    
+							<a style="color: gray; text-decoration: none" href="detail.jsp?no=<%=no%>&reviewOrderBy=최신순">
+								<span><%="최신순".equals(reviewOrderBy) ? "<strong>" : ""%>최신순<%="최신순".equals(reviewOrderBy) ? "</strong>" : ""%></span>
+							</a>
+							<span> | </span>
+							<a style="color: gray; text-decoration: none" href="detail.jsp?no=<%=no%>&reviewOrderBy=평점순">
+								<span><%="평점순".equals(reviewOrderBy) ? "<strong>" : ""%>평점순<%="평점순".equals(reviewOrderBy) ? "</strong>" : ""%></span>
+							</a>
 						</p>
 					</div>
-					<div>
-						<span>리뷰 정렬 기준 ⓘ</span>
-					</div>
 				</div>
-				<hr>
+				<hr class="mb-0">
 			</div>
 		</div>
+		<div class="row">
+			<div class="col">
+				<table class="table">
 <%
-	String pageNo = request.getParameter("pageNo");
-	ReviewDao reviewDao = ReviewDao.getInstance();
-	int totalRecords = reviewDao.getTotalRecords();
-	Pagination pagination = new Pagination(pageNo, totalRecords);
-	
+if (reviewList.isEmpty()) {
 %>
+					<tr>
+						<td class="text-center">게시글이 존재하지 않습니다.</td>
+					</tr>
+<%
+} else {
+		for (Review review : reviewList) {
+			List<String> reviewImageNameList = reviewDao.getReviewImageNameListByReviewNo(review.getNo());
+			User user = userDao.getUserByNo(review.getUserNo());
+%>
+					<tr>
+						<td rowspan="3">
+<%
+			switch (review.getRate()) {
+				case 5: 
+%>
+							<div class="review-rate">
+								<ul class="thumb_img p-0 mt-3" style="list-style: none">
+									<li><img alt="star1" src="../resources/images/review/rate_star/star1.png"></li>
+									<li><img alt="star1" src="../resources/images/review/rate_star/star1.png"></li>
+									<li><img alt="star1" src="../resources/images/review/rate_star/star1.png"></li>
+									<li><img alt="star1" src="../resources/images/review/rate_star/star1.png"></li>
+									<li><img alt="star1" src="../resources/images/review/rate_star/star1.png"></li>
+									<li>-아주 좋아요</li>
+								</ul>
+							</div>
+							<%=review.getContent() %>
+							<div class="review-rate">
+								<ul class="thumb_img p-0 mt-3" style="list-style: none">
+<%
+						if (!reviewImageNameList.isEmpty())	{						
+							for (String reviewImageName : reviewImageNameList) {
+%>
+									<li><img id="reviewImage" alt="review_img" src="../resources/images/review/review_no/<%=review.getNo() %>/<%=reviewImageName %>"></li>
+<%
+							}
+						}
+%>
+								</ul>
+							</div>
+<%
+						break;
+				case 4:
+%>
+							<div class="review-rate">
+								<ul class="thumb_img p-0 mt-3" style="list-style: none">
+									<li><img alt="star1" src="../resources/images/review/rate_star/star1.png"></li>
+									<li><img alt="star1" src="../resources/images/review/rate_star/star1.png"></li>
+									<li><img alt="star1" src="../resources/images/review/rate_star/star1.png"></li>
+									<li><img alt="star1" src="../resources/images/review/rate_star/star1.png"></li>
+									<li><img alt="star1" src="../resources/images/review/rate_star/star0.png"></li>
+									<li>-맘에 들어요</li>
+								</ul>
+							</div>
+							<%=review.getContent() %>
+							<div class="review-rate">
+								<ul class="thumb_img p-0 mt-3" style="list-style: none">
+<%
+						if (!reviewImageNameList.isEmpty())	{						
+							for (String reviewImageName : reviewImageNameList) {
+%>
+									<li><img id="reviewImage" alt="review_img" src="../resources/images/review/review_no/<%=review.getNo() %>/<%=reviewImageName %>"></li>
+<%
+							}
+						}
+%>
+								</ul>
+							</div>
+<%
+						break;
+				case 3:
+%>
+							<div class="review-rate">
+								<ul class="thumb_img p-0 mt-3" style="list-style: none">
+									<li><img alt="star1" src="../resources/images/review/rate_star/star1.png"></li>
+									<li><img alt="star1" src="../resources/images/review/rate_star/star1.png"></li>
+									<li><img alt="star1" src="../resources/images/review/rate_star/star1.png"></li>
+									<li><img alt="star1" src="../resources/images/review/rate_star/star0.png"></li>
+									<li><img alt="star1" src="../resources/images/review/rate_star/star0.png"></li>
+									<li>-보통이에요</li>
+								</ul>
+							</div>
+							<%=review.getContent() %>
+							<div class="review-rate">
+								<ul class="thumb_img p-0 mt-3" style="list-style: none">
+<%
+						if (!reviewImageNameList.isEmpty())	{						
+							for (String reviewImageName : reviewImageNameList) {
+%>
+									<li><img id="reviewImage" alt="review_img" src="../resources/images/review/review_no/<%=review.getNo() %>/<%=reviewImageName %>"></li>
+<%
+							}
+						}
+%>
+								</ul>
+							</div>
+<%
+						break;
+				case 2:
+%>
+							<div class="review-rate">
+								<ul class="thumb_img p-0 mt-3" style="list-style: none">
+									<li><img alt="star1" src="../resources/images/review/rate_star/star1.png"></li>
+									<li><img alt="star1" src="../resources/images/review/rate_star/star1.png"></li>
+									<li><img alt="star1" src="../resources/images/review/rate_star/star0.png"></li>
+									<li><img alt="star1" src="../resources/images/review/rate_star/star0.png"></li>
+									<li><img alt="star1" src="../resources/images/review/rate_star/star0.png"></li>
+									<li>-그냥 그래요</li>
+								</ul>
+							</div>
+							<%=review.getContent() %>
+							<div class="review-rate">
+								<ul class="thumb_img p-0 mt-3" style="list-style: none">
+<%
+						if (!reviewImageNameList.isEmpty())	{						
+							for (String reviewImageName : reviewImageNameList) {
+%>
+									<li><img id="reviewImage" alt="review_img" src="../resources/images/review/review_no/<%=review.getNo() %>/<%=reviewImageName %>"></li>
+<%
+							}
+						}
+%>
+								</ul>
+							</div>
+<%
+						break;
+				default:
+%>
+							<div class="review-rate">
+								<ul class="thumb_img p-0 mt-3" style="list-style: none">
+									<li><img alt="star1" src="../resources/images/review/rate_star/star1.png"></li>
+									<li><img alt="star1" src="../resources/images/review/rate_star/star0.png"></li>
+									<li><img alt="star1" src="../resources/images/review/rate_star/star0.png"></li>
+									<li><img alt="star1" src="../resources/images/review/rate_star/star0.png"></li>
+									<li><img alt="star1" src="../resources/images/review/rate_star/star0.png"></li>
+									<li>-별로에요</li>
+								</ul>
+							</div>
+							<%=review.getContent() %>
+							<div class="review-rate">
+								<ul class="thumb_img p-0 mt-3" style="list-style: none">
+<%
+						if (!reviewImageNameList.isEmpty())	{						
+							for (String reviewImageName : reviewImageNameList) {
+%>
+									<li><img id="reviewImage" alt="review_img" src="../resources/images/review/review_no/<%=review.getNo() %>/<%=reviewImageName %>"></li>
+<%
+							}
+						}
+%>
+								</ul>
+							</div>
+<%
+						break;
+			}
+%>
+						</td>
+						<td>
+							<p class="mb-0">작성자</p>
+							<span class="fw-bold"><%=user.getName().substring(0,1) %>****</span>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<p class="mb-0">작성일</p>
+							<span class="fw-bold"><%=review.getCreatedDate() %></span>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<p class="mb-0">작성자 등급</p>
+							<span class="fw-bold"><%=user.getGradeCode() %></span>
+						</td>
+					</tr>
+<%
+		}
+	}
+%>
+				</table>
+			</div>
+		</div>
+		<div class="row mb-3">
+			<div class="col-6 offset-3">
+				<nav>
+					<ul class="pagination justify-content-center">
+						<!-- 
+							Pagination객체가 제공하는 isExistPrev()는 이전 블록이 존재하는 경우 true를 반환한다.
+							Pagination객체가 제공하는 getPrevPage()는 이전 블록의 마지막 페이지값을 반환한다.
+						 -->
+						<li class="page-item <%=!pagination.isExistPrev() ? "disabled" : "" %>"><a class="page-link" href="detail.jsp?no=<%=product.getNo() %>&reviewPageNo=<%=pagination.getPrevPage()%>" >이전</a></li>
+<%
+	// Pagination 객체로부터 해당 페이지 블록의 시작 페이지번호와 끝 페이지번호만큼 페이지내비게이션 정보를 표시한다.
+	for (int num = pagination.getBeginPage(); num <= pagination.getEndPage(); num++) {
+%>					
+					<li class="page-item <%=pagination.getPageNo() == num ? "active" : "" %>"><a class="page-link" href="detail.jsp?no=<%=product.getNo() %>"><%=num %></a></li>
+<%
+	}
+%>					
+						<!-- 
+							Pagination객체가 제공하는 isExistNext()는 다음 블록이 존재하는 경우 true를 반환한다.
+							Pagination객체가 제공하는 getNexPage()는 다음 블록의 첫 페이지값을 반환한다.
+						 -->
+						<li class="page-item <%=!pagination.isExistNext() ? "disabled" :"" %>"><a class="page-link" href="detail.jsp?no=<%=product.getNo() %>&reviewPageNo=<%=pagination.getNextPage()%>" >다음</a></li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+			
 
 		<div class="row mb-5 pb-3">
 			<div class="col">
@@ -600,7 +834,7 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 								<td><%=inquiryRowNum %></td>
 								<td><%=inquiryDto.getCategoryName() %></td>
 								<td class="text-start"><%=inquiryDto.getTitle() %></td>
-								<td><%=inquiryDto.getUserName() %></td>
+								<td><%=inquiryDto.getUserName().substring(0,1) %>****</td>
 								<td><%=inquiryDto.getInquiryCreatedDate() %></td>
 							</tr>
 <%
@@ -629,10 +863,10 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 		</div>
 		<div class="d-flex justify-content-end">
 			<ul class="btn_list p-0" style="list-style: none">
-				<li><a href="inquiry.jsp?no=<%=product.getNo()%>"><button type="button" class="btn btn-secondary">
+				<li><a href="../inquiryRegister.jsp?no=<%=product.getNo()%>"><button type="button" class="btn btn-secondary">
 						<span class="fs-6">상품 문의하기</span>
 					</button></a></li>
-				<li><a href="inquiry.jsp"><button type="button" class="btn btn-outline-secondary">
+				<li><a href="../inquiry.jsp"><button type="button" class="btn btn-outline-secondary">
 						<span class="fs-6">모두 보기</span>
 					</button></a></li>
 			</ul>
@@ -643,6 +877,11 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 	<script type="text/javascript">
 	var bigPic = document.querySelector("#big-pic");            
 	var smallPics = document.querySelectorAll(".small-pic");    //작은 사진(여러개)
+	
+	var no = [];
+	var color = [];
+	var size = [];
+	var amount = [];
 	
 	for(var i = 0; i < smallPics.length; i++){
 	    smallPics[i].addEventListener("click", changePic);  
@@ -695,15 +934,25 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 	function goBuy() {
 		if (checkForm()) {
 			var orderForm = document.getElementById("form-order");
-			orderForm.setAttribute("action", "order.jsp");
-			orderForm.submit();
+//			if (loginUserInfo != null) {
+				orderForm.setAttribute("action", "order.jsp");
+				orderForm.submit();
+//			} else {
+//				orderForm.setAttribute("action", "../login.jsp");
+//				orderForm.submit();
+//			}
 		}
 	}
 	function goCart() {
 		if (checkForm()) {
 			var orderForm = document.getElementById("form-order");
-			orderForm.setAttribute("action", "cart.jsp");
-			orderForm.submit();
+//			if (loginUserInfo != null) {
+				orderForm.setAttribute("action", "cart.jsp");
+				orderForm.submit();
+//			} else {
+//				orderForm.setAttribute("action", "../login.jsp");
+//				orderForm.submit();
+//			}
 		}
 	}
 
@@ -723,11 +972,6 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 			totalPrice.innerHTML = productTotalPrice;
 	}
 
-	function sizeStockCheck() {
-		var selectedColor = document
-				.querySelector('input[name="color"]:checked').value;
-	}
-	
 	var checkedWithProductNo = [];
 	var index = 0;
 	
@@ -815,15 +1059,19 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 			 	return false;
 			 }
 		}
-		
 	}
 
 	function withGoBuy() {
 		if (withCheckForm()) {
 			if (productWithProduct()) {
 				var orderForm = document.getElementById("form-order");
-				orderForm.setAttribute("action", "order.jsp");
-				orderForm.submit();
+//				if (loginUserInfo != null) {
+					orderForm.setAttribute("action", "order.jsp");
+					orderForm.submit();
+//				} else {
+//					orderForm.setAttribute("action", "../login.jsp");
+//					orderForm.submit();
+//				}
 			}
 		} 
 	}
@@ -831,10 +1079,46 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 		if (withCheckForm()) {
 			if (productWithProduct()) {
 				var orderForm = document.getElementById("form-order");
-				orderForm.setAttribute("action", "cart.jsp");
-				orderForm.submit();
+//				if (loginUserInfo != null) {
+					orderForm.setAttribute("action", "cart.jsp");
+					orderForm.submit();
+//				} else {
+//					orderForm.setAttribute("action", "../login.jsp");
+//					orderForm.submit();
+//				}
 			}
 		} 
 	}
+	
+	var reviewTextArea = "";
+	
+	function textAreaChange() {
+		var reviewTextEl = document.getElementById("review-area");
+		reviewTextArea = reviewTextEl.value;
+		console.log(reviewTextArea);
+	}
+	
+	function reviewRegister(event) {
+		event.preventDefault();
+		console.log(reviewTextArea);
+		var reviewForm = document.getElementById("form-review");
+		
+		if (reviewTextArea === "") {
+			alert("리뷰 메시지를 입력해주세요.");
+		} else {
+			reviewForm.submit();
+		}
+	}
+	
+	/* textarea(496line)에 onclick="reviewLoginCheck()" 추가
+		function reviewLoginCheck(this) {
+		if (confirm("로그인이 필요한 서비스입니다. 로그인 하시겠습니까?") == true){
+			orderForm.setAttribute("action", "../login.jsp");
+			orderForm.submit();
+		 } else {  
+		 	return false;
+		 }
+	} */
 	</script>
 </body>
+</html>

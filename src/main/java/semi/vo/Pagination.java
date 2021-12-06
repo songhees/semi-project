@@ -60,9 +60,11 @@ public class Pagination {
 		if (currentPageNo <= 0) {			// 숫자로 변환된 현재 페이지번호가 0이거나 0보다 작으면 현재 페이지번호를 1로 설정한다.
 			currentPageNo = 1;
 		}
-		if (currentPageNo > totalPages) {	// 숫자로 변환된 현재 페이지번호가 총 페이지갯수 보다 크면 현재 페이지번호를 totalPages로 설정한다.
-			currentPageNo = totalPages;
-		}
+		if (totalPages != 0) {
+			if (currentPageNo > totalPages) {	// 숫자로 변환된 현재 페이지번호가 총 페이지갯수 보다 크면 현재 페이지번호를 totalPages로 설정한다.
+				currentPageNo = totalPages;
+			}
+		} 
 		// 현재 페이지번호에 해당하는 데이터조회 시작 순번과 끝 순번을 계산해서 멤버변수에 대입한다.
 		begin = (currentPageNo - 1)*rowsPerPage + 1;
 		end = currentPageNo*rowsPerPage;
@@ -71,7 +73,11 @@ public class Pagination {
 		currentBlock = (int)(Math.ceil((double)currentPageNo/pagesPerBlock));
 		// 현재 블록 번호에 해당하는 시작페이지번호와 끝페이지번호를 계산해서 멤버변수에 대입한다.
 		beginPage = (currentBlock - 1)*pagesPerBlock + 1;
-		endPage = currentBlock*pagesPerBlock;
+		if (totalPages != 0) {
+			endPage = currentBlock*pagesPerBlock;
+		} else {
+			endPage = 1;
+		}
 		if (currentBlock == totalBlocks) {
 			endPage = totalPages;
 		}
