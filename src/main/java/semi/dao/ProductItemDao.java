@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import semi.criteria.ProductItemCriteria;
 import semi.vo.Product;
 import semi.vo.ProductItem;
 
@@ -55,5 +56,13 @@ public class ProductItemDao {
 		connection.close();
 		
 		return productItems;
+	}
+	
+	public ProductItem getProductItemByProductItemNo(int productItemNO) throws SQLException {
+		return null;
+	}
+	
+	public ProductItem getProductItemByProductItemCriteria(ProductItemCriteria criteria) throws SQLException {
+		return null;
 	}
 }
