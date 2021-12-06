@@ -4,12 +4,12 @@ import java.util.Date;
 
 public class Review {
 	private int no;
-	private int user_no;
-	private int product_no;
+	private int userNo;
+	private int productNo;
 	private int rate;
 	private String content;
-	private Date created_date;
-	private String deleted;
+	private Date createdDate;
+	private String filename;
 	
 	public Review() {
 	
@@ -23,20 +23,20 @@ public class Review {
 		this.no = no;
 	}
 
-	public int getUser_no() {
-		return user_no;
+	public int getUserNo() {
+		return userNo;
 	}
 
-	public void setUser_no(int user_no) {
-		this.user_no = user_no;
+	public void setUserNo(int userNo) {
+		this.userNo = userNo;
 	}
 
-	public int getProduct_no() {
-		return product_no;
+	public int getProductNo() {
+		return productNo;
 	}
 
-	public void setProduct_no(int product_no) {
-		this.product_no = product_no;
+	public void setProductNo(int productNo) {
+		this.productNo = productNo;
 	}
 
 	public int getRate() {
@@ -55,20 +55,20 @@ public class Review {
 		this.content = content;
 	}
 
-	public Date getCreated_date() {
-		return created_date;
+	public Date getCreatedDate() {
+		return createdDate;
 	}
 
-	public void setCreated_date(Date created_date) {
-		this.created_date = created_date;
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
 	}
 
-	public String getDeleted() {
-		return deleted;
+	public String getFilename() {
+		return filename;
 	}
 
-	public void setDeleted(String deleted) {
-		this.deleted = deleted;
+	public void setFilename(String filename) {
+		this.filename = filename;
 	}
 	
 }

@@ -654,4 +654,26 @@ public class ProductDao {
 		product.setColors(colors);
 		return product;
 	}
+	
+	public List<ProductCategory> getAllProductCategory() throws SQLException {
+		String sql = "select category_no, category_name "
+				   + "from semi_product_category ";
+		
+		List<ProductCategory> categoryList = new ArrayList<>();
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		ResultSet rs = pstmt.executeQuery();
+		while (rs.next()) {
+			ProductCategory productCategory = new ProductCategory();
+			productCategory.setNo(rs.getInt("category_no"));
+			productCategory.setName(rs.getString("category_name"));
+			categoryList.add(productCategory);
+		}
+		
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return categoryList;
+	}
 }
