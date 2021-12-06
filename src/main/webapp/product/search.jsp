@@ -139,7 +139,7 @@
 						<strong>상품분류</strong>
 					</label>
 					<div class="col-10">
-						<select class="form-select" name="category" style="font-size: 0.75em;">
+						<select id="category-select" class="form-select" name="category" style="font-size: 0.75em;">
   							<option value="" <%=category.isEmpty() ? "selected" : ""%>>상품분류 선택</option>
 							<!-- 
 								미구현 
@@ -160,7 +160,7 @@
 						<strong>상품명</strong>
 					</label>
 					<div class="col-10">
-						<input type="search" name="nameKeyword" class="form-control" style="font-size: 0.75em;" value="<%=nameKeyword%>">
+						<input id="nameKeyword-input" type="search" name="nameKeyword" class="form-control" style="font-size: 0.75em;" value="<%=nameKeyword%>">
 					</div>
 				</div>
 				<div class="row mb-2">
@@ -168,9 +168,9 @@
 						<strong>판매가격대</strong>
 					</label>
 					<div class="col-10">
-						<input type="number" name="priceRangeFrom" class="form-control" style="font-size: 0.75em; width: 47%; display: inline;" value="<%=priceRangeFrom%>">
+						<input id="priceRangeFrom-input" type="number" name="priceRangeFrom" class="form-control" style="font-size: 0.75em; width: 47%; display: inline;" value="<%=priceRangeFrom%>">
 						<label style="font-size: 0.75em; width: 6%; display: inline;">~</label>
-						<input type="number" name="priceRangeTo" class="form-control" style="font-size: 0.75em;  width: 47%; display: inline;" value="<%=priceRangeTo%>">
+						<input id="priceRangeTo-input" type="number" name="priceRangeTo" class="form-control" style="font-size: 0.75em;  width: 47%; display: inline;" value="<%=priceRangeTo%>">
 					</div>
 				</div>
 				<div class="row mb-2">
@@ -189,6 +189,11 @@
 					</div>
 				</div>
 				<div class="row mb-2 mt-4">
+					<div class="d-grid">
+						<button class="btn btn-secondary" type="reset" onclick="resetForm()">초기화</button>
+					</div>
+				</div>
+				<div class="row mb-2">
 					<div class="d-grid">
 						<button class="btn btn-secondary" type="button" onclick="searchProducts(1)">검색</button>
 					</div>
@@ -311,11 +316,42 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script type="text/javascript">
 	// 검색버튼을 클릭했을 때 실행된다.
+	// 판매가격대에 입력된 값이 적절한지 확인하고 부적절할 경우 바로 죵료된다.
 	// form-search 내부의 값들이 search.jsp로 전달된다.
 	function searchProducts(pageNo) {
+		if (!checkPriceRange()) {
+			return;
+		}
+		
 		document.getElementById("page-field").value = pageNo;
 		var form = document.getElementById("form-search");
+		
 		form.submit();
+	}
+	
+	// 판매가격대에 입력된 값이 적절한지 확인한다.
+	// 적절하면 true, 적절하지 않으면 false를 반환한다.
+	function checkPriceRange() {
+		var priceRangeFromString = document.getElementById("priceRangeFrom-input").value;
+		var priceRangeToString = document.getElementById("priceRangeTo-input").value;
+		
+		if (priceRangeFromString.indexOf(".") !== -1 || priceRangeToString.indexOf(".") !== -1) {
+			alert("판매가격대에는 자연수만 들어갈 수 있습니다.");
+			return false;
+		}
+		
+		var priceRangeFrom = parseInt(priceRangeFromString);
+		var priceRangeTo = parseInt(priceRangeToString);
+		
+		if (priceRangeFrom < 0 || priceRangeTo < 0) {
+			alert("판매가격대에는 0보다 작은 값이 들어갈 수 없습니다.");
+			return false;
+		}
+		if (priceRangeFrom > priceRangeTo) {
+			alert("판매가격대의 최소판매가격은 최대판매가격보다 클 수 없습니다.");
+			return false;
+		}
+		return true;
 	}
 	
 	// 페이지번호를 클릭했을 때 실행된다.
@@ -331,6 +367,14 @@
 		event.preventDefault();
 		document.getElementById("orderBy-select").value = orderBy;
 		searchProducts(1);
+	}
+	
+	function resetForm() {
+		document.getElementById("category-select").value = "";
+		document.getElementById("nameKeyword-input").value = "";
+		document.getElementById("priceRangeFrom-input").value = "";
+		document.getElementById("priceRangeTo-input").value = "";
+		document.getElementById("orderBy-select").value = "";
 	}
 	
 	// 이미지의 경로에서 확장자를 제외한 마지막 문자를 imgNumber로 변경한다.
