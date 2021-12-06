@@ -190,7 +190,7 @@
 				</div>
 				<div class="row mb-2 mt-4">
 					<div class="d-grid">
-						<button class="btn btn-secondary" type="reset" onclick="resetForm()">초기화</button>
+						<button class="btn btn-secondary" type="button" onclick="resetForm()">초기화</button>
 					</div>
 				</div>
 				<div class="row mb-2">
