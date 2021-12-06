@@ -6,76 +6,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" >
     <title>로그인</title>
-    <style>
-		.container {
-			min-width: 992px;
-		}
-		
-		.no-drag {
-			-ms-user-select: none; -moz-user-select: -moz-none; -webkit-user-select: none; -khtml-user-select: none; user-select:none;
-		}
-		
-		#best-item {
-			background-color: #f6f4f3;
-		}
-		.image {
-			position: relative;
-		}
-		.image img {
-			transition: .5s;
-		}
-		.image:hover img {
-			opacity: 0.3;
-		}
-		.text-over-image {
-			position: absolute;
-			top:50%;
-     		left:50%;
-     		transform: translate(-50%, -50%);
-     		text-align: center;
-     		visibility: hidden;
-		}
-		.image:hover .text-over-image {
-			visibility: visible;
-		}
-	</style>
+<style type="text/css">
+	p {
+		color: grey;
+	}
+	[href*='found'] {
+		text-decoration: none;
+		color: grey;
+	}
+	#formInput {
+		width: 650px
+	}
+</style>
 </head>
 <body>
+	
+<%
+	pageContext.setAttribute("menu", "login");
+	String error = request.getParameter("error");
+%>
 <%@ include file="common/navbar.jsp" %>
-<div class="container-fluid">
-	<div id="homeBannerCarousel" class="carousel slide" data-bs-ride="carousel">
-  		<div class="carousel-indicators">
-    		<button type="button" data-bs-target="#homeBannerCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-    		<button type="button" data-bs-target="#homeBannerCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-    		<button type="button" data-bs-target="#homeBannerCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
-  		</div>
-  	</div>
-</div>
-<div class="container">    
-	<div id="contents">
-		<div id="loginbox">
-			<form class="border p-3 bg-white" method="post" action="login.jsp">
-				<div class="mb-3">
-					<h3>LOGIN</h3>
-					<p>가입하신 아이디와 비밀번호를 입력해주세요.</p>
-					<input id="user_id" name="id" class="inputTypeText" placeholder="아이디" type="text">
-				</div>
-				<div >
-					<input id="user_password" name="password" class="inputTypeText" placeholder="비밀번호" type="text">
-				</div>
-				<p class="security">
-					<img src="resources/images/home/security_icon.jpeg" alt="보안접속">보안접속
-					<input id="save_id" name="save_id" value="T" type="checkbox">
-					<label for="save_id">아이디 저장</label>
-				</p>
-				<button type="submit" class="btn btn-dark">로그인</button>
-			</form>
-			<form  action="resisterform.jsp">
-				<button type="submit" class="btn btn-dark">회원가입</button>
-			</form>
+<div class="container" id="formInput">    
+	<div class="row bg-light border mt-5">
+		<div class="m-4">
+			<h3><strong>LOGIN</strong></h3>
+			<p class=""><small>가입하신 아이디와 비밀번호를 입력해 주세요.</small></p>
 		</div>
+		<form method="post" action="login.jsp">
+			<div class="col px-5">
+<%
+	if ("empty".equals(error)) {				
+%>
+				<div class="alert alert-danger">
+					<strong>로그인 실패!!</strong> 아이디와 비밀번호는 필수입력값입니다.
+				</div>
+<%
+	} else if ("notfound-user".equals(error)) {				
+%>
+				<div class="alert alert-danger">
+					<strong>로그인 실패!!</strong> 회원정보가 존재하지 않습니다.
+				</div>
+<%	
+	} else if ("mismatch-password".equals(error)) {			
+%>
+				<div class="alert alert-danger">
+					<strong>로그인 실패!!</strong> 비밀번호가 일치하지 않습니다.
+				</div>
+<%		
+	} else if("login-required".equals(error)) {				// 로그인 후 사용가능한 JSP 페이지를 로그인없이 요청했다.
+		%>
+				<div class="alert alert-danger">
+					<strong>로그인 필수!!</strong> 로그인이 필요한 페이지를 요청하였습니다.
+				</div>
+<%
+	} else if (loginUserInfo != null) {
+		response.sendRedirect("index.jsp");
+		return;
+	}
+%>			
+				<div class="mb-1">
+					<!-- class="form-control"은 bootstap에서 form 에 대한 style을 지정한것을 쓰기 위해 사용 -->
+					<label class="form-label" for="inputId">ID</label>
+					<input type="text" name="id" class="form-control" id="inputId">
+				</div>
+				<div class="mb-3">
+					<label class="form-label" for="inputPassword">PWD</label>
+					<input type="password" name="password" class="form-control" id="inputPassword">
+				</div>
+				<div class="mb-4 d-grid">
+					<button type="submit" class="btn btn-dark">로그인</button>
+				</div>
+				<div class="mb-3 text-center">
+					<p><a href="foundId.jsp">아이디찾기</a> | <a href="foundPassword.jsp">비밀번호찾기</a></p>
+				</div>
+			</div>
+		</form>
 	</div>
-
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

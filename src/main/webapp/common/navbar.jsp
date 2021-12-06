@@ -17,6 +17,11 @@
 	#navbar-2 > ul > li.nav-item {
 		margin: 3px;
 	}
+	
+	.dropdown:hover .dropdown-menu {
+    	display: block;
+    	margin-top: 0;
+	}
 </style>
 <%
 	User loginUserInfo = (User)session.getAttribute("LOGIN_USER_INFO");
@@ -34,21 +39,19 @@
 <%
 	if (loginUserInfo == null) {
 %>
-					<li class="nav-item"><a href="#" class="nav-link">LOGIN</a></li>
+					<li class="nav-item"><a href="/semi-project/loginform.jsp" class="nav-link">LOGIN</a></li>
 					<li class="nav-item"><a href="#" class="nav-link">JOIN US</a></li>
 <%
 	} else {
 %>
 					<li class="nav-item"><a href="#" class="nav-link">LOGOUT</a></li>
 					<li class="nav-item dropdown">
-				    	<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">MY PAGE</a>
+				    	<a class="nav-link dropdown-toggle" href="/semi-project/user/mypage.jsp" role="button">MY PAGE</a>
 				        <ul class="dropdown-menu">
-				        	<li><a class="dropdown-item" href="#">주문조회</a></li>
-				            <li><a class="dropdown-item" href="#">회원정보수정</a></li>
-				            <li><a class="dropdown-item" href="#">관심상품</a></li>
+				        	<li><a class="dropdown-item" href="/semi-project/user/orderList.jsp">주문조회</a></li>
+				            <li><a class="dropdown-item" href="/semi-project/user/modifyForm.jsp">회원정보수정</a></li>
 				            <li><a class="dropdown-item" href="#">적립금</a></li>
 				            <li><a class="dropdown-item" href="#">나의게시물</a></li>
-				            <li><a class="dropdown-item" href="#">최근본상품</a></li>
 				        </ul>
         			</li>
 <%
@@ -67,7 +70,7 @@
 				<input class="form-control form-control-sm" type="search" aria-label="Search" name="nameKeyword">
 			    <button class="btn btn-secondary btn-sm opacity-75" type="submit"><i class="bi bi-search"></i></button>
    			</form>
-   			<a href="#">
+   			<a href="/semi-project/user/cart/cartList.jsp">
 		  		<i class="bi bi-cart text-dark opacity-75 p-3" style="font-size: 30px;"></i>
    			</a>
 		</div>

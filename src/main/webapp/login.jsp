@@ -1,17 +1,42 @@
+<%@page import="org.apache.commons.codec.digest.DigestUtils"%>
+<%@page import="semi.vo.User"%>
+<%@page import="semi.dao.UserDao"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<!doctype html>
-<html lang="ko">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" >
-    <title></title>
-</head>
-<body>
-	<div class="container">    
+<%
+	String id = request.getParameter("id");
+	String password = request.getParameter("password");
 
-	</div>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+	if (id != null && id.isBlank()) {
+		response.sendRedirect("loginform.jsp?error=empty");
+		return;
+	}
+	
+	if (password != null && password.isBlank()) {
+		response.sendRedirect("loginform.jsp?error=empty");
+		return;
+	}
+	
+	UserDao userDao = UserDao.getInstance();
+	User user = userDao.getUserById(id);
+	
+	String secretPassword = DigestUtils.sha256Hex(password);
+	
+	if (user == null) {
+		response.sendRedirect("loginform.jsp?error=notfound-user");
+		return;
+	}
+	
+	if (!secretPassword.equals(user.getPassword())) {
+		response.sendRedirect("loginform.jsp?error=mismatch-password");
+		return;
+	}
+	
+	if ("Y".equals(user.getDeleted())) {
+		response.sendRedirect("loginform.jsp?error=notfound-user");
+		return;
+	}
+	
+	session.setAttribute("LOGIN_USER_INFO", user);
+	response.sendRedirect("index.jsp?");
+%>
