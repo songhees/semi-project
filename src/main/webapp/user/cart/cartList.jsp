@@ -136,8 +136,6 @@
 	int shippingFee = 0;
 	long totalPrice = 0;
 	for (CartItemDto item : itemList) {
-		long productPrice = 0;
-		
 		totalPrice += (item.getRealPrice(item)*item.getQuantity());
 	}
 	
@@ -179,7 +177,8 @@
 		</div>
 	</div>
 	<div>
-		<form id="cartInfo" action="order.jsp?from=cart" method="get">
+		<form id="cartInfo" action="order.jsp" method="get">
+			<input type="hidden" name="from" value="cart">
 			<table class="vinc">
 				<colgroup>
 					<col width="1%">
@@ -360,8 +359,6 @@
 		location.href = "order.jsp?no=" + no + "&amount=" + amount + "&from=cart" ;
 	}
 	
-	
-	
 	function totalOrder() {
 		var checks = document.querySelectorAll("input.check");
 		
@@ -385,12 +382,9 @@
 			}
 		}
 		
-		
 		document.getElementById("cartInfo").submit();
 			
 	}
-	
-	
 	
 	/* function errorNone(event) {
 		event.preventDefault();
