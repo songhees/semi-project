@@ -524,6 +524,7 @@ public class ProductDao {
 		}
 	}
 	
+	// TODO 미구현, NEW 카테고리에서 사용
 	public List<Product> getNewProductList(ProductCriteria criteria) throws SQLException {
 		String sql = "";
 		
