@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import semi.dto.InquiryDto;
+import semi.vo.InquiryCategory;
+
 import static utils.ConnectionUtil.getConnection;
 
 public class InquiryDao {
@@ -199,5 +201,28 @@ public class InquiryDao {
 		connection.close();
 		
 		return inquiryDto;
+	}
+	
+	public List<InquiryCategory> getInquiryCategoryList() throws SQLException {
+		String sql = "select category_no, category_name "
+				   + "from semi_inquiry_category ";
+		
+		List<InquiryCategory> inquiryCategoryList = new ArrayList<>();
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		ResultSet rs = pstmt.executeQuery();
+		while (rs.next()) {
+			InquiryCategory inquiryCategory = new InquiryCategory();
+			inquiryCategory.setNo(rs.getInt("category_no"));
+			inquiryCategory.setName(rs.getString("category_name"));
+			
+			inquiryCategoryList.add(inquiryCategory);
+		}
+		
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return inquiryCategoryList;
 	}
 }

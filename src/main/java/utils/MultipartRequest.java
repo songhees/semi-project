@@ -93,6 +93,21 @@ public class MultipartRequest {
 		return getFilename(items.get(0));
 	}
 	
+	public String[] getFilenames(String name) {
+		List<FileItem> items = parameterMap.get(name);
+		if (items == null || items.isEmpty()) {
+			return null;
+		}
+		
+		String[] names = new String[items.size()];
+		int index = 0;
+		for (FileItem item : items) {
+			names[index++] = getFilename(item);
+		}
+		
+		return names;
+	}
+	
 	/**
 	 * 업로드된 모든 파일을 지정된 디렉토리에 저장한다.
 	 * @throws IOException 업로드된 파일 처리 중 오류가 발생했을 때

@@ -1,3 +1,6 @@
+<%@page import="java.util.Iterator"%>
+<%@page import="semi.vo.Address"%>
+<%@page import="semi.dao.AddressDao"%>
 <%@page import="semi.vo.User"%>
 <%@page import="semi.criteria.ProductItemCriteria"%>
 <%@page import="java.util.ArrayList"%>
@@ -68,7 +71,13 @@
 				productItems.add(productItemDao.getProductItemByProductItemCriteria(productItemCriteria));
 			}
 		}
+		
+		// 주문수량이 상품의 재고보다 많은 것이 하나라도 있으면 false인 변수이다.
 		boolean isStockAvailable = true;
+		AddressDao addressDao = AddressDao.getInstance();
+		
+		List<Address> addresses = addressDao.getAllAddressByUserNo(user.getNo());
+		boolean addressIsEmpty = addresses.isEmpty();
 %>
 <div class="container"> 
 	<form id="form-search" method="post" action="order.jsp">
@@ -84,107 +93,183 @@
 		    			</h2>
 		    			<div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="heading1" data-bs-parent="#accordionExample1">
 		      				<div class="accordion-body px-3">
-		        				<div class="row mb-3">
-		        					<div class="col">
-		        						<div class="form-check form-check-inline">
-		  									<input class="form-check-input" type="radio" name="flexRadio1" id="flexRadioDefault1" checked>
-		  									<label class="form-check-label" for="flexRadioDefault1">회원 정보와 동일</label>
-										</div>
-		        						<div class="form-check form-check-inline">
-		  									<input class="form-check-input" type="radio" name="flexRadio1" id="flexRadioDefault1">
-		  									<label class="form-check-label" for="flexRadioDefault1">새로운 배송지</label>
-										</div>
-		        					</div>
-		        				</div>
-		        				<div class="row mb-2">
-		        					<label class="col-2 col-form-label">받는사람</label>
-		        					<div class="col-10">
-										<input type="text" name="receivePerson" class="form-control" value="<%=user.getName()%>">
+		      					<ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
+									<li class="nav-item" role="presentation">
+								    	<button class="nav-link active" id="addressList-tab" data-bs-toggle="tab" data-bs-target="#addressList"
+								    	 type="button" role="tab" aria-controls="addressList" aria-selected="true" style="color: black; <%=addressIsEmpty ? "display: none;" : ""%>">최근 배송지</button>
+									</li>
+								  	<li class="nav-item" role="presentation">
+								    	<button class="nav-link" id="enterYourself-tab" data-bs-toggle="tab" data-bs-target="#enterYourself"
+								    	 type="button" role="tab" aria-controls="enterYourself" aria-selected="false" style="color: black; <%=addressIsEmpty ? "display: none;" : ""%>">직접입력</button>
+								  	</li>
+								</ul>
+								<div class="tab-content" id="myTabContent">
+									<div class="tab-pane fade show active" id="addressList" role="tabpanel" aria-labelledby="addressList-tab">
+										<%
+											if (!addressIsEmpty) {
+												Address defaultAddress = null;
+												Iterator<Address> addressIter = addresses.iterator();
+												
+												while (addressIter.hasNext()) {
+													Address address = addressIter.next();
+													String addressDefault = address.getAddressDefault();
+													if ("Y".equals(addressDefault)) {
+														defaultAddress = address;
+														addressIter.remove();
+													}
+												}
+												
+												if (defaultAddress != null) {
+										%>
+										<hr>
+										<div class="row justify-content-between">
+			      							<div class="col-10">
+				      							<h6><strong>[기본] <%=user.getName()%></strong></h6>
+				      							<h6 class="text-muted">
+													[<%=defaultAddress.getPostalCode()%>] <%=defaultAddress.getBaseAddress()%><br>
+													<%=defaultAddress.getDetail()%>
+												</h6>
+				      							<h6 class="text-muted">
+													<%=user.getTel()%>
+												</h6>
+			      							</div>
+			      							<div class="col-2 align-self-center">
+				      							<div class="form-check">
+			  										<input class="form-check-input" type="radio" name="flexRadio1" id="flexRadioDefault1" checked>
+												</div>
+			      							</div>
+			      						</div>
+			      						<%
+												}
+												if (!addresses.isEmpty()) {
+													for (Address address : addresses) {
+												
+			      						%>
+										<hr>
+										<div class="row justify-content-between">
+			      							<div class="col-10">
+				      							<h6><strong><%=user.getName()%></strong></h6>
+				      							<h6 class="text-muted">
+													[<%=address.getPostalCode()%>] <%=address.getBaseAddress()%><br>
+													<%=address.getDetail()%>
+												</h6>
+				      							<h6 class="text-muted">
+													<%=user.getTel()%>
+												</h6>
+			      							</div>
+			      							<div class="col-2 align-self-center">
+				      							<div class="form-check">
+			  										<input class="form-check-input" type="radio" name="flexRadio1" id="flexRadioDefault1">
+												</div>
+			      							</div>
+			      						</div>
+				        				<%
+													}
+												}
+											}
+				        				%>
+			      						<div class="row py-3 mt-3 border" style="background-color: #f7f7f7">
+				        					<div class="col">
+				        						<select class="form-select" name="emailDomain">
+						  							<option value="" selected>-- 메시지 선택 (선택사항) --</option>
+													<option value="">배송 전에 미리 연락바랍니다.</option>
+													<option value="">부재 시 경비실에 맡겨주세요.</option>
+												</select>
+				        					</div>
+				        				</div>
 									</div>
-		        				</div>
-		        				<div class="row mb-2">
-		        					<label class="col-2 col-form-label">주소</label>
-		        					<div class="col-2">
-										<input id="postalCode" type="text" name="postalCode" class="form-control" disabled readonly>
+									<div class="tab-pane fade" id="enterYourself" role="tabpanel" aria-labelledby="enterYourself-tab">
+				        				<div class="row mt-4 mb-2">
+				        					<label class="col-2 col-form-label">받는사람</label>
+				        					<div class="col-10">
+												<input type="text" name="receivePerson" class="form-control" value="<%=user.getName()%>">
+											</div>
+				        				</div>
+				        				<div class="row mb-2">
+				        					<label class="col-2 col-form-label">주소</label>
+				        					<div class="col-2">
+												<input id="postalCode" type="text" name="postalCode" class="form-control" disabled readonly>
+											</div>
+				        					<div class="col-2">
+				        						<input type="button" class="btn btn-secondary" onclick="sample6_execDaumPostcode()" value="주소검색">
+											</div>
+				        				</div>
+				        				<div class="row justify-content-end mb-2">
+				        					<div class="col-10">
+												<input id="baseAddress" type="text" name="baseAddress" class="form-control">
+											</div>
+				        				</div>
+				        				<div class="row justify-content-end mb-2">
+				        					<div class="col-10">
+												<input id="detailAddress" type="text" name="detailAddress" class="form-control">
+											</div>
+				        				</div>
+				        				<div class="row mb-2">
+				        					<label class="col-2 col-form-label">휴대전화</label>
+				        					<div class="col-10">
+				        						<%
+				        							String tel = user.getTel();
+				  									String[] telArray = tel.split("-");
+				        						%>
+				        						<select class="form-select" name="firstPhoneNumber" style="width: 28%; display: inline;">
+						  							<option value="010" <%="010".equals(telArray[0]) ? "selected" : ""%>>010</option>
+													<option value="011" <%="011".equals(telArray[0]) ? "selected" : ""%>>011</option>
+													<option value="016" <%="016".equals(telArray[0]) ? "selected" : ""%>>016</option>
+													<option value="017" <%="017".equals(telArray[0]) ? "selected" : ""%>>017</option>
+													<option value="018" <%="018".equals(telArray[0]) ? "selected" : ""%>>018</option>
+													<option value="019" <%="019".equals(telArray[0]) ? "selected" : ""%>>019</option>
+												</select>
+				        						<label style="width: 5%; display: inline;">-</label>
+												<input type="number" name="middlePhoneNumber" class="form-control" style="width: 28%; display: inline;" value=<%=telArray[1]%>>
+												<label style="width: 5%; display: inline;">-</label>
+												<input type="number" name="lastPhoneNumber" class="form-control" style="width: 28%; display: inline;" value=<%=telArray[2]%>>
+											</div>
+				        				</div>
+				        				<div class="row mb-1">
+				        					<%
+				        						String email = user.getEmail();
+				        						String[] emailArray = email.split("@");
+				        					%>
+				        					<label class="col-2 col-form-label">이메일</label>
+				        					<div class="col-10">
+				        						<input type="text" name="emailLocalPart" class="form-control" style="width: 28%; display: inline;" value=<%=emailArray[0]%>>
+												<label style="width: 5%; display: inline;">@</label>
+				        						<select class="form-select" name="emailDomain" style="width: 28%; display: inline;">
+						  							<option value="" selected>-이메일 선택-</option>
+													<option value="naver.com" <%="naver.com".equals(emailArray[1]) ? "selected" : ""%>>naver.com</option>
+													<option value="gmail.com" <%="gmail.com".equals(emailArray[1]) ? "selected" : ""%>>gmail.com</option>
+												</select>
+				        					</div>
+				        				</div>
+				        				<div class="row justify-content-end mb-3">
+				        					<div class="col-10">
+												<label class="text-muted" style="font-size: 0.75rem;">
+													이메일로 주문 처리 과정을 보내드립니다.<br>
+													수신 가능한 이메일 주소를 입력해 주세요.
+												</label>
+											</div>
+				        				</div>
+				        				<div class="row py-3 border" style="background-color: #f7f7f7">
+				        					<div class="col">
+				        						<select class="form-select" name="emailDomain">
+						  							<option value="" selected>-- 메시지 선택 (선택사항) --</option>
+													<option value="">배송 전에 미리 연락바랍니다.</option>
+													<option value="">부재 시 경비실에 맡겨주세요.</option>
+												</select>
+				        					</div>
+				        				</div>
+				        				<div class="row mt-3 mb-2">
+				        					<div class="col-12">
+				        						<div class="form-check">
+													<input class="form-check-input" type="checkbox" value="">
+													<label class="form-check-label" for="flexCheckDefault">
+														기본 배송지로 저장
+													</label>
+												</div>
+				        					</div>
+				        				</div>
 									</div>
-		        					<div class="col-2">
-		        						<input type="button" class="btn btn-secondary" onclick="sample6_execDaumPostcode()" value="주소검색">
-									</div>
-		        				</div>
-		        				<div class="row justify-content-end mb-2">
-		        					<div class="col-10">
-										<input id="baseAddress" type="text" name="baseAddress" class="form-control">
-									</div>
-		        				</div>
-		        				<div class="row justify-content-end mb-2">
-		        					<div class="col-10">
-										<input id="detailAddress" type="text" name="detailAddress" class="form-control">
-									</div>
-		        				</div>
-		        				<div class="row mb-2">
-		        					<label class="col-2 col-form-label">휴대전화</label>
-		        					<div class="col-10">
-		        						<%
-		        							String tel = user.getTel();
-		  									String[] telArray = tel.split("-");
-		        						%>
-		        						<select class="form-select" name="firstPhoneNumber" style="width: 28%; display: inline;">
-				  							<option value="010" <%="010".equals(telArray[0]) ? "selected" : ""%>>010</option>
-											<option value="011" <%="011".equals(telArray[0]) ? "selected" : ""%>>011</option>
-											<option value="016" <%="016".equals(telArray[0]) ? "selected" : ""%>>016</option>
-											<option value="017" <%="017".equals(telArray[0]) ? "selected" : ""%>>017</option>
-											<option value="018" <%="018".equals(telArray[0]) ? "selected" : ""%>>018</option>
-											<option value="019" <%="019".equals(telArray[0]) ? "selected" : ""%>>019</option>
-										</select>
-		        						<label style="width: 5%; display: inline;">-</label>
-										<input type="number" name="middlePhoneNumber" class="form-control" style="width: 28%; display: inline;" value=<%=telArray[1]%>>
-										<label style="width: 5%; display: inline;">-</label>
-										<input type="number" name="lastPhoneNumber" class="form-control" style="width: 28%; display: inline;" value=<%=telArray[2]%>>
-									</div>
-		        				</div>
-		        				<div class="row mb-1">
-		        					<%
-		        						String email = user.getEmail();
-		        						String[] emailArray = email.split("@");
-		        					%>
-		        					<label class="col-2 col-form-label">이메일</label>
-		        					<div class="col-10">
-		        						<input type="text" name="emailLocalPart" class="form-control" style="width: 28%; display: inline;" value=<%=emailArray[0]%>>
-										<label style="width: 5%; display: inline;">@</label>
-		        						<select class="form-select" name="emailDomain" style="width: 28%; display: inline;">
-				  							<option value="" selected>-이메일 선택-</option>
-											<option value="naver.com" <%="naver.com".equals(emailArray[1]) ? "selected" : ""%>>naver.com</option>
-											<option value="gmail.com" <%="gmail.com".equals(emailArray[1]) ? "selected" : ""%>>gmail.com</option>
-										</select>
-		        					</div>
-		        				</div>
-		        				<div class="row justify-content-end mb-3">
-		        					<div class="col-10">
-										<label class="text-muted" style="font-size: 0.75rem;">
-											이메일로 주문 처리 과정을 보내드립니다.<br>
-											수신 가능한 이메일 주소를 입력해 주세요.
-										</label>
-									</div>
-		        				</div>
-		        				<div class="row py-3 border" style="background-color: #f7f7f7">
-		        					<div class="col">
-		        						<select class="form-select" name="emailDomain">
-				  							<option value="" selected>-- 메시지 선택 (선택사항) --</option>
-											<option value="">배송 전에 미리 연락바랍니다.</option>
-											<option value="">부재 시 경비실에 맡겨주세요.</option>
-										</select>
-		        					</div>
-		        				</div>
-		        				<div class="row mt-3 mb-2">
-		        					<div class="col-12">
-		        						<div class="form-check">
-											<input class="form-check-input" type="checkbox" value="">
-											<label class="form-check-label" for="flexCheckDefault">
-												기본 배송지로 저장
-											</label>
-										</div>
-		        					</div>
-		        				</div>
+								</div>
 		      				</div>
 		    			</div>
 		  			</div>
