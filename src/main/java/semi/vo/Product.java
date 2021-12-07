@@ -1,6 +1,7 @@
 package semi.vo;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -154,6 +155,14 @@ public class Product {
 				+ ", createdDate=" + createdDate + ", updatedDate=" + updatedDate + ", onSale=" + onSale + ", detail="
 				+ detail + ", totalSaleCount=" + totalSaleCount + ", totalStock=" + totalStock + ", averageReviewRate="
 				+ averageReviewRate + ", colors=" + colors + "]";
+	}
+	
+	public String toSimpleDate(Date date) {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		if (date == null) {
+			return null;
+		}
+		return df.format(date);
 	}
 
 	/**
