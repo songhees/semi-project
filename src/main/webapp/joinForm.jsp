@@ -119,9 +119,6 @@
 
 <body>
 <%@ include file="../common/navbar.jsp" %>
-<%
-	String error = request.getParameter("error");
-%>
 <div class="container">
 	<div class="row">
 		<div class="col">
@@ -135,6 +132,7 @@
 				</nav>
 			</div>
 <%
+	String error = request.getParameter("error");
 	if ("id-exists".equals(error)) {	
 %>
 			<div class="alert alert-danger">
