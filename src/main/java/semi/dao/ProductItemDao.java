@@ -97,42 +97,42 @@ public class ProductItemDao {
 	}
 	
 	public ProductItem getProductItemByProductItemCriteria(ProductItemCriteria criteria) throws SQLException {
-		String sql = "SELECT I.PRODUCT_ITEM_NO, I.PRODUCT_SIZE, I.PRODUCT_COLOR, I.PRODUCT_STOCK, I.PRODUCT_SALE_COUNT, \r\n"
-				+ "       P.PRODUCT_NO, P.PRODUCT_NAME, P.PRODUCT_PRICE, P.PRODUCT_DISCOUNT_PRICE, \r\n"
-				+ "       P.PRODUCT_DISCOUNT_FROM, P.PRODUCT_DISCOUNT_TO, P.PRODUCT_CREATED_DATE, P.PRODUCT_UPDATED_DATE, \r\n"
-				+ "       P.PRODUCT_ON_SALE, P.PRODUCT_DETAIL, P.PRODUCT_TOTAL_SALE_COUNT, P.PRODUCT_TOTAL_STOCK, \r\n"
-				+ "       P.PRODUCT_AVERAGE_REVIEW_RATE, C.CATEGORY_NO, C.CATEGORY_NAME \r\n"
-				+ "FROM SEMI_PRODUCT_ITEM I, SEMI_PRODUCT P, SEMI_PRODUCT_CATEGORY C \r\n"
-				+ "WHERE I.PRODUCT_NO = P.PRODUCT_NO AND P.CATEGORY_NO = C.CATEGORY_NO \r\n"
-				+ "      AND P.PRODUCT_NO = ? AND I.PRODUCT_SIZE = ? AND I.PRODUCT_COLOR = ?;";
-		
-		ProductItem productItem = null;
-		
-		Connection connection = getConnection();
-		PreparedStatement pstmt = connection.prepareStatement(sql);
-		pstmt.setInt(1, criteria.getProductNo());
-		pstmt.setString(2, criteria.getSize());
-		pstmt.setString(3, criteria.getColor());
-		ResultSet rs = pstmt.executeQuery();
-		
-		if (rs.next()) {
-			productItem = new ProductItem();
-			
-			productItem.setNo(rs.getInt("PRODUCT_ITEM_NO"));
-			productItem.setSize(rs.getString("PRODUCT_SIZE"));
-			productItem.setColor(rs.getString("PRODUCT_COLOR"));
-			productItem.setStock(rs.getInt("PRODUCT_STOCK"));
-			productItem.setSaleCount(rs.getInt("PRODUCT_SALE_COUNT"));
-			
-			Product product = toProductVo(rs);
-			productItem.setProduct(product);
-		}
-		
-		rs.close();
-		pstmt.close();
-		connection.close();
-		
-		return productItem;
+	      String sql = "SELECT I.PRODUCT_ITEM_NO, I.PRODUCT_SIZE, I.PRODUCT_COLOR, I.PRODUCT_STOCK, I.PRODUCT_SALE_COUNT, \r\n"
+	            + "       P.PRODUCT_NO, P.PRODUCT_NAME, P.PRODUCT_PRICE, P.PRODUCT_DISCOUNT_PRICE, \r\n"
+	            + "       P.PRODUCT_DISCOUNT_FROM, P.PRODUCT_DISCOUNT_TO, P.PRODUCT_CREATED_DATE, P.PRODUCT_UPDATED_DATE, \r\n"
+	            + "       P.PRODUCT_ON_SALE, P.PRODUCT_DETAIL, P.PRODUCT_TOTAL_SALE_COUNT, P.PRODUCT_TOTAL_STOCK, \r\n"
+	            + "       P.PRODUCT_AVERAGE_REVIEW_RATE, C.CATEGORY_NO, C.CATEGORY_NAME \r\n"
+	            + "FROM SEMI_PRODUCT_ITEM I, SEMI_PRODUCT P, SEMI_PRODUCT_CATEGORY C \r\n"
+	            + "WHERE I.PRODUCT_NO = P.PRODUCT_NO AND P.CATEGORY_NO = C.CATEGORY_NO \r\n"
+	            + "      AND P.PRODUCT_NO = ? AND I.PRODUCT_SIZE = ? AND I.PRODUCT_COLOR = ?";
+	      
+	      ProductItem productItem = null;
+	      
+	      Connection connection = getConnection();
+	      PreparedStatement pstmt = connection.prepareStatement(sql);
+	      pstmt.setInt(1, criteria.getProductNo());
+	      pstmt.setString(2, criteria.getSize());
+	      pstmt.setString(3, criteria.getColor());
+	      ResultSet rs = pstmt.executeQuery();
+	      
+	      if (rs.next()) {
+	         productItem = new ProductItem();
+	         
+	         productItem.setNo(rs.getInt("PRODUCT_ITEM_NO"));
+	         productItem.setSize(rs.getString("PRODUCT_SIZE"));
+	         productItem.setColor(rs.getString("PRODUCT_COLOR"));
+	         productItem.setStock(rs.getInt("PRODUCT_STOCK"));
+	         productItem.setSaleCount(rs.getInt("PRODUCT_SALE_COUNT"));
+	         
+	         Product product = toProductVo(rs);
+	         productItem.setProduct(product);
+	      }
+	      
+	      rs.close();
+	      pstmt.close();
+	      connection.close();
+	      
+	      return productItem;
 	}
 	
 	/**
