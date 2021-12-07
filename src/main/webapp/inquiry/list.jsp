@@ -164,7 +164,7 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 
 							</td>
 							<td><%=inquiryDto.getCategoryName() %></td>
-							<td class="text-start"><a href="passwordcheckform.jsp?inquiryNo=<%=inquiryDto.getInquiryNo()%>"><%=inquiryDto.getTitle() %></a></td>
+							<td class="text-start"><a style="text-decoration: none; color: black;" href="passwordcheckform.jsp?inquiryNo=<%=inquiryDto.getInquiryNo()%>"><%=inquiryDto.getTitle() %></a></td>
 							<td><%=inquiryDto.getUserName().substring(0,1) %>****</td>
 							<td><%=inquiryDto.getInquiryCreatedDate() %></td>
 						</tr>
@@ -179,7 +179,7 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 							<td><%=inquiryRowNum %></td>
 							<td></td>
 							<td><%=inquiryDto.getCategoryName() %></td>
-							<td class="text-start">└ <%=inquiryDto.getTitle() %></td>
+							<td class="text-start">└ <a style="text-decoration: none; color: black;" href="passwordcheckform.jsp?inquiryNo=<%=inquiryDto.getInquiryNo()%>"><%=inquiryDto.getTitle() %></a></td>
 							<td></td>
 							<td><%=inquiryDto.getReplyCreatedDate() %></td>
 						</tr>
