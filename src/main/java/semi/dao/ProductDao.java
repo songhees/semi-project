@@ -676,4 +676,49 @@ public class ProductDao {
 		
 		return categoryList;
 	}
+	
+	public List<Product> getProductListByCategory(int categoryNo) throws SQLException {
+		String sql = "select p.product_no, p.product_name, p.product_price, p.product_discount_price, "
+				   + "       p.product_discount_from, p.product_discount_to, p.product_created_date, "
+				   + "		 p.product_updated_date, p.product_on_sale, p.product_detail, c.category_no, "
+				   + "		 c.category_name "
+				   + "from semi_product p, semi_product_category c "
+				   + "where p.category_no = c.category_no "
+				   + "		and c.category_no = ? ";
+		List<Product> productList = new ArrayList<>();		
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, categoryNo);
+		ResultSet rs = pstmt.executeQuery();
+			
+		while (rs.next()) {
+			Product product = new Product();
+			ProductCategory category = new ProductCategory();
+			
+			product.setNo(rs.getInt("product_no"));
+			product.setName(rs.getString("product_name"));
+			product.setPrice(rs.getInt("product_price"));
+			product.setDiscountPrice(rs.getInt("product_discount_price"));
+			product.setDiscountFrom(rs.getDate("product_discount_from"));
+			product.setDiscountTo(rs.getDate("product_discount_to"));
+			product.setCreatedDate(rs.getDate("product_created_date"));
+			product.setUpdatedDate(rs.getDate("product_updated_date"));
+			product.setOnSale(rs.getString("product_on_sale"));
+			product.setDetail(rs.getString("product_detail"));
+			category.setNo(rs.getInt("category_no"));
+			category.setName(rs.getString("category_name"));
+			
+			product.setProductCategory(category);
+			
+			productList.add(product);
+		}
+		
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return productList;
+		
+	}
 }
