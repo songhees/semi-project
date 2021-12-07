@@ -54,7 +54,7 @@
           <a class="nav-link" href="#">리뷰관리</a>
         </li>
         <li class="nav-item">
-		  <a class="nav-link" href="/shopping-app/index.jsp">관리자모드 나가기</a>
+		  <a class="nav-link" href="/semi-project/index.jsp">관리자모드 나가기</a>
 		</li>
       </ul>
     </div>

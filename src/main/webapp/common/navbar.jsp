@@ -58,7 +58,7 @@
 	}
 %>
 					<li class="nav-item">
-          				<a class="nav-link" href="/shopping-app/admin/index.jsp">관리자모드</a>
+          				<a class="nav-link" href="/semi-project/admin/index.jsp">관리자모드</a>
         			</li>
 				</ul>
 	  		</div>
