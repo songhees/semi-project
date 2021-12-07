@@ -104,7 +104,7 @@ public class ProductItemDao {
 				+ "       P.PRODUCT_AVERAGE_REVIEW_RATE, C.CATEGORY_NO, C.CATEGORY_NAME \r\n"
 				+ "FROM SEMI_PRODUCT_ITEM I, SEMI_PRODUCT P, SEMI_PRODUCT_CATEGORY C \r\n"
 				+ "WHERE I.PRODUCT_NO = P.PRODUCT_NO AND P.CATEGORY_NO = C.CATEGORY_NO \r\n"
-				+ "      AND P.PRODUCT_NO = ? AND I.PRODUCT_SIZE = ? AND I.PRODUCT_COLOR = ?;";
+				+ "      AND P.PRODUCT_NO = ? AND I.PRODUCT_SIZE = ? AND I.PRODUCT_COLOR = ?";
 		
 		ProductItem productItem = null;
 		
