@@ -40,11 +40,11 @@
 	if (loginUserInfo == null) {
 %>
 					<li class="nav-item"><a href="/semi-project/loginform.jsp" class="nav-link">LOGIN</a></li>
-					<li class="nav-item"><a href="#" class="nav-link">JOIN US</a></li>
+					<li class="nav-item"><a href="/semi-project/joinForm.jsp" class="nav-link">JOIN US</a></li>
 <%
 	} else {
 %>
-					<li class="nav-item"><a href="#" class="nav-link">LOGOUT</a></li>
+					<li class="nav-item"><a href="/semi-project/logout.jsp" class="nav-link">LOGOUT</a></li>
 					<li class="nav-item dropdown">
 				    	<a class="nav-link dropdown-toggle" href="/semi-project/user/mypage.jsp" role="button">MY PAGE</a>
 				        <ul class="dropdown-menu">

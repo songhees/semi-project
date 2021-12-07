@@ -203,7 +203,7 @@
 									<a href="../index.jsp" class="btn btn-dark opacity-50">취소</a>
 								</div>
 								<div class="col-1">
-									<button class="btn btn-outline-secondary btn-sm" style="width: 80px;" type="button" onclick="deleteUser(<%=loginUserInfo.getNo() %>)">회원탈퇴</button>
+									<button class="btn btn-outline-secondary btn-sm" style="width: 80px;" type="button" onclick="deleteUser()">회원탈퇴</button>
 								</div>
 							</div>
 						</div>
@@ -281,9 +281,9 @@
 		}
 	}
 	
-/* 	function deleteUser(no) {
-		location.href = "delete.jsp?no=" + no;
-	} */
+	function deleteUser(no) {
+		location.href = "delete.jsp";
+	} 
 	
     function sample6_execDaumPostcode() {
         new daum.Postcode({

@@ -97,6 +97,7 @@ public class ProductItemDao {
 	}
 	
 	public ProductItem getProductItemByProductItemCriteria(ProductItemCriteria criteria) throws SQLException {
+
 		String sql = "SELECT I.PRODUCT_ITEM_NO, I.PRODUCT_SIZE, I.PRODUCT_COLOR, I.PRODUCT_STOCK, I.PRODUCT_SALE_COUNT, \r\n"
 				+ "       P.PRODUCT_NO, P.PRODUCT_NAME, P.PRODUCT_PRICE, P.PRODUCT_DISCOUNT_PRICE, \r\n"
 				+ "       P.PRODUCT_DISCOUNT_FROM, P.PRODUCT_DISCOUNT_TO, P.PRODUCT_CREATED_DATE, P.PRODUCT_UPDATED_DATE, \r\n"
@@ -133,6 +134,7 @@ public class ProductItemDao {
 		connection.close();
 		
 		return productItem;
+
 	}
 	
 	/**
