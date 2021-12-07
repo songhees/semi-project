@@ -1,3 +1,9 @@
+<%@page import="semi.vo.User"%>
+<%@page import="semi.criteria.ProductItemCriteria"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="semi.vo.ProductItem"%>
+<%@page import="java.util.List"%>
+<%@page import="semi.dao.ProductItemDao"%>
 <%@page import="org.apache.commons.lang3.StringUtils"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!doctype html>
@@ -16,31 +22,53 @@
 <body>
 <%
 	String from = StringUtils.defaultString(request.getParameter("from"), "");
-	String[] productItemNo;
-	String[] productQuantities;
-	String[] productNo;
-	String[] productColors;
-	String[] productSizes;
+	String[] productItemNumbers;
+	String[] productItemQuantities;
+	String[] productNumbers;
+	String[] productItemColors;
+	String[] productItemSizes;
+	
+	User user = (User)session.getAttribute("LOGIN_USER_INFO");
 
 	// 잘못된 접근일 경우
-	if (!"cart".equals(from) && !"detail".equals(from)) {
+	if ((!"cart".equals(from) && !"detail".equals(from)) || user == null) {
 %>
 	<h2 class="text-center mt-5">잘못된 접근입니다.</h2>
 <%
 	} else {
+		ProductItemDao productItemDao = ProductItemDao.getInstance();
+		List<ProductItem> productItems = new ArrayList<>();
+		
 		// 장바구니 페이지에서 왔을 경우
 		if ("cart".equals(from)) {
-			productItemNo = request.getParameterValues("no");
-			productQuantities = request.getParameterValues("amount");
+			productItemNumbers = request.getParameterValues("no");
+			productItemQuantities = request.getParameterValues("amount");
+			
+			for (String productItemNoString : productItemNumbers) {
+				int productItemNo = Integer.parseInt(productItemNoString);
+				productItems.add(productItemDao.getProductItemByProductItemNo(productItemNo));
+			}
 		// 제품상세페이지에서 왔을 경우
 		} else {
-			productNo = request.getParameterValues("no");
-			productColors = request.getParameterValues("color");
-			productSizes = request.getParameterValues("color");
-			productQuantities = request.getParameterValues("amount");
+			productNumbers = request.getParameterValues("no");
+			productItemColors = request.getParameterValues("color");
+			productItemSizes = request.getParameterValues("size");
+			productItemQuantities = request.getParameterValues("amount");
+			
+			for (int i = 0; i < productNumbers.length; i++) {
+				int productNo = Integer.parseInt(productNumbers[i]);
+				String productItemColor = productItemColors[i];
+				String productItemSize = productItemSizes[i];
+				
+				ProductItemCriteria productItemCriteria = new ProductItemCriteria();
+				productItemCriteria.setProductNo(productNo);
+				productItemCriteria.setColor(productItemColor);
+				productItemCriteria.setSize(productItemSize);
+				
+				productItems.add(productItemDao.getProductItemByProductItemCriteria(productItemCriteria));
+			}
 		}
-		
-		
+		boolean isStockAvailable = true;
 %>
 <div class="container"> 
 	<form id="form-search" method="post" action="order.jsp">
@@ -59,11 +87,11 @@
 		        				<div class="row mb-3">
 		        					<div class="col">
 		        						<div class="form-check form-check-inline">
-		  									<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+		  									<input class="form-check-input" type="radio" name="flexRadio1" id="flexRadioDefault1" checked>
 		  									<label class="form-check-label" for="flexRadioDefault1">회원 정보와 동일</label>
 										</div>
 		        						<div class="form-check form-check-inline">
-		  									<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
+		  									<input class="form-check-input" type="radio" name="flexRadio1" id="flexRadioDefault1">
 		  									<label class="form-check-label" for="flexRadioDefault1">새로운 배송지</label>
 										</div>
 		        					</div>
@@ -71,7 +99,7 @@
 		        				<div class="row mb-2">
 		        					<label class="col-2 col-form-label">받는사람</label>
 		        					<div class="col-10">
-										<input type="text" name="receivePerson" class="form-control">
+										<input type="text" name="receivePerson" class="form-control" value="<%=user.getName()%>">
 									</div>
 		        				</div>
 		        				<div class="row mb-2">
@@ -96,29 +124,37 @@
 		        				<div class="row mb-2">
 		        					<label class="col-2 col-form-label">휴대전화</label>
 		        					<div class="col-10">
+		        						<%
+		        							String tel = user.getTel();
+		  									String[] telArray = tel.split("-");
+		        						%>
 		        						<select class="form-select" name="firstPhoneNumber" style="width: 28%; display: inline;">
-				  							<option value="010" selected>010</option>
-											<option value="011">011</option>
-											<option value="016">016</option>
-											<option value="017">017</option>
-											<option value="018">018</option>
-											<option value="019">019</option>
+				  							<option value="010" <%="010".equals(telArray[0]) ? "selected" : ""%>>010</option>
+											<option value="011" <%="011".equals(telArray[0]) ? "selected" : ""%>>011</option>
+											<option value="016" <%="016".equals(telArray[0]) ? "selected" : ""%>>016</option>
+											<option value="017" <%="017".equals(telArray[0]) ? "selected" : ""%>>017</option>
+											<option value="018" <%="018".equals(telArray[0]) ? "selected" : ""%>>018</option>
+											<option value="019" <%="019".equals(telArray[0]) ? "selected" : ""%>>019</option>
 										</select>
 		        						<label style="width: 5%; display: inline;">-</label>
-										<input type="number" name="middlePhoneNumber" class="form-control" style="width: 28%; display: inline;">
+										<input type="number" name="middlePhoneNumber" class="form-control" style="width: 28%; display: inline;" value=<%=telArray[1]%>>
 										<label style="width: 5%; display: inline;">-</label>
-										<input type="number" name="lastPhoneNumber" class="form-control" style="width: 28%; display: inline;">
+										<input type="number" name="lastPhoneNumber" class="form-control" style="width: 28%; display: inline;" value=<%=telArray[2]%>>
 									</div>
 		        				</div>
 		        				<div class="row mb-1">
+		        					<%
+		        						String email = user.getEmail();
+		        						String[] emailArray = email.split("@");
+		        					%>
 		        					<label class="col-2 col-form-label">이메일</label>
 		        					<div class="col-10">
-		        						<input type="text" name="emailLocalPart" class="form-control" style="width: 28%; display: inline;">
+		        						<input type="text" name="emailLocalPart" class="form-control" style="width: 28%; display: inline;" value=<%=emailArray[0]%>>
 										<label style="width: 5%; display: inline;">@</label>
 		        						<select class="form-select" name="emailDomain" style="width: 28%; display: inline;">
 				  							<option value="" selected>-이메일 선택-</option>
-											<option value="naver.com">naver.com</option>
-											<option value="gmail.com">gmail.com</option>
+											<option value="naver.com" <%="naver.com".equals(emailArray[1]) ? "selected" : ""%>>naver.com</option>
+											<option value="gmail.com" <%="gmail.com".equals(emailArray[1]) ? "selected" : ""%>>gmail.com</option>
 										</select>
 		        					</div>
 		        				</div>
@@ -162,21 +198,29 @@
 		    			</h2>
 		    			<div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2" data-bs-parent="#accordionExample2">
 		      				<div class="accordion-body px-3">
+		      					<%
+		      						int i = 0;
+		      						for (ProductItem productItem : productItems) {
+		      							boolean isQuantityOverStock = Integer.parseInt(productItemQuantities[i]) > productItem.getStock();
+		      							if (isQuantityOverStock) {
+		      								isStockAvailable = false;
+		      							}
+		      					%>
 		      					<div class="card p-0" style="border: none;">
 		      						<div class="row mb-3 justify-content-between">
 		      							<div class="col-2">
-		      								<a href="/semi-project/product/detail.jsp?no=1000">
-											<img class="img-fluid rounded-start" src="/semi-project/resources/images/product/1000/thumbnail/1000_1.jpg">
+		      								<a href="/semi-project/product/detail.jsp?no=<%=productItem.getProduct().getNo()%>">
+											<img class="img-fluid rounded-start" src="/semi-project/resources/images/product/<%=productItem.getProduct().getNo()%>/thumbnail/<%=productItem.getProduct().getNo()%>_1.jpg">
 										</a>
 		      							</div>
 		      							<div class="col-8 p-0">
 		      								<div class="card-body">
-		      									<h6 class="card-title">어반 모직 양털자켓 4color</h6>
+		      									<h6 class="card-title"><%=productItem.getProduct().getName() %></h6>
 		      									<p class="card-text text-muted" style="font-size: 0.85rem;">
-													[옵션: 크림/Free]<br>
-													수량: 1개<br>
-													상품구매금액: 78000원<br>
-													[무료] / 기본배송
+													[옵션: <%=productItem.getColor()%>/<%=productItem.getSize()%>]<br>
+													수량: <%=isQuantityOverStock ? "<s>" : "" %><%=productItemQuantities[i]%><%=isQuantityOverStock ? "</s>" : "" %>개<%=isQuantityOverStock ? "<mark><strong>(재고 초과)</strong></mark>" : "" %><br>
+													상품구매금액: <%=productItem.getProduct().getPrice()%>원<br>
+													<%=productItem.getProduct().getPrice()>=50000 ? "[무료] / 기본배송" : "[조건] / 기본배송"%>
 												</p>
 		      								</div>
 		      							</div>
@@ -185,29 +229,10 @@
 		      							</div>
 		      						</div>
 		        				</div>
-		      					<div class="card p-0" style="border: none;">
-		      						<div class="row mb-3 justify-content-between">
-		      							<div class="col-2">
-		      								<a href="/semi-project/product/detail.jsp?no=1000">
-											<img class="img-fluid rounded-start" src="/semi-project/resources/images/product/1000/thumbnail/1000_1.jpg">
-										</a>
-		      							</div>
-		      							<div class="col-8 p-0">
-		      								<div class="card-body">
-		      									<h6 class="card-title">어반 모직 양털자켓 4color</h6>
-		      									<p class="card-text text-muted" style="font-size: 0.85rem;">
-													[옵션: 크림/Free]<br>
-													수량: 1개<br>
-													상품구매금액: 78000원<br>
-													[무료] / 기본배송
-												</p>
-		      								</div>
-		      							</div>
-		      							<div class="col-2 align-self-center">
-		      								<button class="btn btn-danger">삭제</button>
-		      							</div>
-		      						</div>
-		        				</div>
+		        				<%
+		      						i++;
+		      						}
+		        				%>
 		      				</div>
 		      			</div>
 		      		</div>
@@ -303,23 +328,23 @@
 				      			<div class="row border-start border-end border-bottom">
 				      				<div class="col py-2">
 		        						<div class="form-check form-check-inline">
-		  									<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
+		  									<input class="form-check-input" type="radio" name="flexRadio2" id="flexRadioDefault1" checked>
 		  									<label class="form-check-label" for="flexRadioDefault1">무통장입금</label>
 										</div>
 		        						<div class="form-check form-check-inline">
-		  									<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+		  									<input class="form-check-input" type="radio" name="flexRadio2" id="flexRadioDefault1">
 		  									<label class="form-check-label" for="flexRadioDefault1">신용카드</label>
 										</div>
 		        						<div class="form-check form-check-inline">
-		  									<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+		  									<input class="form-check-input" type="radio" name="flexRadio2" id="flexRadioDefault1">
 		  									<label class="form-check-label" for="flexRadioDefault1">휴대폰</label>
 										</div>
 		        						<div class="form-check form-check-inline">
-		  									<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+		  									<input class="form-check-input" type="radio" name="flexRadio2" id="flexRadioDefault1">
 		  									<label class="form-check-label" for="flexRadioDefault1">카카오페이</label>
 										</div>
 		        						<div class="form-check form-check-inline">
-		  									<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+		  									<input class="form-check-input" type="radio" name="flexRadio2" id="flexRadioDefault1">
 		  									<label class="form-check-label" for="flexRadioDefault1">에스크로(실시간 계좌이체)</label>
 										</div>
 		        					</div>
@@ -345,11 +370,11 @@
 		        				<div class="row mb-2">
 		        					<div class="col">
 										<div class="form-check form-check-inline">
-		  									<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+		  									<input class="form-check-input" type="radio" name="flexRadio3" id="flexRadioDefault1">
 		  									<label class="form-check-label" for="flexRadioDefault1">현금영수증 신청</label>
 										</div>
 		        						<div class="form-check form-check-inline">
-		  									<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
+		  									<input class="form-check-input" type="radio" name="flexRadio3" id="flexRadioDefault1" checked>
 		  									<label class="form-check-label" for="flexRadioDefault1">신청안함</label>
 										</div>
 									</div>
@@ -409,7 +434,8 @@
 					</div>
 				</div>
 				<div class="border p-4 d-grid">
-					<button class="btn btn-secondary" type="button">18200원 결제하기</button>
+					<button class="btn btn-secondary" type="button" <%=isStockAvailable ? "" : "style='display: none;'" %>>18200원 결제하기</button>
+					<button class="btn btn-warning" type="button" <%=isStockAvailable ? "style='display: none;'" : "" %> disabled>재고부족으로 주문불가</button>
 					<p class="text-muted mt-4" style="font-size: 0.85rem;">- 무이자할부가 적용되지 않은 상품과 무이자할부가 가능한 상품을 동시에 구매할 경우 전체 주문 상품 금액에 대해 무이자할부가 적용되지 않습니다. 무이자할부를 원하시는 경우 장바구니에서 무이자할부 상품만 선택하여 주문하여 주시기 바랍니다.</p>
 					<p class="text-muted" style="font-size: 0.85rem;">- 최소 결제 가능 금액은 결제금액에서 배송비를 제외한 금액입니다.</p>
 				</div>
