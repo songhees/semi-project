@@ -68,7 +68,7 @@ int inquiryNo = Integer.parseInt(request.getParameter("inquiryNo"));
 				</div>
 				<div id="button-list" class="d-flex justify-content-center mt-5 mb-5">
 					<div class="me-3">
-						<a href="inquiry.jsp?inquiryCategory=전체보기">
+						<a href="list.jsp?inquiryCategory=전체보기">
 							<button type="button" class="btn btn-secondary btn-lg">
 								<span class="fs-6">목록</span>
 							</button>

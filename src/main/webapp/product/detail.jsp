@@ -404,16 +404,6 @@ List<Integer> styleProductNoList = productDao.getProductStyleNoList(no);
 											<p align="right"><%=formatter.format(styleProduct.getPrice())%>원
 											</p>
 										</div>
-										<select id="withAmount<%=styleProduct.getNo()%>"
-											disabled="disabled" class="form-select mb-1"
-											aria-label="Default select example" name="amount">
-											<option selected disabled="disabled" value="null">수량을 선택해주세요</option>
-											<option value="1">1</option>
-											<option value="2">2</option>
-											<option value="3">3</option>
-											<option value="4">4</option>
-											<option value="5">5</option>
-										</select>
 <%
 List<String> styleProductColorList = productDao.getProductColorList(styleProductNo);
 		if (styleProductColorList.get(0) != null) {
@@ -449,6 +439,16 @@ List<String> styleProductSizeList = productDao.getProductSizeList(styleProductNo
 <%
 }
 %>
+										</select>
+										<select id="withAmount<%=styleProduct.getNo()%>"
+											disabled="disabled" class="form-select mb-1"
+											aria-label="Default select example" name="amount">
+											<option selected disabled="disabled" value="null">수량을 선택해주세요</option>
+											<option value="1">1</option>
+											<option value="2">2</option>
+											<option value="3">3</option>
+											<option value="4">4</option>
+											<option value="5">5</option>
 										</select>
 									</div>
 								</li>
@@ -935,7 +935,7 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 		if (checkForm()) {
 			var orderForm = document.getElementById("form-order");
 //			if (loginUserInfo != null) {
-				orderForm.setAttribute("action", "order.jsp");
+				orderForm.setAttribute("action", "orderForm.jsp");
 				orderForm.submit();
 //			} else {
 //				orderForm.setAttribute("action", "../login.jsp");
@@ -1066,7 +1066,7 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 			if (productWithProduct()) {
 				var orderForm = document.getElementById("form-order");
 //				if (loginUserInfo != null) {
-					orderForm.setAttribute("action", "order.jsp");
+					orderForm.setAttribute("action", "orderForm.jsp");
 					orderForm.submit();
 //				} else {
 //					orderForm.setAttribute("action", "../login.jsp");

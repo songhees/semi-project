@@ -101,7 +101,7 @@
 	          		<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">COMMUNITY</a>
 				    <ul class="dropdown-menu">
 						<li><a class="dropdown-item" href="#">NOTICE</a></li>
-			            <li><a class="dropdown-item" href="#">Q&amp;A</a></li>
+			            <li><a class="dropdown-item" href="/semi-project/inquiry/list.jsp">Q&amp;A</a></li>
 			            <li><a class="dropdown-item" href="#">REVIEW</a></li>
 			        </ul>
 				</li>
