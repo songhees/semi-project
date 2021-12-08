@@ -74,7 +74,7 @@ List<String> thumbnails = productDao.getProductThumbnailImageList(no);
 
 	<%@ include file="../common/navbar.jsp"%>
 	<div class="container">
-		<form method="post" id="form-order" action="order.jsp">
+		<form method="post" id="form-order" action="orderForm.jsp">
 			<div class="row">
 				<div class="col">
 					<div class="d-flex justify-content-end">
@@ -935,7 +935,7 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 		if (checkForm()) {
 			var orderForm = document.getElementById("form-order");
 //			if (loginUserInfo != null) {
-				orderForm.setAttribute("action", "order.jsp");
+				orderForm.setAttribute("action", "orderForm.jsp");
 				orderForm.submit();
 //			} else {
 //				orderForm.setAttribute("action", "../login.jsp");
@@ -1066,7 +1066,7 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 			if (productWithProduct()) {
 				var orderForm = document.getElementById("form-order");
 //				if (loginUserInfo != null) {
-					orderForm.setAttribute("action", "order.jsp");
+					orderForm.setAttribute("action", "orderForm.jsp");
 					orderForm.submit();
 //				} else {
 //					orderForm.setAttribute("action", "../login.jsp");
