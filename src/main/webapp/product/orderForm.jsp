@@ -1,3 +1,4 @@
+<%@page import="java.util.Arrays"%>
 <%@page import="semi.dao.ProductDao"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="semi.vo.Address"%>
@@ -80,7 +81,30 @@
 		
 		List<Address> addresses = addressDao.getAllAddressByUserNo(user.getNo());
 		boolean addressIsEmpty = addresses.isEmpty();
+		boolean isDeliveryChargeFree = false;
+		long totalProductPrice = 0;
+		long totalDeliveryCharge = 3000;
+		long totalAmount = 0;
+		long totalProductPoint = 0;
+		
+		// 상품가격을 모두 합한 금액을 구한다.
+		for (ProductItem productItem : productItems) {
+			totalProductPrice += productItem.getProduct().getPrice();
+		}
+		
+		// 총 상품금액이 50000 이상일 경우 배송비는 무료이다.
+		if (totalProductPrice >= 50000) {
+			isDeliveryChargeFree = true;
+			totalDeliveryCharge = 0;
+		}
+		// 총금액을 계산한다.
+		totalAmount = totalProductPrice + totalDeliveryCharge;
+		
+		// 상품적립포인트를 계산한다.
+		// 적립률은 상품, 회원등급 관계없이 모두 1%이다.
+		totalProductPoint = (long)(totalProductPrice*0.01);
 %>
+<input id="numberOfProductItems" type="hidden" value="<%=productItems.size()%>">
 <div class="container"> 
 	<form id="form-search" method="post" action="order.jsp">
 		<div class="row justify-content-center">
@@ -293,7 +317,7 @@
 		      								isStockAvailable = false;
 		      							}
 		      					%>
-		      					<div class="card p-0" style="border: none;">
+		      					<div id="productItem<%=i%>" class="card p-0" style="border: none;">
 		      						<div class="row mb-3 justify-content-between">
 		      							<div class="col-2">
 		      								<a href="/semi-project/product/detail.jsp?no=<%=productItem.getProduct().getNo()%>">
@@ -307,17 +331,17 @@
 													[옵션: <%=productItem.getColor()%>/<%=productItem.getSize()%>]<br>
 													수량: <%=isQuantityOverStock ? "<s>" : "" %><%=productItemQuantities[i]%><%=isQuantityOverStock ? "</s>" : "" %>개<%=isQuantityOverStock ? "<mark><strong>(재고 초과)</strong></mark>" : "" %><br>
 													상품구매금액: <%=productItem.getProduct().getPrice()%>원<br>
-													<%=productItem.getProduct().getPrice()>=50000 ? "[무료] / 기본배송" : "[조건] / 기본배송"%>
+													<%=isDeliveryChargeFree ? "[무료] / 기본배송" : "[조건] / 기본배송"%>
 												</p>
 		      								</div>
 		      							</div>
 		      							<div class="col-2 align-self-center">
-		      								<button class="btn btn-danger">삭제</button>
+		      								<button class="btn btn-danger" type="button" onclick="deleteProductItem(<%=i%>)">삭제</button>
 		      							</div>
 		      						</div>
 		        				</div>
 		        				<%
-		      						i++;
+		        					i++;
 		      						}
 		        				%>
 		      				</div>
@@ -335,14 +359,14 @@
 		      				<div class="accordion-body pt-3">
 		      					<div class="row mb-1 justify-content-between">
 		        					<label class="col-2 col-form-label">적립금</label>
-		        					<label class="col-2 col-form-label text-end text-muted" style="font-size: 0.85rem;">(사용 가능 <strong>2000원</strong>)</label>
+		        					<label class="col-2 col-form-label text-end text-muted" style="font-size: 0.85rem;">(사용 가능 <strong><span id="availablePoint"><%=user.getPoint()%></span>원</strong>)</label>
 		        				</div>
 		        				<div class="row mb-1">
 		        					<div class="col-10">
-		        						<input type="number" name="usingPoint" class="form-control">
+		        						<input id="usingPoint" name="usingPoint" type="number" class="form-control" onchange="checkUsingPoint(this)">
 		        					</div>
 		        					<div class="col-2 d-grid">
-		        						<button class="btn btn-secondary">전액 사용</button>
+		        						<button class="btn btn-secondary" type="button" onclick="userAllPoint()">전액 사용</button>
 		        					</div>
 		        				</div>
 		        				<div class="accordion accordion-flush p-0 mt-2" id="accordionExample4">
@@ -365,7 +389,7 @@
 					      		</div>
 					      		<div class="row py-1 justify-content-between" style="font-size: 1.2rem; background-color: #eff1f4;">
 			        				<label class="col-2 col-form-label py-1"><strong>적용금액</strong></label>
-			        				<label class="col-2 col-form-label py-1 text-end"><strong>-0원</strong></label>
+			        				<label class="col-2 col-form-label py-1 text-end"><strong>-<span id="discountAmount">0</span>원</strong></label>
 				        		</div>
 			      			</div>
 			      		</div>
@@ -382,19 +406,19 @@
 				      		<div class="accordion-body px-4">
 				      			<div class="row justify-content-between">
 			        				<label class="col-2 col-form-label py-1">주문상품</label>
-			        				<label class="col-2 col-form-label py-1 text-end">15200원</label>
+			        				<label class="col-2 col-form-label py-1 text-end"><span id="totalProductPrice"><%=totalProductPrice%></span>원</label>
 				        		</div>
 				      			<div class="row justify-content-between">
 			        				<label class="col-2 col-form-label py-1">할인/부가결제</label>
-			        				<label class="col-2 col-form-label py-1 text-end">-0원</label>
+			        				<label class="col-2 col-form-label py-1 text-end">-<span id="totalDiscount">0</span>원</label>
 				        		</div>
 				      			<div class="row mb-2 justify-content-between">
 			        				<label class="col-2 col-form-label py-1">배송비</label>
-			        				<label class="col-2 col-form-label py-1 text-end">+3000원</label>
+			        				<label class="col-2 col-form-label py-1 text-end">+<span id="totalDeliveryCharge"><%=totalDeliveryCharge%></span>원</label>
 				        		</div>
 				      			<div class="row py-1 justify-content-between" style="font-size: 1.2rem; background-color: #eff1f4;">
 			        				<label class="col-2 col-form-label py-1"><strong>결제금액</strong></label>
-			        				<label class="col-2 col-form-label py-1 text-end"><strong>18200원</strong></label>
+			        				<label class="col-2 col-form-label py-1 text-end"><strong><span id="totalAmount"><%=totalAmount%></span>원</strong></label>
 				        		</div>
 				      		</div>
 				      	</div>
@@ -491,8 +515,9 @@
 				      		<div class="accordion-body px-4">
 				      			<div class="row justify-content-between">
 			        				<label class="col-2 col-form-label py-1">상품별 적립금</label>
-			        				<label class="col-2 col-form-label py-1 text-end">160원</label>
+			        				<label class="col-2 col-form-label py-1 text-end"><%=totalProductPoint%>원</label>
 				        		</div>
+				      			<!-- 미구현
 				      			<div class="row justify-content-between">
 			        				<label class="col-2 col-form-label py-1">회원 적립금</label>
 			        				<label class="col-2 col-form-label py-1 text-end">150원</label>
@@ -501,9 +526,10 @@
 			        				<label class="col-2 col-form-label py-1">쿠폰 적립금</label>
 			        				<label class="col-2 col-form-label py-1 text-end">0원</label>
 				        		</div>
+				        		 -->
 				      			<div class="row py-1 justify-content-between" style="font-size: 1.2rem; background-color: #eff1f4;">
 			        				<label class="col-2 col-form-label py-1"><strong>적립 예정금액</strong></label>
-			        				<label class="col-2 col-form-label py-1 text-end"><strong>310원</strong></label>
+			        				<label class="col-2 col-form-label py-1 text-end"><strong><%=totalProductPoint%>원</strong></label>
 				        		</div>
 				      		</div>
 				      	</div>
@@ -521,7 +547,7 @@
 					</div>
 				</div>
 				<div class="border p-4 d-grid">
-					<button class="btn btn-secondary" type="button" <%=isStockAvailable ? "" : "style='display: none;'" %>>18200원 결제하기</button>
+					<button class="btn btn-secondary" type="button" <%=isStockAvailable ? "" : "style='display: none;'" %>><span id="totalAmount-Button"><%=totalAmount%></span>원 결제하기</button>
 					<button class="btn btn-warning" type="button" <%=isStockAvailable ? "style='display: none;'" : "" %> disabled>재고부족으로 주문불가</button>
 					<p class="text-muted mt-4" style="font-size: 0.85rem;">- 무이자할부가 적용되지 않은 상품과 무이자할부가 가능한 상품을 동시에 구매할 경우 전체 주문 상품 금액에 대해 무이자할부가 적용되지 않습니다. 무이자할부를 원하시는 경우 장바구니에서 무이자할부 상품만 선택하여 주문하여 주시기 바랍니다.</p>
 					<p class="text-muted" style="font-size: 0.85rem;">- 최소 결제 가능 금액은 결제금액에서 배송비를 제외한 금액입니다.</p>
@@ -536,6 +562,57 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script type="text/javascript">
+	window.onload=function(){
+		
+	}
+
+	// 사용 적립금이 user의 잔여 적립금 이하인지 확인한다.
+	// 사용 적립금이 user의 잔여 적립금보다 클 경우 경고창을 표시하고 사용 적립금 값을 0으로 변경한다.
+	function checkUsingPoint(el) {
+		if (parseInt(el.value) > parseInt(document.getElementById("availablePoint").innerHTML)) {
+			alert("사용 가능 적립금보다 많습니다.\n사용 적립금을 다시 입력해 주세요.");
+			el.value = 0;
+		}
+		
+		updateDiscountAmount(el.value);
+	}
+	
+	// 할인/부가결제의 전액 사용 버튼을 클릭했을 때 실행된다.
+	// 사용 적립금의 값을 user의 잔여 적립금으로 변경한다.
+	function userAllPoint() {
+		var availablePoint = document.getElementById("availablePoint").innerHTML;
+		document.getElementById("usingPoint").value = availablePoint;
+		updateDiscountAmount(availablePoint);
+	}
+	
+	function updateDiscountAmount(discountAmount) {
+		document.getElementById("discountAmount").innerHTML = discountAmount;
+		document.getElementById("totalDiscount").innerHTML = discountAmount;
+		
+		updateTotalAmount()
+	}
+	
+	function updateTotalAmount() {
+		var totalAmount = 0;
+		totalAmount += parseInt(document.getElementById("totalProductPrice").innerHTML);
+		totalAmount -= parseInt(document.getElementById("totalDiscount").innerHTML);
+		totalAmount += parseInt(document.getElementById("totalDeliveryCharge").innerHTML);
+		
+		document.getElementById("totalAmount").innerHTML = totalAmount;
+		document.getElementById("totalAmount-Button").innerHTML = totalAmount;
+	}
+	
+	var numberOfProductItems = document.getElementById("numberOfProductItems");
+	function deleteProductItem(productItemElementNo) {
+		console.log("numberOfProductItems:" + numberOfProductItems);
+		console.log("i:" + productItemElementNo);
+		if (numberOfProductItems <= 1) {
+			location.href="/semi-project/index.jsp";
+			return;
+		}
+		document.getElementById("productItem" + productItemElementNo).remove();
+	}
+	
 	function sample6_execDaumPostcode() {
 	    new daum.Postcode({
 	        oncomplete: function(data) {
