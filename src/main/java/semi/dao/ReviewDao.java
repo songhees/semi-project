@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import semi.dto.ReviewDto;
 import semi.vo.Review;
 
 import static utils.ConnectionUtil.getConnection;
@@ -228,4 +229,98 @@ public class ReviewDao {
 		return reviewList;
 	}
 
+	
+	/**
+	 * 유저 번호에 해당하는 모든 리뷰 목록 조회
+	 * @param no 유저 번호
+	 * @param begin 
+	 * @param end
+	 * @return
+	 * @throws SQLException
+	 */
+	public List<ReviewDto> getReviewListByUserNo(int no, int begin, int end) throws SQLException {
+		String	sql = "select review_no, product_no, review_rate, review_content, review_created_date, product_name, thumbnail_image_url "
+			    + "from (select row_number() over (order by review_no desc) rn, "
+			    + "      r.review_no, r.product_no, r.review_rate, r.review_content, r.review_created_date, "
+			    + "		 p.product_name, s.thumbnail_image_url "
+			    + "      from semi_product_review r, semi_product p, semi_product_thumbnail_image s "
+			    + "      where user_no = ? "
+			    + "      and review_deleted = 'N' "
+			    + "		 and s.thumbnail_image_url=p.product_no || '_1.jpg' "
+			    + "		 and r.product_no = p.product_no "
+			    + "		 and s.product_no = p.product_no) "
+			    + "where rn >= ? and rn <= ? "
+			    + "order by rn ";
+		
+		List<ReviewDto> reviewList = new ArrayList<>();
+
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, no);
+		pstmt.setInt(2, begin);
+		pstmt.setInt(3, end);
+		ResultSet rs = pstmt.executeQuery();
+		while (rs.next()) {
+			ReviewDto review = new ReviewDto();
+			review.setNo(rs.getInt("review_no"));
+			review.setProductNo(rs.getInt("product_no"));
+			review.setProductName(rs.getString("product_name"));
+			review.setRate(rs.getInt("review_rate"));
+			review.setContent(rs.getString("review_content"));
+			review.setCreatedDate(rs.getDate("review_created_date"));
+			review.setThumbnailUrl(rs.getString("thumbnail_image_url"));
+			reviewList.add(review);
+		}
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return reviewList;
+	}
+	
+	public int getTotalRecordsByUserNo(int no) throws SQLException {
+		String sql = "select count(*) cnt "
+				   + "from semi_product_review "
+				   + "where user_no = ? ";
+		
+		int totalRecords = 0;
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, no);
+		ResultSet rs = pstmt.executeQuery();
+		rs.next();
+		totalRecords = rs.getInt("cnt");
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return totalRecords;
+	}
+	
+	/**
+	 * 회원 번호와 리뷰 번호에 해당하는 리뷰를 삭제
+	 * @param userNo 회원 번호
+	 * @param reviewNo 리뷰 번호
+	 * @throws SQLException
+	 */
+	public void deleteReview(int userNo, int reviewNo) throws SQLException {
+		String sql = "update semi_product_review "
+				   + "set "
+				   + "	review_deleted = 'y', "
+				   + "	review_deleted_date = sysdate "
+				   + "where user_no = ? "
+				   + "and review_no = ? ";
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, userNo);
+		pstmt.setInt(2, reviewNo);
+		
+		pstmt.executeUpdate();
+		
+		pstmt.close();
+		connection.close();
+	}
+	
 }
