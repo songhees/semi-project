@@ -74,7 +74,7 @@ List<String> thumbnails = productDao.getProductThumbnailImageList(no);
 
 	<%@ include file="../common/navbar.jsp"%>
 	<div class="container">
-		<form method="post" id="form-order" action="orderForm.jsp">
+		<form method="post" id="form-order" action="order.jsp">
 			<div class="row">
 				<div class="col">
 					<div class="d-flex justify-content-end">
@@ -404,16 +404,6 @@ List<Integer> styleProductNoList = productDao.getProductStyleNoList(no);
 											<p align="right"><%=formatter.format(styleProduct.getPrice())%>원
 											</p>
 										</div>
-										<select id="withAmount<%=styleProduct.getNo()%>"
-											disabled="disabled" class="form-select mb-1"
-											aria-label="Default select example" name="amount">
-											<option selected disabled="disabled" value="null">수량을 선택해주세요</option>
-											<option value="1">1</option>
-											<option value="2">2</option>
-											<option value="3">3</option>
-											<option value="4">4</option>
-											<option value="5">5</option>
-										</select>
 <%
 List<String> styleProductColorList = productDao.getProductColorList(styleProductNo);
 		if (styleProductColorList.get(0) != null) {
@@ -449,6 +439,16 @@ List<String> styleProductSizeList = productDao.getProductSizeList(styleProductNo
 <%
 }
 %>
+										</select>
+										<select id="withAmount<%=styleProduct.getNo()%>"
+											disabled="disabled" class="form-select mb-1"
+											aria-label="Default select example" name="amount">
+											<option selected disabled="disabled" value="null">수량을 선택해주세요</option>
+											<option value="1">1</option>
+											<option value="2">2</option>
+											<option value="3">3</option>
+											<option value="4">4</option>
+											<option value="5">5</option>
 										</select>
 									</div>
 								</li>
