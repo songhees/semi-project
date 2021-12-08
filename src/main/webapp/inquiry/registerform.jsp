@@ -24,13 +24,17 @@
 }
 </style>
 <body>
+	<%@ include file="../common/navbar.jsp"%>
 	<%
 	String no = request.getParameter("no");
 	ProductDao productDao = ProductDao.getInstance();
 	DecimalFormat formatter = new DecimalFormat("###,###");
 	int productNo = 0;
+	if (loginUserInfo == null) {
+		response.sendRedirect("../loginform.jsp?error=login-required");
+		return;
+	}
 	%>
-	<%@ include file="../common/navbar.jsp"%>
 	<div class="container">
 		<div class="row mb-5">
 			<div class="col">
