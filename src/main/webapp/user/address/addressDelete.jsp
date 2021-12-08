@@ -1,3 +1,4 @@
+<%@page import="semi.vo.User"%>
 <%@page import="semi.vo.Address"%>
 <%@page import="semi.dao.AddressDao"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -5,13 +6,12 @@
 <%
 	String[] nums = request.getParameterValues("no");
 
-// 로그인되어 있지 않는 유저일 경우
-/* 	
+	// 로그인되어 있지 않는 유저일 경우
 	User loginUserInfo = (User)session.getAttribute("LOGIN_USER_INFO");
 	if (loginUserInfo == null) {
-	response.sendRedirect("../../login.jsp");		
-	return;
-} */
+		response.sendRedirect("../../loginform.jsp");		
+		return;
+	} 
 	
 	AddressDao addressDao = AddressDao.getInstance();
 
@@ -21,7 +21,7 @@
 		
 		Address address = addressDao.getAddressByNo(no);
 		
-		if (10000 != address.getUser().getNo()) {
+		if (loginUserInfo.getNo() != address.getUser().getNo()) {
 			response.sendRedirect("addressList.jsp?error=deny-delete");
 			return;
 		}
