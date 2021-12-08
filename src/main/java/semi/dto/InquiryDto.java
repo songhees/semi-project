@@ -3,19 +3,17 @@ package semi.dto;
 import java.util.Date;
 
 public class InquiryDto {
+	private int rn;
 	// semi_product_inquiry
 	private int inquiryNo;
 	private String title;
 	private String password;
 	private int productNo;
-	private String inquiryContent;
-	private Date inquiryCreatedDate;
-	private String inquiryDeleted;
+	private String content;
+	private Date createdDate;
+	private String deleted;
 	// semi_product_inquiry_reply
 	private int replyNo;
-	private String replyContent;
-	private Date replyCreatedDate;
-	private String replyDeleted;
 	// semi_user
 	private int userNo;
 	private String userName;
@@ -24,6 +22,14 @@ public class InquiryDto {
 	private String categoryName;
 	
 	public InquiryDto() {
+	}
+
+	public int getRn() {
+		return rn;
+	}
+
+	public void setRn(int rn) {
+		this.rn = rn;
 	}
 
 	public int getInquiryNo() {
@@ -58,20 +64,28 @@ public class InquiryDto {
 		this.productNo = productNo;
 	}
 
-	public String getInquiryContent() {
-		return inquiryContent;
+	public String getContent() {
+		return content;
 	}
 
-	public void setInquiryContent(String inquiryContent) {
-		this.inquiryContent = inquiryContent;
+	public void setContent(String content) {
+		this.content = content;
 	}
 
-	public Date getInquiryCreatedDate() {
-		return inquiryCreatedDate;
+	public Date getCreatedDate() {
+		return createdDate;
 	}
 
-	public void setInquiryCreatedDate(Date inquiryCreatedDate) {
-		this.inquiryCreatedDate = inquiryCreatedDate;
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public String getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(String deleted) {
+		this.deleted = deleted;
 	}
 
 	public int getReplyNo() {
@@ -80,22 +94,6 @@ public class InquiryDto {
 
 	public void setReplyNo(int replyNo) {
 		this.replyNo = replyNo;
-	}
-
-	public String getReplyContent() {
-		return replyContent;
-	}
-
-	public void setReplyContent(String replyContent) {
-		this.replyContent = replyContent;
-	}
-
-	public Date getReplyCreatedDate() {
-		return replyCreatedDate;
-	}
-
-	public void setReplyCreatedDate(Date replyCreatedDate) {
-		this.replyCreatedDate = replyCreatedDate;
 	}
 
 	public int getUserNo() {
@@ -130,22 +128,4 @@ public class InquiryDto {
 		this.categoryName = categoryName;
 	}
 
-	public String getInquiryDeleted() {
-		return inquiryDeleted;
-	}
-
-	public void setInquiryDeleted(String inquiryDeleted) {
-		this.inquiryDeleted = inquiryDeleted;
-	}
-
-	public String getReplyDeleted() {
-		return replyDeleted;
-	}
-
-	public void setReplyDeleted(String replyDeleted) {
-		this.replyDeleted = replyDeleted;
-	}
-	
-	
-	
 }

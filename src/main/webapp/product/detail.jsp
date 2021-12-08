@@ -26,8 +26,6 @@ if (reviewOrderBy == null) {
 
 ProductDao productDao = ProductDao.getInstance();
 Product product = productDao.getProductDetail(no);
-
-List<String> thumbnails = productDao.getProductThumbnailImageList(no);
 %>
 <head>
 <meta charset="UTF-8">
@@ -71,18 +69,19 @@ List<String> thumbnails = productDao.getProductThumbnailImageList(no);
 }
 </style>
 <body>
-
-	<%@ include file="../common/navbar.jsp"%>
+<%@ include file="../common/navbar.jsp"%>
+<%
+List<String> thumbnails = productDao.getProductThumbnailImageList(no);
+%>
 	<div class="container">
 		<form method="post" id="form-order" action="order.jsp">
 			<div class="row">
 				<div class="col">
 					<div class="d-flex justify-content-end">
-						<nav style="-bs-breadcrumb-divider: '&gt;';"
-							aria-label="breadcrumb">
+						<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
 							<ol class="breadcrumb">
 								<li class="breadcrumb-item"><a
-									href="/semi-prodject/index.jsp"
+									href="/semi-project/index.jsp"
 									style="text-decoration: none; color: gray;">Home</a></li>
 								<li class="breadcrumb-item active" aria-current="page"><%=product.getProductCategory().getName()%></li>
 							</ol>
@@ -115,7 +114,7 @@ List<String> thumbnails = productDao.getProductThumbnailImageList(no);
 					<div class="col-md-5">
 						<h5><%=product.getName()%></h5>
 						<hr class="mt-4 mb-3">
-						<input type="hidden" name="no" value="<%=product.getNo()%>">
+						<input id="detail-productNo" type="hidden" name="no" value="<%=product.getNo()%>">
 						<table class="table table-borderless">
 							<tr>
 								<%
@@ -494,7 +493,13 @@ List<String> styleProductSizeList = productDao.getProductSizeList(styleProductNo
 				<div>
 					<form method="post" action="reviewregister.jsp" id="form-review" enctype="multipart/form-data">
 						<input type="hidden" name="from" value="detail">
-						<!-- user_no session에서 가져오기 hidden으로 -->
+<%
+	if (loginUserInfo != null) {
+%>
+						<input type="hidden" name="userNo" value="<%=loginUserInfo.getNo() %>">
+<%
+	}
+%>
 						<input type="hidden" name="productNo" value="<%=product.getNo()%>">
 						<p style="font-size: small; color: gray; margin-bottom: 0">
 							<strong>REVIEW</strong> | 문의글 혹은 악의적인 비방글은 무통보 삭제된다는 점 유의해주세요^^
@@ -530,19 +535,19 @@ List<String> styleProductSizeList = productDao.getProductSizeList(styleProductNo
 			</div>
 		</div>
 <%
-String pageNo = request.getParameter("reviewPageNo");
-	UserDao userDao = UserDao.getInstance();
-	ReviewDao reviewDao = ReviewDao.getInstance();
-	int totalRecords = reviewDao.getTotalRecordsByProductNo(no);
-	Pagination pagination = new Pagination(pageNo, totalRecords, 5, 5);
-	List<Review> reviewList = reviewDao.getReviewList(no, pagination.getBegin(), pagination.getEnd(), reviewOrderBy);
+String reviewPageNo = request.getParameter("reviewPageNo");
+ReviewDao reviewDao = ReviewDao.getInstance();
+int reviewTotalRecords = reviewDao.getTotalRecordsByProductNo(no);
+UserDao userDao = UserDao.getInstance();
+Pagination pagination = new Pagination(reviewPageNo, reviewTotalRecords, 5, 5);
+List<Review> reviewList = reviewDao.getReviewList(no, pagination.getBegin(), pagination.getEnd(), reviewOrderBy);
 %>
 		<div class="row">
 			<div class="col">
 				<div class="d-flex justify-content-start mt-5 mb-3 p-0">
 					<div>
 						<p>
-							<span><strong>리뷰(<%=totalRecords%>)</strong></span>    
+							<span><strong>리뷰(<%=reviewTotalRecords%>)</strong></span>    
 							<a style="color: gray; text-decoration: none" href="detail.jsp?no=<%=no%>&reviewOrderBy=최신순">
 								<span><%="최신순".equals(reviewOrderBy) ? "<strong>" : ""%>최신순<%="최신순".equals(reviewOrderBy) ? "</strong>" : ""%></span>
 							</a>
@@ -568,8 +573,8 @@ if (reviewList.isEmpty()) {
 <%
 } else {
 		for (Review review : reviewList) {
-			List<String> reviewImageNameList = reviewDao.getReviewImageNameListByReviewNo(review.getNo());
 			User user = userDao.getUserByNo(review.getUserNo());
+			List<String> reviewImageNameList = reviewDao.getReviewImageNameListByReviewNo(review.getNo());
 %>
 					<tr>
 						<td rowspan="3">
@@ -755,7 +760,7 @@ if (reviewList.isEmpty()) {
 	// Pagination 객체로부터 해당 페이지 블록의 시작 페이지번호와 끝 페이지번호만큼 페이지내비게이션 정보를 표시한다.
 	for (int num = pagination.getBeginPage(); num <= pagination.getEndPage(); num++) {
 %>					
-					<li class="page-item <%=pagination.getPageNo() == num ? "active" : "" %>"><a class="page-link" href="detail.jsp?no=<%=product.getNo() %>"><%=num %></a></li>
+					<li class="page-item <%=pagination.getPageNo() == num ? "active" : "" %>"><a class="page-link" href="detail.jsp?no=<%=product.getNo() %>&reviewPageNo=<%=num%>"><%=num %></a></li>
 <%
 	}
 %>					
@@ -768,7 +773,7 @@ if (reviewList.isEmpty()) {
 				</nav>
 			</div>
 		</div>
-			
+		
 
 		<div class="row mb-5 pb-3">
 			<div class="col">
@@ -814,46 +819,35 @@ if (reviewList.isEmpty()) {
 						</thead>
 						<tbody>
 <%
+String inquiryPageNo = request.getParameter("inquiryPageNo");
 InquiryDao inquiryDao = InquiryDao.getInstance();
-List<InquiryDto> inquiryDtoList = inquiryDao.getInquiryDtoByProductNo(no);
-int inquiryRowNum = 0;
+int inquiryTotalRecords = inquiryDao.getTotalRecords();
+Pagination inquiryPagination = new Pagination(inquiryPageNo, inquiryTotalRecords, 5, 5);
+List<InquiryDto> inquiryDtoList = inquiryDao.getInquiryDtoByProductNo(product.getNo(), inquiryPagination.getBegin(), inquiryPagination.getEnd());
+
 for (InquiryDto inquiryDto : inquiryDtoList) {
-	if (inquiryDto.getInquiryDeleted().equals("N")) {
-		inquiryRowNum += 1;
-	} else {
-		continue;
-	}
-	if ((inquiryDto.getReplyNo() != 0) && (inquiryDto.getReplyDeleted().equals("N"))) {
-		inquiryRowNum += 1;
-	}
-}
-for (InquiryDto inquiryDto : inquiryDtoList) {
-	if (inquiryDto.getInquiryDeleted().equals("N")) {
 %>
 							<tr>
-								<td><%=inquiryRowNum %></td>
-								<td><%=inquiryDto.getCategoryName() %></td>
-								<td class="text-start"><%=inquiryDto.getTitle() %></td>
+								<td><%=inquiryDto.getRn() %></td>
+<%
+	if (inquiryDto.getCategoryName() == null) {
+		InquiryDto adminInquiryDto = inquiryDao.getInquiryDtoByInquiryNo(inquiryDto.getInquiryNo());
+%>
+								<td><%=adminInquiryDto.getCategoryName() %></td>
+								<td class="text-start"><a href="../inquiry/detail.jsp?inquiryNo=<%=inquiryDto.getInquiryNo() %>"><%=inquiryDto.getTitle() %></a></td>
 								<td><%=inquiryDto.getUserName().substring(0,1) %>****</td>
-								<td><%=inquiryDto.getInquiryCreatedDate() %></td>
-							</tr>
 <%
-		inquiryRowNum -= 1;
 	} else {
-		continue;
-	}
-	if ((inquiryDto.getReplyNo() != 0) && (inquiryDto.getReplyDeleted().equals("N"))) {
 %>
-							<tr>
-								<td><%=inquiryRowNum %></td>
 								<td><%=inquiryDto.getCategoryName() %></td>
-								<td class="text-start">└ <%=inquiryDto.getTitle() %></td>
-								<td></td>
-								<td><%=inquiryDto.getReplyCreatedDate() %></td>
+								<td class="text-start"><a href="../inquiry/detail.jsp?inquiryNo=<%=inquiryDto.getInquiryNo() %>"><%=inquiryDto.getTitle() %></a></td>
+								<td><%=inquiryDto.getUserName().substring(0,1) %>****</td>
+<%
+	}
+%>
+								<td><%=inquiryDto.getCreatedDate() %></td>
 							</tr>
 <%
-		inquiryRowNum -= 1;
-	}
 }
 %>
 						</tbody>
@@ -863,10 +857,10 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 		</div>
 		<div class="d-flex justify-content-end">
 			<ul class="btn_list p-0" style="list-style: none">
-				<li><a href="../inquiryRegister.jsp?no=<%=product.getNo()%>"><button type="button" class="btn btn-secondary">
+				<li><a href="../inquiry/registerform.jsp?no=<%=product.getNo()%>"><button type="button" class="btn btn-secondary">
 						<span class="fs-6">상품 문의하기</span>
 					</button></a></li>
-				<li><a href="../inquiry.jsp"><button type="button" class="btn btn-outline-secondary">
+				<li><a href="../inquiry/list.jsp"><button type="button" class="btn btn-outline-secondary">
 						<span class="fs-6">모두 보기</span>
 					</button></a></li>
 			</ul>
@@ -878,19 +872,14 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 	var bigPic = document.querySelector("#big-pic");            
 	var smallPics = document.querySelectorAll(".small-pic");    //작은 사진(여러개)
 	
-	var no = [];
-	var color = [];
-	var size = [];
-	var amount = [];
-	
 	for(var i = 0; i < smallPics.length; i++){
 	    smallPics[i].addEventListener("click", changePic);  
 	}
+	
 	function changePic(){   //사진 바꾸는 함수
 		var smallPicAttribute = this.getAttribute("src");
 	    bigPic.setAttribute("src", smallPicAttribute);
 	}
-
 
 	function checkForm() {
 		var colorElements = document.querySelectorAll("#color-check input");
@@ -931,28 +920,20 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 		
 		return isColor && isSize;
 	}
+	
 	function goBuy() {
 		if (checkForm()) {
 			var orderForm = document.getElementById("form-order");
-//			if (loginUserInfo != null) {
-				orderForm.setAttribute("action", "orderForm.jsp");
-				orderForm.submit();
-//			} else {
-//				orderForm.setAttribute("action", "../login.jsp");
-//				orderForm.submit();
-//			}
+			orderForm.setAttribute("action", "orderForm.jsp");
+			orderForm.submit();
 		}
 	}
+	
 	function goCart() {
 		if (checkForm()) {
 			var orderForm = document.getElementById("form-order");
-//			if (loginUserInfo != null) {
-				orderForm.setAttribute("action", "cart.jsp");
-				orderForm.submit();
-//			} else {
-//				orderForm.setAttribute("action", "../login.jsp");
-//				orderForm.submit();
-//			}
+			orderForm.setAttribute("action", "cart.jsp");
+			orderForm.submit();
 		}
 	}
 
@@ -968,7 +949,6 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 		
 		var productTotalPrice = numberWithCommas(productAmountText * <%=currentPrice %>
 		)
-
 			totalPrice.innerHTML = productTotalPrice;
 	}
 
@@ -1006,7 +986,6 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 			sizeEl.disabled = true;
 			checkedWithProductNo[i] = null;
 		}
-		
 	}
 	
 	function withCheckForm() {
@@ -1029,6 +1008,8 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 	function productWithProduct() {
 		var colorElements = document.querySelectorAll("#color-check input");
 		var sizeElements = document.querySelectorAll("#size-check input");
+		var detailProductNo = document.getElementById("detail-productNo");
+		var productAmount = document.getElementById("product-amount");
 		
 		var isColor = false;
 		var isSize = false;
@@ -1054,6 +1035,14 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 			return true;
 		} else {
 			if (confirm("본상품의 옵션이 선택되지 않았습니다. 선택한 상품만 구매하시겠습니까?") == true){
+				for (var i=0; i < colorElements.length; i++) {
+					colorElements[i].setAttribute("disabled","disabled");
+				}
+				for (var i=0; i < sizeElements.length; i++) {
+					sizeElements[i].setAttribute("disabled","disabled");
+				}
+				detailProductNo.setAttribute("disabled","disabled");
+				productAmount.setAttribute("disabled","disabled");
 				return true;
 			 } else {  
 			 	return false;
@@ -1065,29 +1054,20 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 		if (withCheckForm()) {
 			if (productWithProduct()) {
 				var orderForm = document.getElementById("form-order");
-//				if (loginUserInfo != null) {
 					orderForm.setAttribute("action", "orderForm.jsp");
 					orderForm.submit();
-//				} else {
-//					orderForm.setAttribute("action", "../login.jsp");
-//					orderForm.submit();
-//				}
 			}
 		} 
 	}
+	
 	function withGoCart() {
 		if (withCheckForm()) {
 			if (productWithProduct()) {
 				var orderForm = document.getElementById("form-order");
-//				if (loginUserInfo != null) {
-					orderForm.setAttribute("action", "cart.jsp");
-					orderForm.submit();
-//				} else {
-//					orderForm.setAttribute("action", "../login.jsp");
-//					orderForm.submit();
-//				}
+				orderForm.setAttribute("action", "cart.jsp");
+				orderForm.submit();
 			}
-		} 
+		}
 	}
 	
 	var reviewTextArea = "";
@@ -1109,16 +1089,6 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 			reviewForm.submit();
 		}
 	}
-	
-	/* textarea(496line)에 onclick="reviewLoginCheck()" 추가
-		function reviewLoginCheck(this) {
-		if (confirm("로그인이 필요한 서비스입니다. 로그인 하시겠습니까?") == true){
-			orderForm.setAttribute("action", "../login.jsp");
-			orderForm.submit();
-		 } else {  
-		 	return false;
-		 }
-	} */
 	</script>
 </body>
 </html>

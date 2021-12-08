@@ -122,18 +122,18 @@ if (product.getDiscountPrice() != 0) {
 	</div>
 	<form action="delete.jsp" id="password-form">
 		<input type="hidden" name="inquiryNo" value="<%=inquiryNo %>">
-		<div class="row">
+		<div class="row mt-5 mb-2">
 			<div class="col">
-					<table class="table">
-					<colgroup>
-						<col width="15%">
-						<col width="*">
-					</colgroup>
-						<tr>
-							<td>비밀번호</td>
-							<td><input type="password" name="password"><span>삭제하려면 비밀번호를 입력하세요.</span></td>
-						</tr>
-					</table>
+				<table class="table">
+				<colgroup>
+					<col width="15%">
+					<col width="*">
+				</colgroup>
+					<tr>
+						<td>비밀번호</td>
+						<td><input type="password" name="password"><span>삭제하려면 비밀번호를 입력하세요.</span></td>
+					</tr>
+				</table>
 	
 			</div>
 		</div>
@@ -159,6 +159,13 @@ if (product.getDiscountPrice() != 0) {
 			</div>
 		</div>
 	</form>
+	<div class="row">
+		<div class="col">
+			<table>
+				
+			</table>
+		</div>
+	</div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script type="text/javascript">
