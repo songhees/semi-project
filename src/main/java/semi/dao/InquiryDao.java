@@ -225,4 +225,60 @@ public class InquiryDao {
 		
 		return inquiryCategoryList;
 	}
+	
+	public void insertInquiry(InquiryDto inquiryDto) throws SQLException {
+		String sql = "insert into semi_product_inquiry(user_no, product_no, category_no, inquiry_title, "
+				   + "inquiry_password, inquiry_content) "
+				   + "values(?,?,?,?,?,?)";
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, inquiryDto.getUserNo());
+		pstmt.setInt(2, inquiryDto.getProductNo());
+		pstmt.setInt(3, inquiryDto.getCategoryNo());
+		pstmt.setString(4, inquiryDto.getTitle());
+		pstmt.setString(5, inquiryDto.getPassword());
+		pstmt.setString(6, inquiryDto.getInquiryContent());
+		pstmt.executeUpdate();
+		
+		pstmt.close();
+		connection.close();
+	}
+	
+	public void updateInquiry(InquiryDto inquiryDto) throws SQLException {
+		String sql = "update semi_product_inquiry "
+				   + "set "
+				   + "	category_no = ?, "
+				   + "	inquiry_title = ?, "
+				   + "	inquiry_content = ? "
+				   + "where inquiry_no = ? ";
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, inquiryDto.getCategoryNo());
+		pstmt.setString(2, inquiryDto.getTitle());
+		pstmt.setString(3, inquiryDto.getInquiryContent());
+		pstmt.setInt(4, inquiryDto.getInquiryNo());
+		pstmt.executeUpdate();
+		
+		pstmt.close();
+		connection.close();
+	}
+	
+	public void deleteInquiry(InquiryDto inquiryDto) throws SQLException {
+		String sql = "update semi_product_inquiry "
+				   + "set "
+				   + "	inquiry_deleted = ?,"
+				   + "	inquiry_deleted_date = sysdate "
+				   + "where inquiry_no = ? ";
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setString(1, inquiryDto.getInquiryDeleted());
+		pstmt.setInt(2, inquiryDto.getInquiryNo());
+		pstmt.executeUpdate();
+		
+		pstmt.close();
+		connection.close();
+	}
 }
