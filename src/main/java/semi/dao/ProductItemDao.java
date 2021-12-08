@@ -97,7 +97,6 @@ public class ProductItemDao {
 	}
 	
 	public ProductItem getProductItemByProductItemCriteria(ProductItemCriteria criteria) throws SQLException {
-
 		String sql = "SELECT I.PRODUCT_ITEM_NO, I.PRODUCT_SIZE, I.PRODUCT_COLOR, I.PRODUCT_STOCK, I.PRODUCT_SALE_COUNT, \r\n"
 				+ "       P.PRODUCT_NO, P.PRODUCT_NAME, P.PRODUCT_PRICE, P.PRODUCT_DISCOUNT_PRICE, \r\n"
 				+ "       P.PRODUCT_DISCOUNT_FROM, P.PRODUCT_DISCOUNT_TO, P.PRODUCT_CREATED_DATE, P.PRODUCT_UPDATED_DATE, \r\n"
@@ -105,7 +104,11 @@ public class ProductItemDao {
 				+ "       P.PRODUCT_AVERAGE_REVIEW_RATE, C.CATEGORY_NO, C.CATEGORY_NAME \r\n"
 				+ "FROM SEMI_PRODUCT_ITEM I, SEMI_PRODUCT P, SEMI_PRODUCT_CATEGORY C \r\n"
 				+ "WHERE I.PRODUCT_NO = P.PRODUCT_NO AND P.CATEGORY_NO = C.CATEGORY_NO \r\n"
-				+ "      AND P.PRODUCT_NO = ? AND I.PRODUCT_SIZE = ? AND I.PRODUCT_COLOR = ?";
+				+ "      AND P.PRODUCT_NO = ? AND I.PRODUCT_SIZE = ?";
+		if (!"null".equals(criteria.getColor()))	{
+			sql += " AND I.PRODUCT_COLOR = ?";
+		}
+		System.out.println(sql);
 		
 		ProductItem productItem = null;
 		
@@ -113,7 +116,9 @@ public class ProductItemDao {
 		PreparedStatement pstmt = connection.prepareStatement(sql);
 		pstmt.setInt(1, criteria.getProductNo());
 		pstmt.setString(2, criteria.getSize());
-		pstmt.setString(3, criteria.getColor());
+		if (!"null".equals(criteria.getColor()))	{
+			pstmt.setString(3, criteria.getColor());
+		}
 		ResultSet rs = pstmt.executeQuery();
 		
 		if (rs.next()) {

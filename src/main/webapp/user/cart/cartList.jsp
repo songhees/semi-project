@@ -177,7 +177,7 @@
 		</div>
 	</div>
 	<div>
-		<form id="cartInfo" action="order.jsp" method="get">
+		<form id="cartInfo" action="/semi-project/product/orderForm.jsp?" method="get">
 			<input type="hidden" name="from" value="cart">
 			<table class="vinc">
 				<colgroup>
@@ -356,7 +356,7 @@
 	
 	function orderItem(no) {
 		var amount = document.getElementById("amount-" + no).value
-		location.href = "order.jsp?no=" + no + "&amount=" + amount + "&from=cart" ;
+		location.href = "/semi-project/product/orderForm.jsp?no=" + no + "&amount=" + amount + "&from=cart" ;
 	}
 	
 	function totalOrder() {

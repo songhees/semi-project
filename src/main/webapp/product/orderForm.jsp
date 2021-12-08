@@ -1,3 +1,4 @@
+<%@page import="semi.dao.ProductDao"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="semi.vo.Address"%>
 <%@page import="semi.dao.AddressDao"%>
@@ -75,6 +76,7 @@
 		// 주문수량이 상품의 재고보다 많은 것이 하나라도 있으면 false인 변수이다.
 		boolean isStockAvailable = true;
 		AddressDao addressDao = AddressDao.getInstance();
+		ProductDao productDao = ProductDao.getInstance();
 		
 		List<Address> addresses = addressDao.getAllAddressByUserNo(user.getNo());
 		boolean addressIsEmpty = addresses.isEmpty();
@@ -295,7 +297,7 @@
 		      						<div class="row mb-3 justify-content-between">
 		      							<div class="col-2">
 		      								<a href="/semi-project/product/detail.jsp?no=<%=productItem.getProduct().getNo()%>">
-											<img class="img-fluid rounded-start" src="/semi-project/resources/images/product/<%=productItem.getProduct().getNo()%>/thumbnail/<%=productItem.getProduct().getNo()%>_1.jpg">
+											<img class="img-fluid rounded-start" src="/semi-project/resources/images/product/<%=productDao.getProductThumbnailImageList(productItem.getProduct().getNo()).isEmpty() ? 1000 : productItem.getProduct().getNo()%>/thumbnail/<%=productDao.getProductThumbnailImageList(productItem.getProduct().getNo()).isEmpty() ? 1000 : productItem.getProduct().getNo()%>_1.jpg">
 										</a>
 		      							</div>
 		      							<div class="col-8 p-0">
