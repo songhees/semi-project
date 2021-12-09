@@ -144,7 +144,7 @@
 		for (ReviewDto review : reviewList) {
 %>
 				<tr class="review-<%=review.getNo() %>">
-					<td rowspan="3">
+					<td rowspan="3" style="width: 70%;">
 						<div class="review-rate py-2">
 							<img alt="상품사진" src="../resources/images/product/<%=review.getProductNo() %>/thumbnail/<%=review.getThumbnailUrl() %>">
 							<a href="../product/detail.jsp?no=<%=review.getProductNo()%>#review"><%=review.getProductName() %></a>
@@ -213,7 +213,7 @@
 %>
 							</ul>
 						</div>
-						<div class="review-rate mt-3">
+						<div class="review-rate" style="display: inline-block; width: 730px; height: 40px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
 							<%=review.getContent() %>
 						</div>
 					</td>

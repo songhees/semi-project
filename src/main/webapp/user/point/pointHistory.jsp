@@ -198,10 +198,15 @@
 							<td><a class="orderDetail" href="../orderDetail.jsp?orderNo=<%=point.getOrderNo() %>"><%=point.getOrderNo() %></a></td>
 <%
 			}
-			 if ("사용".equals(point.getStatus())) {
+			 if ("use".equals(point.getStatus())) {
 %>
 							<td>-<%=df.format(point.getPoint()) %>원</td>
 							<td style="text-align: left;">상품구매시 사용한 적립금</td>
+<%
+			} else if ("add".equals(point.getStatus())){
+%>
+							<td><%=df.format(point.getPoint()) %>원</td>
+							<td style="text-align: left;">구매에 대한 적립금</td>
 <%
 			} else {
 %>
