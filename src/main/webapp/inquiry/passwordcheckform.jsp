@@ -17,9 +17,9 @@ int inquiryNo = Integer.parseInt(request.getParameter("inquiryNo"));
 	<div class="row mb-5">
 		<div class="col">
 			<div class="d-flex justify-content-end">
-				<nav style="-bs-breadcrumb-divider: '&gt;';" aria-label="breadcrumb">
+				<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
 					<ol class="breadcrumb">
-						<li class="breadcrumb-item"><a href="/semi-prodject/index.jsp" style="text-decoration: none; color: gray;">Home</a></li>
+						<li class="breadcrumb-item"><a href="/semi-project/index.jsp" style="text-decoration: none; color: gray;">Home</a></li>
 						<li class="breadcrumb-item">BOARD</li>
 						<li class="breadcrumb-item active" aria-current="page">Q&amp;A</li>
 					</ol>

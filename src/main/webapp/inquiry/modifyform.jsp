@@ -32,7 +32,6 @@
 	ProductDao productDao = ProductDao.getInstance();
 	Product product = productDao.getProductDetail(inquiryDto.getProductNo());
 	List<String> productImageList = productDao.getProductThumbnailImageList(product.getNo());
-	System.out.println(productImageList.get(0)); 
 	DecimalFormat formatter = new DecimalFormat("###,###");
 	%>
 	<%@ include file="../common/navbar.jsp"%>
@@ -40,11 +39,10 @@
 		<div class="row mb-5">
 			<div class="col">
 				<div class="d-flex justify-content-end">
-					<nav style="-bs-breadcrumb-divider: '&gt;';"
-						aria-label="breadcrumb">
+					<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
 						<ol class="breadcrumb">
 							<li class="breadcrumb-item"><a
-								href="/semi-prodject/index.jsp"
+								href="/semi-project/index.jsp"
 								style="text-decoration: none; color: gray;">Home</a></li>
 							<li class="breadcrumb-item">BOARD</li>
 							<li class="breadcrumb-item active" aria-current="page">Q&amp;A</li>
@@ -67,9 +65,19 @@
 				<div class="col m-2">
 					<table>
 						<tr>
+<%
+if (!productImageList.isEmpty()) {
+%>
 							<td rowspan="2" width="100px"><img id="inquiry-image"
 								src="../resources/images/product/<%=product.getNo()%>/thumbnail/<%=productImageList.get(0)%>">
 							</td>
+<%
+} else {
+%>
+							<td></td>
+<%
+}
+%>
 							<td><strong><%=product.getName()%></strong></td>
 						</tr>
 						<tr>
@@ -122,7 +130,7 @@
 						<div>
 							<div class="form-floating">
 								<textarea class="form-control" placeholder="문의글을 작성해주세요."
-									name="content" id="Textarea" style="height: 400px"><%=inquiryDto.getInquiryContent() %></textarea>
+									name="content" id="Textarea" style="height: 400px"><%=inquiryDto.getContent() %></textarea>
 								<label for="Textarea">문의글을 작성해주세요.</label>
 							</div>
 						</div>

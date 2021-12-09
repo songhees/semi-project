@@ -32,7 +32,7 @@
 	inquiryDto.setCategoryNo(categoryNo);
 	inquiryDto.setTitle(title);
 	inquiryDto.setPassword(secretPassword);
-	inquiryDto.setInquiryContent(content);
+	inquiryDto.setContent(content);
 	inquiryDto.setUserNo(userNo);
 	
 	InquiryDao inquiryDao = InquiryDao.getInstance();

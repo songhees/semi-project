@@ -22,7 +22,7 @@
 </style>
 <body>
 <%@ include file="../common/navbar.jsp"%>
-<div class="container">    
+<div class="container mb-5 pb-5">    
 	<%
 	int inquiryNo = Integer.parseInt(request.getParameter("inquiryNo"));
 	InquiryDao inquiryDao = InquiryDao.getInstance();
@@ -35,11 +35,10 @@
 	<div class="row mb-5">
 		<div class="col">
 			<div class="d-flex justify-content-end">
-				<nav style="-bs-breadcrumb-divider: '&gt;';"
-					aria-label="breadcrumb">
+				<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
 					<ol class="breadcrumb">
 						<li class="breadcrumb-item"><a
-							href="/semi-prodject/index.jsp"
+							href="/semi-project/index.jsp"
 							style="text-decoration: none; color: gray;">Home</a></li>
 						<li class="breadcrumb-item">BOARD</li>
 						<li class="breadcrumb-item active" aria-current="page">Q&amp;A</li>
@@ -60,9 +59,19 @@
 		<div class="col m-2">
 			<table>
 				<tr>
+<%
+if (!productImageList.isEmpty()) {
+%>
 					<td rowspan="2" width="100px"><img id="inquiry-image"
 						src="../resources/images/product/<%=product.getNo()%>/thumbnail/<%=productImageList.get(0)%>">
 					</td>
+<%
+} else {
+%>
+					<td></td>
+<%
+}
+%>			
 					<td><strong><%=product.getName()%></strong></td>
 				</tr>
 				<tr>
@@ -111,13 +120,13 @@ if (product.getDiscountPrice() != 0) {
 	</div>
 	<div class="row">
 		<div class="col d-flex justify-content-end">
-			<p><strong>작성일</strong><%=inquiryDto.getInquiryCreatedDate() %></p>
+			<p style="margin: 0px"><strong>작성일</strong><%=inquiryDto.getCreatedDate() %></p>
 		</div>
 	</div>
 	<hr>
 	<div class="row">
 		<div class="col">
-			<%=inquiryDto.getInquiryContent() %>		
+			<%=inquiryDto.getContent() %>		
 		</div>
 	</div>
 	<form action="delete.jsp" id="password-form">
@@ -159,10 +168,27 @@ if (product.getDiscountPrice() != 0) {
 			</div>
 		</div>
 	</form>
-	<div class="row">
+	<div class="row mt-3 mb-5 pb-5">
 		<div class="col">
-			<table>
-				
+			<p>답변</p>
+			<table class="table">
+				<colgroup>
+					<col width="10%">
+					<col width="70%">
+					<col width="20%">
+				</colgroup>
+				<tr>
+<%
+	List<InquiryDto> replys = inquiryDao.getReplyByInquiryNo(inquiryNo);
+	for (InquiryDto reply : replys) {
+%>
+					<td>관리자</td>
+					<td><%=reply.getContent() %></td>
+					<td><%=reply.getCreatedDate() %></td>
+<%
+	}
+%>
+				</tr>
 			</table>
 		</div>
 	</div>
