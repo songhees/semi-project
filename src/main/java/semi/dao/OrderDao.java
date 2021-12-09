@@ -13,6 +13,7 @@ import static utils.ConnectionUtil.*;
 
 import semi.criteria.OrderItemCriteria;
 import semi.dto.OrderItemDto;
+import semi.vo.Order;
 
 /**
  * 주문 정보를 관리하는 클래스
@@ -279,5 +280,49 @@ public class OrderDao {
 		connection.close();
 		
 		return amount;
+	}
+	
+	public void insertOrder(Order order) throws SQLException {
+		String sql = "INSERT INTO SEMI_ORDER (ORDER_NO, USER_NO, TOTAL_PRICE, DEPOSIT_POINT, ORDER_STATUS, \r\n"
+				+ "            ORDER_ADDRESS_NAME, ADDRESS_DETAIL, PAYMENT_METHOD, ORDER_POSTAL_CODE, \r\n"
+				+ "            BASE_ADDRESS, USE_POINT) \r\n"
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setInt(1, order.getNo());
+		pstmt.setInt(2, order.getUser().getNo());
+		pstmt.setLong(3, order.getTotalPrice());
+		pstmt.setInt(4, order.getDepositPoint());
+		pstmt.setString(5, order.getStatus());
+		pstmt.setString(6, order.getAddress().getAddressName());
+		pstmt.setString(7, order.getAddress().getDetail());
+		pstmt.setString(8, order.getPaymentMethod());
+		pstmt.setString(9, order.getAddress().getPostalCode());
+		pstmt.setString(10, order.getAddress().getBaseAddress());
+		pstmt.setInt(11, order.getUsePoint());
+
+		pstmt.executeUpdate();
+
+		pstmt.close();
+		connection.close();
+	}
+	
+	public int getSequenceNextVal() throws SQLException {
+		String sql = "SELECT ORDER_SEQ.NEXTVAL FROM DUAL";
+		int result = 0;
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		ResultSet rs = pstmt.executeQuery();
+		
+		rs.next();
+		result = rs.getInt("NEXTVAL");
+		
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return result;
 	}
 }

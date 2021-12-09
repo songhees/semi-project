@@ -8,6 +8,7 @@ public class Order {
 	private User user;
 	private long totalPrice;
 	private int depositPoint;
+	private int usePoint;
 	private String status;
 	private Date createdDate;
 	private Address address;
@@ -46,6 +47,14 @@ public class Order {
 
 	public void setDepositPoint(int depositPoint) {
 		this.depositPoint = depositPoint;
+	}
+	
+	public int getUsePoint() {
+		return usePoint;
+	}
+	
+	public void setUsePoint(int usePoint) {
+		this.usePoint = usePoint;
 	}
 
 	public String getStatus() {
