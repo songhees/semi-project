@@ -147,7 +147,7 @@ public class OrderDao {
 		String sql = "select i.order_no, "
 				+ "     i.order_product_price, i.order_product_quantity, "
 				+ "		t.product_item_no, t.product_color, t.product_size, "
-				+ "		p.product_no, p.product_name, "
+				+ "		p.product_no, p.product_name, p.product_price, "
 				+ "		s.thumbnail_image_url "
 				+ "from semi_order_item i, semi_product_item t, semi_product p, semi_product_thumbnail_image s "
 				+ "where i.order_no = ? "
@@ -172,6 +172,7 @@ public class OrderDao {
 			item.setProductNo(rs.getInt("product_no"));
 			item.setProductName(rs.getString("product_name"));
 			item.setThumbnailUrl(rs.getString("thumbnail_image_url"));
+			item.setProductPrice(rs.getLong("product_price"));
 			itemsInfo.add(item);
 		}
 		rs.close();
@@ -192,7 +193,7 @@ public class OrderDao {
 		Map<String, Object> orderDetail = null;
 		String sql = "select u.user_name, u.user_tel, "
 				+ "o.order_no, o.total_price, o.order_status, o.order_created, o.payment_method, "
-				+ "o.order_postal_code, o.address_detail, o.base_address "
+				+ "o.order_postal_code, o.address_detail, o.base_address, o.use_point "
 				+ "from semi_user u, semi_order o "
 				+ "where u.user_no = ? "
 				+ "and o.order_no = ? "
@@ -215,6 +216,7 @@ public class OrderDao {
 			orderDetail.put("postalCode", rs.getString("order_postal_code"));
 			orderDetail.put("addressDetail", rs.getString("address_detail"));
 			orderDetail.put("baseAddress", rs.getString("base_address"));
+			orderDetail.put("usePoint", rs.getInt("use_point"));
 		}
 		rs.close();
 		pstmt.close();
