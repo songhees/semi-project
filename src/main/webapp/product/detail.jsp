@@ -19,6 +19,7 @@
 <%
 int no = Integer.parseInt(request.getParameter("no"));
 String reviewOrderBy = request.getParameter("reviewOrderBy");
+String error = request.getParameter("error");
 
 if (reviewOrderBy == null) {
 	reviewOrderBy = "최신순";
@@ -75,6 +76,7 @@ List<String> thumbnails = productDao.getProductThumbnailImageList(no);
 %>
 	<div class="container">
 		<form method="post" id="form-order" action="order.jsp">
+			<input type="hidden" name="from" value="detail" id="from">
 			<div class="row">
 				<div class="col">
 					<div class="d-flex justify-content-end">
@@ -492,7 +494,6 @@ List<String> styleProductSizeList = productDao.getProductSizeList(styleProductNo
 			<div class="col p-0">
 				<div>
 					<form method="post" action="reviewregister.jsp" id="form-review" enctype="multipart/form-data">
-						<input type="hidden" name="from" value="detail">
 <%
 	if (loginUserInfo != null) {
 %>
@@ -535,6 +536,18 @@ List<String> styleProductSizeList = productDao.getProductSizeList(styleProductNo
 			</div>
 		</div>
 <%
+if ("exist-review".equals(error)) {
+%>
+		<div class="row">
+			<div class="col">
+				<div class="alert alert-danger">
+					<strong>리뷰 등록 실패</strong> 이미 등록된 리뷰가 있습니다.
+				</div>
+			</div>
+		</div>
+<%
+}
+
 String reviewPageNo = request.getParameter("reviewPageNo");
 ReviewDao reviewDao = ReviewDao.getInstance();
 int reviewTotalRecords = reviewDao.getTotalRecordsByProductNo(no);
@@ -563,7 +576,7 @@ List<Review> reviewList = reviewDao.getReviewList(no, pagination.getBegin(), pag
 		</div>
 		<div class="row">
 			<div class="col">
-				<table class="table">
+				<table class="table table-sm">
 <%
 if (reviewList.isEmpty()) {
 %>
@@ -576,6 +589,11 @@ if (reviewList.isEmpty()) {
 			User user = userDao.getUserByNo(review.getUserNo());
 			List<String> reviewImageNameList = reviewDao.getReviewImageNameListByReviewNo(review.getNo());
 %>
+					<colgroup>
+						<col width="69%">
+						<col width="8%">
+						<col width="23%">
+					</colgroup>
 					<tr>
 						<td rowspan="3">
 <%
@@ -723,6 +741,16 @@ if (reviewList.isEmpty()) {
 			}
 %>
 						</td>
+						<td rowspan="3">
+<%
+	if (loginUserInfo != null && loginUserInfo.getNo() == review.getUserNo()) {		// 로그인한 사용자의 사용자번호와 게시글작성자의 사용자번호가 일치하는 경우 버튼이 출력된다.
+%>
+							<a href="reviewdelete.jsp?reviewNo=<%=review.getNo() %>&reviewPageNo=<%=reviewPageNo %>" class="btn btn-secondary">삭제</a>
+<%
+	}
+%>							
+						
+						</td>
 						<td>
 							<p class="mb-0">작성자</p>
 							<span class="fw-bold"><%=user.getName().substring(0,1) %>****</span>
@@ -760,7 +788,7 @@ if (reviewList.isEmpty()) {
 	// Pagination 객체로부터 해당 페이지 블록의 시작 페이지번호와 끝 페이지번호만큼 페이지내비게이션 정보를 표시한다.
 	for (int num = pagination.getBeginPage(); num <= pagination.getEndPage(); num++) {
 %>					
-					<li class="page-item <%=pagination.getPageNo() == num ? "active" : "" %>"><a class="page-link" href="detail.jsp?no=<%=product.getNo() %>&reviewPageNo=<%=num%>"><%=num %></a></li>
+					<li class="page-item <%=pagination.getPageNo() == num ? "active" : "" %>"><a class="page-link" href="detail.jsp?no=<%=product.getNo() %>&reviewPageNo=<%=num%>&reviewOrderBy=<%=reviewOrderBy%>"><%=num %></a></li>
 <%
 	}
 %>					
@@ -773,8 +801,6 @@ if (reviewList.isEmpty()) {
 				</nav>
 			</div>
 		</div>
-		
-
 		<div class="row mb-5 pb-3">
 			<div class="col">
 				<div class="d-flex justify-content-center mt-5 mb-4" id="inquiry">
@@ -821,7 +847,7 @@ if (reviewList.isEmpty()) {
 <%
 String inquiryPageNo = request.getParameter("inquiryPageNo");
 InquiryDao inquiryDao = InquiryDao.getInstance();
-int inquiryTotalRecords = inquiryDao.getTotalRecords();
+int inquiryTotalRecords = inquiryDao.getTotalRecordsByProductNo(product.getNo());
 Pagination inquiryPagination = new Pagination(inquiryPageNo, inquiryTotalRecords, 5, 5);
 List<InquiryDto> inquiryDtoList = inquiryDao.getInquiryDtoByProductNo(product.getNo(), inquiryPagination.getBegin(), inquiryPagination.getEnd());
 
@@ -834,13 +860,13 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 		InquiryDto adminInquiryDto = inquiryDao.getInquiryDtoByInquiryNo(inquiryDto.getInquiryNo());
 %>
 								<td><%=adminInquiryDto.getCategoryName() %></td>
-								<td class="text-start"><a href="../inquiry/detail.jsp?inquiryNo=<%=inquiryDto.getInquiryNo() %>"><%=inquiryDto.getTitle() %></a></td>
-								<td><%=inquiryDto.getUserName().substring(0,1) %>****</td>
+								<td class="text-start"><a style="text-decoration: none; color: black;" href="../inquiry/detail.jsp?inquiryNo=<%=inquiryDto.getInquiryNo() %>">└ <%=adminInquiryDto.getTitle() %></a></td>
+								<td></td>
 <%
 	} else {
 %>
 								<td><%=inquiryDto.getCategoryName() %></td>
-								<td class="text-start"><a href="../inquiry/detail.jsp?inquiryNo=<%=inquiryDto.getInquiryNo() %>"><%=inquiryDto.getTitle() %></a></td>
+								<td class="text-start"><a style="text-decoration: none; color: black;" href="../inquiry/passwordcheckform.jsp?inquiryNo=<%=inquiryDto.getInquiryNo() %>"><%=inquiryDto.getTitle() %></a></td>
 								<td><%=inquiryDto.getUserName().substring(0,1) %>****</td>
 <%
 	}
@@ -864,6 +890,32 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 						<span class="fs-6">모두 보기</span>
 					</button></a></li>
 			</ul>
+		</div>
+		<div class="row mb-3">
+			<div class="col-6 offset-3">
+				<nav>
+					<ul class="pagination justify-content-center">
+						<!-- 
+							Pagination객체가 제공하는 isExistPrev()는 이전 블록이 존재하는 경우 true를 반환한다.
+							Pagination객체가 제공하는 getPrevPage()는 이전 블록의 마지막 페이지값을 반환한다.
+						 -->
+						<li class="page-item <%=!inquiryPagination.isExistPrev() ? "disabled" : "" %>"><a class="page-link" href="detail.jsp?no=<%=product.getNo() %>&inquiryPageNo=<%=inquiryPagination.getPrevPage()%>" >이전</a></li>
+<%
+	// Pagination 객체로부터 해당 페이지 블록의 시작 페이지번호와 끝 페이지번호만큼 페이지내비게이션 정보를 표시한다.
+	for (int inquiryNum = inquiryPagination.getBeginPage(); inquiryNum <= inquiryPagination.getEndPage(); inquiryNum++) {
+%>					
+					<li class="page-item <%=inquiryPagination.getPageNo() == inquiryNum ? "active" : "" %>"><a class="page-link" href="detail.jsp?no=<%=product.getNo() %>&inquiryPageNo=<%=inquiryNum%>"><%=inquiryNum %></a></li>
+<%
+	}
+%>					
+						<!-- 
+							Pagination객체가 제공하는 isExistNext()는 다음 블록이 존재하는 경우 true를 반환한다.
+							Pagination객체가 제공하는 getNexPage()는 다음 블록의 첫 페이지값을 반환한다.
+						 -->
+						<li class="page-item <%=!inquiryPagination.isExistNext() ? "disabled" :"" %>"><a class="page-link" href="detail.jsp?no=<%=product.getNo() %>&inquiryPageNo=<%=inquiryPagination.getNextPage()%>" >다음</a></li>
+					</ul>
+				</nav>
+			</div>
 		</div>
 	</div>
 	<script
@@ -1075,12 +1127,10 @@ for (InquiryDto inquiryDto : inquiryDtoList) {
 	function textAreaChange() {
 		var reviewTextEl = document.getElementById("review-area");
 		reviewTextArea = reviewTextEl.value;
-		console.log(reviewTextArea);
 	}
 	
 	function reviewRegister(event) {
 		event.preventDefault();
-		console.log(reviewTextArea);
 		var reviewForm = document.getElementById("form-review");
 		
 		if (reviewTextArea === "") {

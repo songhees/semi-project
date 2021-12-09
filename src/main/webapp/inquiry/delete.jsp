@@ -15,8 +15,8 @@
 		return;
 	}
 	
-	inquiryDto.setInquiryDeleted("Y");
-	inquiryDao.deleteInquiry(inquiryDto);	
+	inquiryDto.setDeleted("Y");
+	inquiryDao.deleteInquiry(inquiryDto);
 	
 	response.sendRedirect("list.jsp");
 %>

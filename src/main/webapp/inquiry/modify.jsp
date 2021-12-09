@@ -14,7 +14,7 @@
 	
 	inquiryDto.setCategoryNo(categoryNo);
 	inquiryDto.setTitle(title);
-	inquiryDto.setInquiryContent(content);
+	inquiryDto.setContent(content);
 	
 	inquiryDao.updateInquiry(inquiryDto);
 	
