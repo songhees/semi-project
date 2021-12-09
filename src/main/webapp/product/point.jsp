@@ -18,6 +18,10 @@
 	String[] points = request.getParameterValues("point");
 	int orderNo = NumberUtils.toInt(request.getParameter("orderNo"));
 	String[] statuses = request.getParameterValues("status");
+	for (String temp : statuses) {
+		System.out.println(temp);
+		
+	}
 	
 	Point inputsPoint = new Point();
 	PointDao pointDao = PointDao.getInstance();
@@ -42,7 +46,7 @@
 	// point 조정
 	int depositPoint = 0;
 	for (int i=0; i<points.length; i++) {
-		if ("구입".equals(statuses[i])) {
+		if ("add".equals(statuses[i])) {
 			depositPoint += Integer.parseInt(points[i]);
 		} else {
 			depositPoint -= Integer.parseInt(points[i]);
@@ -51,4 +55,6 @@
 	loginUserInfo.setPoint(loginUserInfo.getPoint() + depositPoint);
 	
 	userDao.updateUser(loginUserInfo);
+	
+	response.sendRedirect("/semi-project/user/orderDetail.jsp?orderNo=" + orderNo);
 %>

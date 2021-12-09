@@ -57,7 +57,11 @@
 	address.setDetail(addressDetail);
 	order.setAddress(address);
 	order.setPaymentMethod(paymentMethod);
-	order.setUsePoint(Integer.parseInt(usingPoint));
+	if (usingPoint.isEmpty()) {
+		order.setUsePoint(0);
+	} else {
+		order.setUsePoint(Integer.parseInt(usingPoint));
+	}
 	orderDao.insertOrder(order);
 	
 	int i = 0;
@@ -90,9 +94,9 @@
 	}
 	StringBuilder sb = new StringBuilder();
 	if (!usingPoint.isEmpty()) {
-		sb.append("&status=사용");
-		sb.append(usingPoint);
+		sb.append("&status=use");
+		sb.append("&point=" + usingPoint);
 	}
 	
-	response.sendRedirect("point.jsp?orderNo=" + orderNo + "&status=구입&point=" + totalPoint + sb.toString());
+	response.sendRedirect("point.jsp?orderNo=" + orderNo + "&status=add&point=" + totalPoint + sb.toString());
 %>

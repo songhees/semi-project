@@ -429,7 +429,7 @@
 				      			<div class="row border-start border-end border-bottom">
 				      				<div class="col py-2">
 		        						<div class="form-check form-check-inline">
-		  									<input class="form-check-input" type="radio" name="paymentMethod" id="flexRadioDefault1" checked>
+		  									<input class="form-check-input" type="radio" name="paymentMethod" id="flexRadioDefault1" value="무통장입금" checked>
 		  									<label class="form-check-label" for="flexRadioDefault1">무통장입금</label>
 										</div>
 										<!-- 미구현
