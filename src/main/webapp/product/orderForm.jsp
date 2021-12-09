@@ -53,7 +53,7 @@
 				int productItemNo = Integer.parseInt(productItemNoString);
 				productItems.add(productItemDao.getProductItemByProductItemNo(productItemNo));
 			}
-		// 제품상세페이지에서 왔을 경우
+		// 제품상세 페이지에서 왔을 경우
 		} else {
 			productNumbers = request.getParameterValues("no");
 			productItemColors = request.getParameterValues("color");
@@ -81,32 +81,11 @@
 		
 		List<Address> addresses = addressDao.getAllAddressByUserNo(user.getNo());
 		boolean addressIsEmpty = addresses.isEmpty();
-		boolean isDeliveryChargeFree = false;
-		long totalProductPrice = 0;
-		long totalDeliveryCharge = 3000;
-		long totalAmount = 0;
-		long totalProductPoint = 0;
-		
-		// 상품가격을 모두 합한 금액을 구한다.
-		for (ProductItem productItem : productItems) {
-			totalProductPrice += productItem.getProduct().getPrice();
-		}
-		
-		// 총 상품금액이 50000 이상일 경우 배송비는 무료이다.
-		if (totalProductPrice >= 50000) {
-			isDeliveryChargeFree = true;
-			totalDeliveryCharge = 0;
-		}
-		// 총금액을 계산한다.
-		totalAmount = totalProductPrice + totalDeliveryCharge;
-		
-		// 상품적립포인트를 계산한다.
-		// 적립률은 상품, 회원등급 관계없이 모두 1%이다.
-		totalProductPoint = (long)(totalProductPrice*0.01);
 %>
 <input id="numberOfProductItems" type="hidden" value="<%=productItems.size()%>">
+<input type="hidden" name="from" value="orderForm">
 <div class="container"> 
-	<form id="form-search" method="post" action="order.jsp">
+	<form id="order-form" method="post" action="order.jsp" onsubmit="checkSubmit(event)">
 		<div class="row justify-content-center">
 			<div class="col-10">
 				<label class="col-12 col-form-label text-center p-3" style="font-size: 1.2rem; color: white; background-color: #404040"><strong>주문/결제</strong></label>
@@ -122,15 +101,15 @@
 		      					<ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
 									<li class="nav-item" role="presentation">
 								    	<button class="nav-link active" id="addressList-tab" data-bs-toggle="tab" data-bs-target="#addressList"
-								    	 type="button" role="tab" aria-controls="addressList" aria-selected="true" style="color: black; <%=addressIsEmpty ? "display: none;" : ""%>">최근 배송지</button>
+								    	 type="button" role="tab" aria-controls="addressList" aria-selected="<%=addressIsEmpty ? "false" : "true"%>" style="color: black; <%=addressIsEmpty ? "display: none;" : ""%>">최근 배송지</button>
 									</li>
 								  	<li class="nav-item" role="presentation">
 								    	<button class="nav-link" id="enterYourself-tab" data-bs-toggle="tab" data-bs-target="#enterYourself"
-								    	 type="button" role="tab" aria-controls="enterYourself" aria-selected="false" style="color: black; <%=addressIsEmpty ? "display: none;" : ""%>">직접입력</button>
+								    	 type="button" role="tab" aria-controls="enterYourself" aria-selected="<%=addressIsEmpty ? "true" : "false"%>" style="color: black;">직접입력</button>
 								  	</li>
 								</ul>
 								<div class="tab-content" id="myTabContent">
-									<div class="tab-pane fade show active" id="addressList" role="tabpanel" aria-labelledby="addressList-tab">
+									<div class="tab-pane fade <%=addressIsEmpty ? "" : "show active"%>" id="addressList" role="tabpanel" aria-labelledby="addressList-tab">
 										<%
 											if (!addressIsEmpty) {
 												Address defaultAddress = null;
@@ -148,7 +127,11 @@
 												if (defaultAddress != null) {
 										%>
 										<hr>
-										<div class="row justify-content-between">
+										<div id="addressDefault" class="row justify-content-between">
+											<input type="hidden" name="addressName" value="<%=defaultAddress.getAddressName()%>">
+											<input type="hidden" name="postalCode" value="<%=defaultAddress.getPostalCode()%>">
+				      						<input type="hidden" name="baseAddress" value="<%=defaultAddress.getBaseAddress()%>">
+				      						<input type="hidden" name="addressDetail" value="<%=defaultAddress.getDetail()%>">
 			      							<div class="col-10">
 				      							<h6><strong>[기본] <%=user.getName()%></strong></h6>
 				      							<h6 class="text-muted">
@@ -161,18 +144,22 @@
 			      							</div>
 			      							<div class="col-2 align-self-center">
 				      							<div class="form-check">
-			  										<input class="form-check-input" type="radio" name="flexRadio1" id="flexRadioDefault1" checked>
+			  										<input type="radio" name="flexRadio1" id="addressDefault-radio" checked>
 												</div>
 			      							</div>
 			      						</div>
 			      						<%
 												}
 												if (!addresses.isEmpty()) {
+													int i = 0;
 													for (Address address : addresses) {
-												
 			      						%>
 										<hr>
-										<div class="row justify-content-between">
+										<div id="address<%=i%>" class="row justify-content-between">
+				      						<input type="hidden" name="addressName" value="<%=address.getAddressName()%>">
+				      						<input type="hidden" name="postalCode" value="<%=address.getPostalCode()%>">
+				      						<input type="hidden" name="baseAddress" value="<%=address.getBaseAddress()%>">
+				      						<input type="hidden" name="addressDetail" value="<%=address.getDetail()%>">
 			      							<div class="col-10">
 				      							<h6><strong><%=user.getName()%></strong></h6>
 				      							<h6 class="text-muted">
@@ -185,11 +172,12 @@
 			      							</div>
 			      							<div class="col-2 align-self-center">
 				      							<div class="form-check">
-			  										<input class="form-check-input" type="radio" name="flexRadio1" id="flexRadioDefault1">
+			  										<input class="addresses-radio" type="radio" name="flexRadio1" id="addressRadio<%=i%>">
 												</div>
 			      							</div>
 			      						</div>
-				        				<%
+			      						<%
+														i++;
 													}
 												}
 											}
@@ -204,7 +192,7 @@
 				        					</div>
 				        				</div>
 									</div>
-									<div class="tab-pane fade" id="enterYourself" role="tabpanel" aria-labelledby="enterYourself-tab">
+									<div class="tab-pane fade <%=addressIsEmpty ? "show active" : ""%>" id="enterYourself" role="tabpanel" aria-labelledby="enterYourself-tab">
 				        				<div class="row mt-4 mb-2">
 				        					<label class="col-2 col-form-label">받는사람</label>
 				        					<div class="col-10">
@@ -318,6 +306,8 @@
 		      							}
 		      					%>
 		      					<div id="productItem<%=i%>" class="card p-0" style="border: none;">
+			      					<input type="hidden" name="no" value="<%=productItem.getNo()%>">
+			      					<input class="productItemQuantity" type="hidden" name="amount" value="<%=productItemQuantities[i]%>">
 		      						<div class="row mb-3 justify-content-between">
 		      							<div class="col-2">
 		      								<a href="/semi-project/product/detail.jsp?no=<%=productItem.getProduct().getNo()%>">
@@ -330,8 +320,8 @@
 		      									<p class="card-text text-muted" style="font-size: 0.85rem;">
 													[옵션: <%=productItem.getColor()%>/<%=productItem.getSize()%>]<br>
 													수량: <%=isQuantityOverStock ? "<s>" : "" %><%=productItemQuantities[i]%><%=isQuantityOverStock ? "</s>" : "" %>개<%=isQuantityOverStock ? "<mark><strong>(재고 초과)</strong></mark>" : "" %><br>
-													상품구매금액: <%=productItem.getProduct().getPrice()%>원<br>
-													<%=isDeliveryChargeFree ? "[무료] / 기본배송" : "[조건] / 기본배송"%>
+													상품구매금액: <span class="productItemPrice"><%=productItem.getProduct().getPrice()%></span>원<br>
+													[<span class="freeDeliveryCharge"></span>] / 기본배송
 												</p>
 		      								</div>
 		      							</div>
@@ -366,7 +356,7 @@
 		        						<input id="usingPoint" name="usingPoint" type="number" class="form-control" onchange="checkUsingPoint(this)">
 		        					</div>
 		        					<div class="col-2 d-grid">
-		        						<button class="btn btn-secondary" type="button" onclick="userAllPoint()">전액 사용</button>
+		        						<button class="btn btn-secondary" type="button" onclick="useAllPoint()">전액 사용</button>
 		        					</div>
 		        				</div>
 		        				<div class="accordion accordion-flush p-0 mt-2" id="accordionExample4">
@@ -379,8 +369,7 @@
 					    				<div id="collapse4" class="accordion-collapse collapse" aria-labelledby="heading4" data-bs-parent="#accordionExample4">
 					      					<div class="accordion-body px-3">
 						      					<p class="card-text text-muted" style="font-size: 0.85rem;">
-													최대 사용금액은 제한이 없습니다.<br>
-													1회 구매시 적립금 최대 사용금액은 2,000원입니다.<br>
+													포인트는 결제금액 이하로만 사용 가능합니다.<br>
 													적립금으로만 결제할 경우, 결제금액이 0으로 보여지는 것은 정상이며 [결제하기] 버튼을 누르면 주문이 완료됩니다.
 												</p>
 					      					</div>
@@ -406,7 +395,7 @@
 				      		<div class="accordion-body px-4">
 				      			<div class="row justify-content-between">
 			        				<label class="col-2 col-form-label py-1">주문상품</label>
-			        				<label class="col-2 col-form-label py-1 text-end"><span id="totalProductPrice"><%=totalProductPrice%></span>원</label>
+			        				<label class="col-2 col-form-label py-1 text-end"><span id="totalProductPrice"></span>원</label>
 				        		</div>
 				      			<div class="row justify-content-between">
 			        				<label class="col-2 col-form-label py-1">할인/부가결제</label>
@@ -414,11 +403,12 @@
 				        		</div>
 				      			<div class="row mb-2 justify-content-between">
 			        				<label class="col-2 col-form-label py-1">배송비</label>
-			        				<label class="col-2 col-form-label py-1 text-end">+<span id="totalDeliveryCharge"><%=totalDeliveryCharge%></span>원</label>
+			        				<label class="col-2 col-form-label py-1 text-end">+<span id="totalDeliveryCharge"></span>원</label>
 				        		</div>
 				      			<div class="row py-1 justify-content-between" style="font-size: 1.2rem; background-color: #eff1f4;">
 			        				<label class="col-2 col-form-label py-1"><strong>결제금액</strong></label>
-			        				<label class="col-2 col-form-label py-1 text-end"><strong><span id="totalAmount"><%=totalAmount%></span>원</strong></label>
+			        				<label class="col-2 col-form-label py-1 text-end"><strong><span id="totalAmount"></span>원</strong></label>
+			        				<input id="totalAmount-input" type="hidden" name="totalAmount" value="">
 				        		</div>
 				      		</div>
 				      	</div>
@@ -439,9 +429,10 @@
 				      			<div class="row border-start border-end border-bottom">
 				      				<div class="col py-2">
 		        						<div class="form-check form-check-inline">
-		  									<input class="form-check-input" type="radio" name="flexRadio2" id="flexRadioDefault1" checked>
+		  									<input class="form-check-input" type="radio" name="paymentMethod" id="flexRadioDefault1" checked>
 		  									<label class="form-check-label" for="flexRadioDefault1">무통장입금</label>
 										</div>
+										<!-- 미구현
 		        						<div class="form-check form-check-inline">
 		  									<input class="form-check-input" type="radio" name="flexRadio2" id="flexRadioDefault1">
 		  									<label class="form-check-label" for="flexRadioDefault1">신용카드</label>
@@ -458,12 +449,13 @@
 		  									<input class="form-check-input" type="radio" name="flexRadio2" id="flexRadioDefault1">
 		  									<label class="form-check-label" for="flexRadioDefault1">에스크로(실시간 계좌이체)</label>
 										</div>
+										 -->
 		        					</div>
 				      			</div>
 				      			<div class="row mb-2 mt-4">
 		        					<label class="col-2 col-form-label">입금은행</label>
 		        					<div class="col-10">
-										<select class="form-select" name="depositBank">
+										<select class="form-select" name="depositBank" required>
 				  							<option value="" selected>::: 선택해 주세요. :::</option>
 											<option value="농협">농협:1234567890123 빈스</option>
 										</select>
@@ -472,9 +464,10 @@
 				      			<div class="row mb-2">
 		        					<label class="col-2 col-form-label">입금자명</label>
 		        					<div class="col-10">
-										<input type="text" name="depositPersonName" class="form-control">
+										<input type="text" name="depositPersonName" class="form-control" required>
 									</div>
 		        				</div>
+		        				<!-- 미구현
 				      			<div class="row mb-1 mt-4">
 		        					<label class="col col-form-label"><strong>현금영수증</strong></label>
 		        				</div>
@@ -490,6 +483,8 @@
 										</div>
 									</div>
 		        				</div>
+		        				 -->
+		        				<!-- 미구현
 		        				<div class="row py-3 border" style="background-color: #f7f7f7">
 		        					<div class="col">
 		        						<div class="form-check">
@@ -500,6 +495,7 @@
 										</div>
 		        					</div>
 		        				</div>
+		        				 -->
 				      		</div>
 				      	</div>
 					</div>
@@ -515,7 +511,7 @@
 				      		<div class="accordion-body px-4">
 				      			<div class="row justify-content-between">
 			        				<label class="col-2 col-form-label py-1">상품별 적립금</label>
-			        				<label class="col-2 col-form-label py-1 text-end"><%=totalProductPoint%>원</label>
+			        				<label class="col-2 col-form-label py-1 text-end"><span id="totalProductPoint"></span>원</label>
 				        		</div>
 				      			<!-- 미구현
 				      			<div class="row justify-content-between">
@@ -529,7 +525,8 @@
 				        		 -->
 				      			<div class="row py-1 justify-content-between" style="font-size: 1.2rem; background-color: #eff1f4;">
 			        				<label class="col-2 col-form-label py-1"><strong>적립 예정금액</strong></label>
-			        				<label class="col-2 col-form-label py-1 text-end"><strong><%=totalProductPoint%>원</strong></label>
+			        				<label class="col-2 col-form-label py-1 text-end"><strong><span id="totalPoint"></span>원</strong></label>
+			        				<input id="totalPoint-input" type="hidden" name="totalPoint" value="">
 				        		</div>
 				      		</div>
 				      	</div>
@@ -537,17 +534,17 @@
 				</div>
 				<div class="border p-4 mt-2" style="background-color: white;">
 					<div class="form-check">
-						<input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+						<input class="form-check-input" type="checkbox" id="agreeAllTerms-checkbox" onclick="agreeAllTerms()">
 						<label class="form-check-label" for="flexCheckDefault"><strong>모든 약관 동의</strong></label>
 					</div>
 					<hr>
 					<div class="form-check">
-						<input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+						<input class="form-check-input" type="checkbox" id="agreePurchaseCondition-checkbox" required>
 						<label class="form-check-label" for="flexCheckDefault">[필수] 구매조건 확인 및 결제진행 동의</label>
 					</div>
 				</div>
 				<div class="border p-4 d-grid">
-					<button class="btn btn-secondary" type="button" <%=isStockAvailable ? "" : "style='display: none;'" %>><span id="totalAmount-Button"><%=totalAmount%></span>원 결제하기</button>
+					<button class="btn btn-secondary" type="submit" <%=isStockAvailable ? "" : "style='display: none;'" %>><span id="totalAmount-button"></span>원 결제하기</button>
 					<button class="btn btn-warning" type="button" <%=isStockAvailable ? "style='display: none;'" : "" %> disabled>재고부족으로 주문불가</button>
 					<p class="text-muted mt-4" style="font-size: 0.85rem;">- 무이자할부가 적용되지 않은 상품과 무이자할부가 가능한 상품을 동시에 구매할 경우 전체 주문 상품 금액에 대해 무이자할부가 적용되지 않습니다. 무이자할부를 원하시는 경우 장바구니에서 무이자할부 상품만 선택하여 주문하여 주시기 바랍니다.</p>
 					<p class="text-muted" style="font-size: 0.85rem;">- 최소 결제 가능 금액은 결제금액에서 배송비를 제외한 금액입니다.</p>
@@ -562,36 +559,62 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script type="text/javascript">
-	window.onload=function(){
+	var totalProductPrice = 0;
+	var numberOfProductItems = 0;
+	
+	// 페이지 로딩이 끝나고 자동으로 실행되는 함수이다.
+	window.onload = function() {
+		numberOfProductItems = document.getElementById("numberOfProductItems").value;
 		
+		updateTotalProductPrice();
+		updateTotalDeliveryCharge();
+		updateTotalAmount();
+		updateTotalProductPoint();
 	}
-
-	// 사용 적립금이 user의 잔여 적립금 이하인지 확인한다.
-	// 사용 적립금이 user의 잔여 적립금보다 클 경우 경고창을 표시하고 사용 적립금 값을 0으로 변경한다.
-	function checkUsingPoint(el) {
-		if (parseInt(el.value) > parseInt(document.getElementById("availablePoint").innerHTML)) {
-			alert("사용 가능 적립금보다 많습니다.\n사용 적립금을 다시 입력해 주세요.");
-			el.value = 0;
+	
+	// 상품가격의 총금액을 갱신한다.
+	function updateTotalProductPrice() {
+		totalProductPrice = 0;
+		var productItemPrices = document.querySelectorAll(".productItemPrice");
+		var productItemQuantities = document.querySelectorAll(".productItemQuantity");
+		
+		for (var i = 0; i < productItemPrices.length; i++) {
+			totalProductPrice += parseInt(productItemPrices[i].innerHTML)*parseInt(productItemQuantities[i].value);
 		}
 		
-		updateDiscountAmount(el.value);
+		document.getElementById("totalProductPrice").innerHTML = totalProductPrice;
 	}
 	
-	// 할인/부가결제의 전액 사용 버튼을 클릭했을 때 실행된다.
-	// 사용 적립금의 값을 user의 잔여 적립금으로 변경한다.
-	function userAllPoint() {
-		var availablePoint = document.getElementById("availablePoint").innerHTML;
-		document.getElementById("usingPoint").value = availablePoint;
-		updateDiscountAmount(availablePoint);
-	}
-	
-	function updateDiscountAmount(discountAmount) {
-		document.getElementById("discountAmount").innerHTML = discountAmount;
-		document.getElementById("totalDiscount").innerHTML = discountAmount;
+	// 배송비를 갱신한다.
+	function updateTotalDeliveryCharge() {
+		var totalDeliveryCharge = 3000;
+		var freeDeliveryCharges = document.querySelectorAll(".freeDeliveryCharge");
+		var deliveryChargeStatus = "조건";
+
+		if (totalProductPrice >= 50000) {
+			totalDeliveryCharge = 0;
+			deliveryChargeStatus = "무료";
+		}
 		
-		updateTotalAmount()
+		for (var i = 0; i < freeDeliveryCharges.length; i++) {
+			freeDeliveryCharges[i].innerHTML = deliveryChargeStatus;
+		}
+		document.getElementById("totalDeliveryCharge").innerHTML = totalDeliveryCharge;
 	}
 	
+	// 상품적립포인트를 갱신한다.
+	// 적립률은 상품, 회원등급 관계없이 모두 1%이다.
+	function updateTotalProductPoint() {
+		var totalProductPoint = 0;
+		
+		totalProductPoint = document.getElementById("totalProductPrice").innerHTML*0.01;
+		
+		document.getElementById("totalProductPoint").innerHTML = totalProductPoint;
+		document.getElementById("totalPoint").innerHTML = totalProductPoint;
+		document.getElementById("totalPoint-input").value = totalProductPoint;
+	}
+	
+	// 총금액을 갱신한다.
 	function updateTotalAmount() {
 		var totalAmount = 0;
 		totalAmount += parseInt(document.getElementById("totalProductPrice").innerHTML);
@@ -599,18 +622,90 @@
 		totalAmount += parseInt(document.getElementById("totalDeliveryCharge").innerHTML);
 		
 		document.getElementById("totalAmount").innerHTML = totalAmount;
-		document.getElementById("totalAmount-Button").innerHTML = totalAmount;
+		document.getElementById("totalAmount-button").innerHTML = totalAmount;
+		document.getElementById("totalAmount-input").value = totalAmount;
+	}
+
+	// 할인금액을 갱신한다.
+	function updateDiscountAmount(discountAmount) {
+		document.getElementById("discountAmount").innerHTML = discountAmount;
+		document.getElementById("totalDiscount").innerHTML = discountAmount;
+		
+		updateTotalAmount();
 	}
 	
-	var numberOfProductItems = document.getElementById("numberOfProductItems");
+	// 상품아이템의 삭제 버튼을 클릭했을 때 실행된다.
+	// 상품아이템의 수가 1개 이하이면 홈페이지로 이동한다.
 	function deleteProductItem(productItemElementNo) {
-		console.log("numberOfProductItems:" + numberOfProductItems);
-		console.log("i:" + productItemElementNo);
 		if (numberOfProductItems <= 1) {
 			location.href="/semi-project/index.jsp";
 			return;
 		}
+		
 		document.getElementById("productItem" + productItemElementNo).remove();
+		updateTotalProductPrice();
+		updateTotalDeliveryCharge();
+		updateTotalAmount();
+		updateTotalProductPoint();
+	}
+
+	// 사용 적립금이 user의 잔여 적립금 이하인지 확인한다.
+	// 사용 적립금이 user의 잔여 적립금보다 클 경우 경고창을 표시하고 사용 적립금 값을 0으로 변경한다.
+	// 사용 적립금이 결제금액보다 많을 경우 경고창을 표시하고 사용 적립금 값을 0으로 변경한다.
+	function checkUsingPoint(el) {
+		if (parseInt(el.value) > parseInt(document.getElementById("availablePoint").innerHTML)) {
+			alert("사용 가능 적립금보다 많습니다.\n사용 적립금을 다시 입력해 주세요.");
+			el.value = 0;
+		}
+		if (parseInt(el.value) > parseInt(document.getElementById("totalAmount").innerHTML)) {
+			alert("사용 적립금이 결제금액보다 많습니다.\n사용 적립금을 다시 입력해 주세요.");
+			el.value = 0;
+		}
+		
+		updateDiscountAmount(el.value);
+	}
+	
+	// 포인트 전액 사용 버튼을 클릭했을 때 실행된다.
+	// 사용 적립금이 결제금액보다 많을 경우 경고창을 표시하고 사용 적립금 값을 0으로 변경한다.
+	// 사용 적립금이 결제금액 이하일 경우 사용 적립금의 값을 user의 잔여 적립금으로 변경한다.
+	function useAllPoint() {
+		var availablePoint = document.getElementById("availablePoint").innerHTML;
+		var discountAmount = 0;
+		
+		if (availablePoint > parseInt(document.getElementById("totalAmount").innerHTML)) {
+			alert("사용 적립금이 결제금액보다 많습니다.\n사용 적립금을 다시 입력해 주세요.");
+			document.getElementById("usingPoint").value = 0;
+		} else {
+			document.getElementById("usingPoint").value = availablePoint;
+			discountAmount = availablePoint;
+		}
+		
+		updateDiscountAmount(discountAmount);
+	}
+	
+	function agreeAllTerms() {
+		document.getElementById("agreePurchaseCondition-checkbox").checked = document.getElementById("agreeAllTerms-checkbox").checked;
+	}
+	
+	function checkSubmit(e) {
+		e.preventDefault();
+		
+		var addresses = document.querySelectorAll(".addresses-radio");
+		var defaultAddress = document.getElementById("addressDefault-radio");
+		if (defaultAddress.checked) {
+			for (var i = 0; i < addresses.length; i++) {
+				document.getElementById("address" + i).remove();
+			}
+		} else {
+			document.getElementById("addressDefault").remove();
+			for (var i = 0; i < addresses.length; i++) {
+				if (!addresses[i].checked) {
+					document.getElementById("address" + i).remove();
+				}
+			}
+		}
+		
+		document.querySelector("form").submit();
 	}
 	
 	function sample6_execDaumPostcode() {
