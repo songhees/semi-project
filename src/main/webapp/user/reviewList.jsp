@@ -137,7 +137,7 @@
 	if (reviewList.isEmpty()) {
 %>
 				<tr>
-					<td class="text-center">게시글이 존재하지 않습니다.</td>
+					<td class="text-center py-5">게시글이 존재하지 않습니다.</td>
 				</tr>
 <%
 	} else {
@@ -259,7 +259,6 @@
 				<li class="page-item <%=pagination.getPageNo() == num ? "active" : "" %>"><a class="page-link" href="reviewList.jsp?reviewPageNo=<%=num%>"><%=num %></a></li>
 <%
 		}
-	}
 %>					
 					<!-- 
 						Pagination객체가 제공하는 isExistNext()는 다음 블록이 존재하는 경우 true를 반환한다.
@@ -274,6 +273,9 @@
 			</nav>
 		</div>
 	</div>
+<%
+	}
+%>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script type="text/javascript">

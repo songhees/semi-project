@@ -1,9 +1,9 @@
-<%@page import="semi.dao.UserDao"%>
-<%@page import="semi.dao.OrderDao"%>
-<%@page import="semi.dao.PointDao"%>
-<%@page import="semi.vo.Point"%>
 <%@page import="semi.vo.User"%>
 <%@page import="org.apache.commons.lang3.math.NumberUtils"%>
+<%@page import="semi.dao.PointDao"%>
+<%@page import="semi.vo.Point"%>
+<%@page import="semi.dao.UserDao"%>
+<%@page import="semi.dao.OrderDao"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%
@@ -14,7 +14,6 @@
 		response.sendRedirect("../loginform.jsp");		
 		return;
 	}	
-	
 	
 	String[] points = request.getParameterValues("point");
 	int orderNo = NumberUtils.toInt(request.getParameter("orderNo"));
@@ -39,5 +38,17 @@
 	int totalAmount = orderDao.getTotalAmount(loginUserInfo.getNo())[0];
 	UserDao userDao = UserDao.getInstance();
 	loginUserInfo.setGradeCode(userDao.getGrade(totalAmount));
+	
+	// point 조정
+	int depositPoint = 0;
+	for (int i=0; i<points.length; i++) {
+		if ("구입".equals(statuses[i])) {
+			depositPoint += Integer.parseInt(points[i]);
+		} else {
+			depositPoint -= Integer.parseInt(points[i]);
+		}
+	}
+	loginUserInfo.setPoint(loginUserInfo.getPoint() + depositPoint);
+	
 	userDao.updateUser(loginUserInfo);
 %>
