@@ -109,7 +109,7 @@
 	long totalPrice = (Long)orderInfo.get("totalPrice");
 	long comparedPrice = 0;
 	for (OrderItemDto item : orderItems) {
-		comparedPrice += item.getProductPrice();
+		comparedPrice += (item.getProductPrice()*item.getOrderProductQuantity() - (int)orderInfo.get("usePoint"));
 	}
 	long shippingFee = totalPrice-comparedPrice;
 	
@@ -258,7 +258,7 @@
 									[기본배송]
 								</div>
 								<div>
-									상품구매금액 <strong><%=df.format(comparedPrice) %></strong> + 배송비 <%=shippingFee %> = 합계 : 
+									상품구매금액 <strong><%=df.format(comparedPrice) %></strong>원 + 배송비 <%=df.format(shippingFee) %>원 = 합계 : 
 									<strong class="px-3" style="font-size: 18px;"><%=df.format(totalPrice) %>원</strong>
 								</div>
 							</div>

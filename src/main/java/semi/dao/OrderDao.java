@@ -193,7 +193,7 @@ public class OrderDao {
 		Map<String, Object> orderDetail = null;
 		String sql = "select u.user_name, u.user_tel, "
 				+ "o.order_no, o.total_price, o.order_status, o.order_created, o.payment_method, "
-				+ "o.order_postal_code, o.address_detail, o.base_address "
+				+ "o.order_postal_code, o.address_detail, o.base_address, o.use_point "
 				+ "from semi_user u, semi_order o "
 				+ "where u.user_no = ? "
 				+ "and o.order_no = ? "
@@ -216,6 +216,7 @@ public class OrderDao {
 			orderDetail.put("postalCode", rs.getString("order_postal_code"));
 			orderDetail.put("addressDetail", rs.getString("address_detail"));
 			orderDetail.put("baseAddress", rs.getString("base_address"));
+			orderDetail.put("usePoint", rs.getInt("use_point"));
 		}
 		rs.close();
 		pstmt.close();
