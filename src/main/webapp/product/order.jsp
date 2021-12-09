@@ -57,7 +57,11 @@
 	address.setDetail(addressDetail);
 	order.setAddress(address);
 	order.setPaymentMethod(paymentMethod);
-	order.setUsePoint(Integer.parseInt(usingPoint));
+	if (usingPoint.isEmpty()) {
+		order.setUsePoint(0);
+	} else {
+		order.setUsePoint(Integer.parseInt(usingPoint));
+	}
 	orderDao.insertOrder(order);
 	
 	int i = 0;

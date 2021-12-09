@@ -175,7 +175,7 @@ public class Product {
 	public String getRemainTimeInOneDay() throws ParseException {
 //		long oneDayMillisecond = 24*60*60*1000;
 		// TODO 테스트용 기간
-		long oneDayMillisecond = 3*24*60*60*1000 + 20*60*60*1000;
+		long oneDayMillisecond = 9*24*60*60*1000 + 20*60*60*1000;
 		
 		Date currentDate = new Date();
 		

@@ -18,6 +18,10 @@
 	String[] points = request.getParameterValues("point");
 	int orderNo = NumberUtils.toInt(request.getParameter("orderNo"));
 	String[] statuses = request.getParameterValues("status");
+	for (String temp : statuses) {
+		System.out.println(temp);
+		
+	}
 	
 	Point inputsPoint = new Point();
 	PointDao pointDao = PointDao.getInstance();
@@ -51,4 +55,6 @@
 	loginUserInfo.setPoint(loginUserInfo.getPoint() + depositPoint);
 	
 	userDao.updateUser(loginUserInfo);
+	
+	response.sendRedirect("/semi-project/user/orderDetail.jsp?orderNo=" + orderNo);
 %>
