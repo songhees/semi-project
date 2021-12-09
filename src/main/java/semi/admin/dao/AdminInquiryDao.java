@@ -44,6 +44,8 @@ public class AdminInquiryDao {
 		
 		if (rs.next()) {
 			inquiry = rowToInquiry(rs);
+			inquiry.setDeletedDate(rs.getDate("INQUIRY_DELETED_DATE"));
+			inquiry.setDeleted(rs.getString("INQUIRY_DELETED"));
 		}
 		
 		rs.close();

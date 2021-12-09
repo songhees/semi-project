@@ -9,6 +9,7 @@ import semi.admin.dao.AdminProductCategoryDao;
 import semi.admin.dao.AdminProductDao;
 import semi.admin.dao.AdminProductItemDao;
 import semi.admin.dao.AdminProductThumbnailImageDao;
+import semi.admin.dao.AdminReviewDao;
 import semi.admin.dao.AdminUserDao;
 import semi.admin.dao.AdminProductDetailImageDao;
 import semi.admin.dao.AdminProductStyleDao;
@@ -18,6 +19,7 @@ import semi.vo.ProductDetailImage;
 import semi.vo.ProductItem;
 import semi.vo.ProductStyle;
 import semi.vo.ProductThumbnailImage;
+import semi.vo.Review2;
 import semi.vo.User;
 import semi.vo.Inquiry;
 import semi.vo.InquiryReply;
@@ -33,7 +35,7 @@ public class AdminService {
 	private final AdminUserDao userDao = new AdminUserDao();
 	private final AdminInquiryDao inquiryDao = new AdminInquiryDao();
 	private final AdminInquiryReplyDao replyDao = new AdminInquiryReplyDao();
-	
+	private final AdminReviewDao reviewDao = new AdminReviewDao();
 	
 	private static AdminService service = new AdminService();
 	private AdminService() {}
@@ -216,4 +218,12 @@ public class AdminService {
 	/**************************************************************************
 	 * 리뷰관리 기능                                                              * 
 	 **************************************************************************/
+	
+	public List<Review2> getReviewList(int begin, int end) throws SQLException {
+		return reviewDao.getReviewList(begin, end);
+	}
+	
+	public Review2 getReviewByNo(int no) throws SQLException {
+		return reviewDao.getReviewByNo(no);
+	}
 }
