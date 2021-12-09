@@ -61,8 +61,11 @@
 						<li><a class="dropdown-item <%="inquiry-list".equals(dropdownMenu) ? "active" : "" %>" href="/semi-project/admin/inquiry/list.jsp">문의목록</a></li>
 					</ul>
 				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="#">리뷰관리</a>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle <%="review".equals(menu) ? "active" : "" %>" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">리뷰관리</a>
+					<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<li><a class="dropdown-item <%="review-list".equals(dropdownMenu) ? "active" : "" %>" href="/semi-project/admin/review/list.jsp">리뷰목록</a></li>
+					</ul>
 				</li>
 			</ul>
 			<ul class="navbar-nav mb-2 mb-lg-0">

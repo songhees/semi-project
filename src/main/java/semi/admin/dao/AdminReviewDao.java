@@ -88,6 +88,27 @@ public class AdminReviewDao {
 		return reviewList;
 	}
 	
+	public int getTotalRecords() throws SQLException {
+		int totalRecords = 0;
+		
+		String sql = "SELECT COUNT(*) CNT "
+				   + "FROM SEMI_PRODUCT_REVIEW "
+				   + "WHERE REVIEW_DELETED = 'N'";
+		
+		Connection connection = getConnection();
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		ResultSet rs = pstmt.executeQuery();
+		
+		rs.next();
+		totalRecords = rs.getInt("CNT");
+		
+		rs.close();
+		pstmt.close();
+		connection.close();
+		
+		return totalRecords;
+	}
+	
 	private Review2 rowToReview(ResultSet rs) throws SQLException {
 		Review2 review = new Review2();
 		

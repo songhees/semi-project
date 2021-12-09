@@ -226,4 +226,8 @@ public class AdminService {
 	public Review2 getReviewByNo(int no) throws SQLException {
 		return reviewDao.getReviewByNo(no);
 	}
+	
+	public int getTotalReviewRecords() throws SQLException {
+		return reviewDao.getTotalRecords();
+	}
 }

@@ -41,7 +41,7 @@
 		</div>
 		<div class="row">
 			<div class="col">	
-				<h2>리뷰관리</h2>
+				<h2><a href="/semi-project/admin/review/list.jsp">리뷰관리</a></h2>
 			</div> 		
 		</div>
 	</div>

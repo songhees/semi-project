@@ -1,5 +1,6 @@
 package semi.vo;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Review2 {
@@ -78,5 +79,11 @@ public class Review2 {
 		this.deleted = deleted;
 	}
 	
-	
+	public String toSimpleDate(Date date) {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		if (date == null) {
+			return null;
+		}
+		return df.format(date);
+	}
 }
