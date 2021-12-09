@@ -1,5 +1,6 @@
 package semi.vo;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class User {
@@ -140,6 +141,14 @@ public class User {
 
 	public void setCreatedDate(Date createdDate) {
 		this.createdDate = createdDate;
+	}
+	
+	public String toSimpleDate(Date date) {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		if (date == null) {
+			return null;
+		}
+		return df.format(date);
 	}
 	
 }

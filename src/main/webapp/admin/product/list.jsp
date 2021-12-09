@@ -10,32 +10,59 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" >
-    <title>상품 목록</title>
+    <title></title>
 </head>
 <body>
 <%
+	// include 시킨 navbar의 nav-item 중에서 페이지에 해당하는 nav-item를 active 시키기위해서 "menu"라는 이름으로 페이지이름을 속성으로 저장한다.
+	// pageContext에 menu라는 이름으로 설정한 속성값은 navbar.jsp에서 조회해서 navbar의 메뉴들 중 하나를 active 시키기 위해서 읽어간다.
 	pageContext.setAttribute("menu", "product");
-	pageContext.setAttribute("dropdownMenu", "list");
+
+	// list.jsp로 요청되는 경우와 list.jsp?categoryNo=1001으로 요청되는 2가지 요청을 처리하는 JSP다.
+	String tempCategoryNo = request.getParameter("categoryNo");
+	int categoryNo = 0;
+	
+	if (tempCategoryNo == null) {
+		pageContext.setAttribute("dropdownMenu", "product-list");
+	} else {
+		categoryNo = Integer.parseInt(tempCategoryNo);
+	}
+		
+	if (categoryNo == 1001) {
+		pageContext.setAttribute("dropdownMenu", "outer");
+	} else if (categoryNo  == 1002) {
+		pageContext.setAttribute("dropdownMenu", "top");
+	} else if (categoryNo == 1003) {
+		pageContext.setAttribute("dropdownMenu", "shirt-blouse");
+	} else if (categoryNo == 1004) {
+		pageContext.setAttribute("dropdownMenu", "dress");
+	} else if (categoryNo == 1005) {
+		pageContext.setAttribute("dropdownMenu", "skirt");
+	} else if (categoryNo == 1006) {
+		pageContext.setAttribute("dropdownMenu", "pants");
+	}
 %>
 <%@ include file="/admin/common/navbar.jsp" %>
 <%
-	String tempCategoryNo = request.getParameter("categoryNo");
-	String pageNo = request.getParameter("pageNo");		
+	// 요청파라미터에서 pageNo값을 조회한다.
+	// 요청파라미터에 pageNo값이 존재하지 않으면 Pagination객체에서 1페이지로 설정한다.
+	String pageNo = request.getParameter("pageNo");	
 	
+	// 관리자 모드 관련 기능을 제공하는 AdminService객체를 획득한다.
 	AdminService service = AdminService.getInstance();
-	
-	int categoryNo = 0;
-	int totalRecords = 0;
-	Pagination pagination = null;
+
+	int totalRecords = 0;         // 총 데이터 개수를 담을 변수 선언
+	Pagination pagination = null; // 페이징 처리 필요한 값을 계산하는 Paginatition객체를 담을 Pagination타입 변수 선언
 	List<Product> products = List.of();
-	if (tempCategoryNo == null) {
-		totalRecords = service.getTotalRecords();	
+	if (tempCategoryNo == null) { // list.jsp 요청인 경우
+		totalRecords = service.getTotalProductRecords();	
 		pagination = new Pagination(pageNo, totalRecords, 5, 5);
+		// 현재 페이지번호에 해당하는 상품 목록을 조회한다.
 		products = service.getProductList(pagination.getBegin(), pagination.getEnd());	
-	} else {
-		categoryNo = Integer.parseInt(tempCategoryNo);
+	} else {					  // list.jsp?categoryNo=카테고리번호 요청인 경우
 		totalRecords = service.getTotalRecordsByCategory(categoryNo);
 		pagination = new Pagination(pageNo, totalRecords, 5, 5);
+		// 현재 페이지번호와 카테고리번호에 해당하는 게시글 목록을 조회한다.
 		products = service.getProductListByCategory(pagination.getBegin(), pagination.getEnd(), categoryNo);
 	}	
 %>
@@ -63,11 +90,24 @@
 	if (products.isEmpty()) {
 %>
 						<tr class="d-flex">
-							<td class="text-center" colspan="6">상품이 존재하지 않습니다.</td>
+							<td class="text-center" colspan="6">상품정보가 존재하지 않습니다.</td>
 						</tr>
 <%
 	} else {
 		for (Product product : products) {
+		// 판매여부 항목에 표시할 값을 계산한다.
+		// String status = null;
+		// if (product.getOnSale().equals("Y")) {
+		// 	status = "판매중";
+		//	if (product.getTotalStock() < 10) {
+		//		status = "재고부족";
+		//	}
+		//} else {
+		//	status = "판매중단";
+		//	if (product.getTotalStock() == 0) {
+		//		status = "재고없음";
+		//	}
+		//}
 %>
 						<tr class="d-flex">	
 							<td class="col-1"><%=product.getNo() %></td>
@@ -89,14 +129,23 @@
 			<div class="col">
 				<nav>
 					<ul class="pagination justify-content-center">
+						<!-- 
+							Pagination객체가 제공하는 isExistPrev()는 이전 블록이 존재하는 경우 true를 반환한다.
+							Pagination객체가 제공하는 getPrevPage()는 이전 블록의 마지막 페이지값을 반환한다.
+					 	-->
 					 	<li class="page-item <%=!pagination.isExistPrev() ? "disabled" : "" %>"><a class="page-link" href="list.jsp?pageNo=<%=pagination.getPrevPage()%><%=tempCategoryNo == null ? "" : "&categoryNo=" + categoryNo %>" >이전</a></li>
 <%
+	//Pagination 객체로부터 해당 페이지 블록의 시작 페이지번호와 끝 페이지번호만큼 페이지내비게이션 정보를 표시한다.
 	for (int num = pagination.getBeginPage(); num <= pagination.getEndPage(); num++) {
 %>
 						<li class="page-item <%=pagination.getPageNo() == num ? "active" : "" %>"><a class="page-link" href="list.jsp?pageNo=<%=num%><%=tempCategoryNo == null ? "" : "&categoryNo=" + categoryNo %>"><%=num %></a></li>
 <%
 	}
 %>
+						<!-- 
+							Pagination객체가 제공하는 isExistNext()는 다음 블록이 존재하는 경우 true를 반환한다.
+							Pagination객체가 제공하는 getNexPage()는 다음 블록의 첫 페이지값을 반환한다.
+					 	-->
 					 	<li class="page-item <%=!pagination.isExistNext() ? "disabled" :"" %>"><a class="page-link" href="list.jsp?pageNo=<%=pagination.getNextPage()%><%=tempCategoryNo == null ? "" : "&categoryNo=" + categoryNo %>" >다음</a></li>
 					</ul>
 				</nav>
