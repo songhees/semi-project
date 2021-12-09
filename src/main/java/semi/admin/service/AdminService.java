@@ -3,10 +3,13 @@ package semi.admin.service;
 import java.sql.SQLException;
 import java.util.List;
 
+import semi.admin.dao.AdminInquiryDao;
+import semi.admin.dao.AdminInquiryReplyDao;
 import semi.admin.dao.AdminProductCategoryDao;
 import semi.admin.dao.AdminProductDao;
 import semi.admin.dao.AdminProductItemDao;
 import semi.admin.dao.AdminProductThumbnailImageDao;
+import semi.admin.dao.AdminUserDao;
 import semi.admin.dao.AdminProductDetailImageDao;
 import semi.admin.dao.AdminProductStyleDao;
 import semi.vo.Product;
@@ -15,6 +18,9 @@ import semi.vo.ProductDetailImage;
 import semi.vo.ProductItem;
 import semi.vo.ProductStyle;
 import semi.vo.ProductThumbnailImage;
+import semi.vo.User;
+import semi.vo.Inquiry;
+import semi.vo.InquiryReply;
 
 public class AdminService {
 
@@ -24,6 +30,10 @@ public class AdminService {
 	private final AdminProductThumbnailImageDao thumbnailImageDao = new AdminProductThumbnailImageDao();
 	private final AdminProductDetailImageDao detailImageDao = new AdminProductDetailImageDao();
 	private final AdminProductStyleDao styleDao = new AdminProductStyleDao();
+	private final AdminUserDao userDao = new AdminUserDao();
+	private final AdminInquiryDao inquiryDao = new AdminInquiryDao();
+	private final AdminInquiryReplyDao replyDao = new AdminInquiryReplyDao();
+	
 	
 	private static AdminService service = new AdminService();
 	private AdminService() {}
@@ -55,7 +65,7 @@ public class AdminService {
 		return productDao.getProductsByCategory(categoryNo);
 	}
 	
-	public int getTotalRecords() throws SQLException {
+	public int getTotalProductRecords() throws SQLException {
 		return productDao.getTotalRecords();
 	}
 	
@@ -145,5 +155,65 @@ public class AdminService {
 	
 	/**************************************************************************
 	 * 고객관리 기능                                                              * 
+	 **************************************************************************/
+	
+	public User getUserById(String id) throws SQLException {
+		return userDao.getUserById(id);
+	}
+	
+	public User getUserByEmail(String email) throws SQLException {
+		return userDao.getUserByEmail(email);
+	}
+	
+	public void addUser(User user) throws SQLException {
+		userDao.addUser(user);
+	}
+	
+	public int getTotalUserRecords() throws SQLException {
+		return userDao.getTotalRecords();
+	}
+	
+	public List<User> getUserList(int begin, int end) throws SQLException {
+		return userDao.getUserList(begin, end);
+	}
+	
+	public User getUserByNo(int no) throws SQLException {
+		return userDao.getUserByNo(no);
+	}
+	
+	/**************************************************************************
+	 * 문의관리 기능                                                              * 
+	 **************************************************************************/
+	
+	public int getTotalInquiryRecords() throws SQLException {
+		return inquiryDao.getTotalRecords();
+	}
+	
+	public List<Inquiry> getInquiryList(int begin, int end) throws SQLException {
+		return inquiryDao.getInquiryList(begin, end);
+	}
+	
+	public Inquiry getInquiryByNo(int no) throws SQLException {
+		return inquiryDao.getInquiryByNo(no);
+	}
+	
+	public void addReply(InquiryReply reply) throws SQLException { 
+		replyDao.addReply(reply);
+	}
+	
+	public InquiryReply getReplyByInquiryNo(int inquiryNo) throws SQLException {
+		return replyDao.getReplyByInquiryNo(inquiryNo);
+	}
+	
+	public void updateReply(InquiryReply reply) throws SQLException {
+		replyDao.updateReply(reply);
+	}
+	
+	public void deleteReply(int replyNo) throws SQLException {
+		replyDao.deleteReply(replyNo);
+	}
+	
+	/**************************************************************************
+	 * 리뷰관리 기능                                                              * 
 	 **************************************************************************/
 }

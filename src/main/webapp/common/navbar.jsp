@@ -25,6 +25,7 @@
 </style>
 <%
 	User loginUserInfo = (User)session.getAttribute("LOGIN_USER_INFO");
+	User adminUserInfo = (User)session.getAttribute("ADMIN_USER_INFO");
 %>
 <!-- 맨 위 navbar -->
 <nav class="navbar navbar-expand-lg navbar-light border-bottom" style="font-weight: bold; background-color: #FFFAFA;">
@@ -55,11 +56,13 @@
 				        </ul>
         			</li>
 <%
+		if (adminUserInfo != null || "Y".equals(adminUserInfo.getAdmin())) {
+%>
+					<li class="nav-item"><a class="nav-link" href="/semi-project/admin/index.jsp">관리자모드</a></li>
+<%		
+		}
 	}
 %>
-					<li class="nav-item">
-          				<a class="nav-link" href="/semi-project/admin/index.jsp">관리자모드</a>
-        			</li>
 				</ul>
 	  		</div>
 		</div>

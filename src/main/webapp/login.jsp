@@ -1,3 +1,4 @@
+<%@page import="semi.admin.service.AdminService"%>
 <%@page import="org.apache.commons.codec.digest.DigestUtils"%>
 <%@page import="semi.vo.User"%>
 <%@page import="semi.dao.UserDao"%>
@@ -9,6 +10,9 @@
 	
 	UserDao userDao = UserDao.getInstance();
 	User user = userDao.getUserById(id);
+
+	AdminService service = AdminService.getInstance();
+	User admin = service.getUserById(id);
 	
 	String secretPassword = DigestUtils.sha256Hex(password);
 	
@@ -28,5 +32,6 @@
 	}
 	
 	session.setAttribute("LOGIN_USER_INFO", user);
+	session.setAttribute("ADMIN_USER_INFO", admin);
 	response.sendRedirect("index.jsp?");
 %>
