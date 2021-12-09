@@ -90,9 +90,9 @@
 	}
 	StringBuilder sb = new StringBuilder();
 	if (!usingPoint.isEmpty()) {
-		sb.append("&status=사용");
-		sb.append(usingPoint);
+		sb.append("&status=use");
+		sb.append("&point=" + usingPoint);
 	}
 	
-	response.sendRedirect("point.jsp?orderNo=" + orderNo + "&status=구입&point=" + totalPoint + sb.toString());
+	response.sendRedirect("point.jsp?orderNo=" + orderNo + "&status=add&point=" + totalPoint + sb.toString());
 %>

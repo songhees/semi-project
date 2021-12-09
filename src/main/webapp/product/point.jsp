@@ -42,7 +42,7 @@
 	// point 조정
 	int depositPoint = 0;
 	for (int i=0; i<points.length; i++) {
-		if ("구입".equals(statuses[i])) {
+		if ("add".equals(statuses[i])) {
 			depositPoint += Integer.parseInt(points[i]);
 		} else {
 			depositPoint -= Integer.parseInt(points[i]);
