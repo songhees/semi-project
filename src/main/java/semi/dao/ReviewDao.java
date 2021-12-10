@@ -281,7 +281,8 @@ public class ReviewDao {
 	public int getTotalRecordsByUserNo(int no) throws SQLException {
 		String sql = "select count(*) cnt "
 				   + "from semi_product_review "
-				   + "where user_no = ? ";
+				   + "where user_no = ? "
+				   + "and review_deleted = 'N' ";
 		
 		int totalRecords = 0;
 		
