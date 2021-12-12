@@ -215,10 +215,6 @@ public class ProductDao {
 		Connection connection = getConnection();
 		PreparedStatement pstmt = connection.prepareStatement(sql);
 		
-		// TODO 테스트용 프린트
-		System.out.println("begin: " + criteria.getBegin());
-		System.out.println("end: " + criteria.getEnd());
-		System.out.println("category: " + criteria.getCategory());
 		pstmt.setString(1, criteria.getCategory());
 		pstmt.setInt(2, criteria.getBegin());
 		pstmt.setInt(3, criteria.getEnd());
@@ -260,9 +256,6 @@ public class ProductDao {
 		Connection connection = getConnection();
 		PreparedStatement pstmt = connection.prepareStatement(sql);
 		
-		// TODO 테스트용 프린트
-		System.out.println("begin: " + criteria.getBegin());
-		System.out.println("end: " + criteria.getEnd());
 		pstmt.setInt(1, criteria.getBegin());
 		pstmt.setInt(2, criteria.getEnd());
 		ResultSet rs = pstmt.executeQuery();
@@ -522,13 +515,6 @@ public class ProductDao {
 		} else {
 			return pstmt;
 		}
-	}
-	
-	// TODO 미구현, NEW 카테고리에서 사용
-	public List<Product> getNewProductList(ProductCriteria criteria) throws SQLException {
-		String sql = "";
-		
-		return null;
 	}
 	
 	public Map<String, Integer> getProductStock(int no, String color) throws SQLException {
