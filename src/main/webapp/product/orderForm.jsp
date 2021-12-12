@@ -74,8 +74,6 @@
 			}
 		}
 		
-		// 주문수량이 상품의 재고보다 많은 것이 하나라도 있으면 false인 변수이다.
-		boolean isStockAvailable = true;
 		AddressDao addressDao = AddressDao.getInstance();
 		ProductDao productDao = ProductDao.getInstance();
 		
@@ -301,11 +299,9 @@
 		      						int i = 0;
 		      						for (ProductItem productItem : productItems) {
 		      							boolean isQuantityOverStock = Integer.parseInt(productItemQuantities[i]) > productItem.getStock();
-		      							if (isQuantityOverStock) {
-		      								isStockAvailable = false;
-		      							}
 		      					%>
 		      					<div id="productItem<%=i%>" class="card p-0" style="border: none;">
+		      						<%=isQuantityOverStock ? "<input type='hidden' class='isQuantityOverStock' value='over'>" : ""%>
 			      					<input type="hidden" name="no" value="<%=productItem.getNo()%>">
 			      					<input class="productItemQuantity" type="hidden" name="amount" value="<%=productItemQuantities[i]%>">
 		      						<div class="row mb-3 justify-content-between">
@@ -331,7 +327,7 @@
 		      						</div>
 		        				</div>
 		        				<%
-		        					i++;
+		        						i++;
 		      						}
 		        				%>
 		      				</div>
@@ -544,8 +540,8 @@
 					</div>
 				</div>
 				<div class="border p-4 d-grid">
-					<button class="btn btn-secondary" type="submit" <%=isStockAvailable ? "" : "style='display: none;'" %>><span id="totalAmount-button"></span>원 결제하기</button>
-					<button class="btn btn-warning" type="button" <%=isStockAvailable ? "style='display: none;'" : "" %> disabled>재고부족으로 주문불가</button>
+					<button id="purchaseAvailable-button" class="btn btn-secondary" style="" type="submit" ><span id="totalAmount-button"></span>원 결제하기</button>
+					<button id="purchaseNotAvailable-button" class="btn btn-warning" style="" type="button" disabled>재고부족으로 주문불가</button>
 					<p class="text-muted mt-4" style="font-size: 0.85rem;">- 무이자할부가 적용되지 않은 상품과 무이자할부가 가능한 상품을 동시에 구매할 경우 전체 주문 상품 금액에 대해 무이자할부가 적용되지 않습니다. 무이자할부를 원하시는 경우 장바구니에서 무이자할부 상품만 선택하여 주문하여 주시기 바랍니다.</p>
 					<p class="text-muted" style="font-size: 0.85rem;">- 최소 결제 가능 금액은 결제금액에서 배송비를 제외한 금액입니다.</p>
 				</div>
@@ -570,6 +566,7 @@
 		updateTotalDeliveryCharge();
 		updateTotalAmount();
 		updateTotalProductPoint();
+		updatePurchaseAvailable();
 	}
 	
 	// 상품가격의 총금액을 갱신한다.
@@ -614,6 +611,19 @@
 		document.getElementById("totalPoint-input").value = totalProductPoint;
 	}
 	
+	// 구매버튼을 갱신한다.
+	// 상품아이템 중 하나라도 주문량이 재고량보다 많으면 구매 불가 버튼을 표시한다.
+	function updatePurchaseAvailable() {
+		var isQuantityOverStock = document.querySelectorAll(".isQuantityOverStock");
+		if (isQuantityOverStock.length !== 0) {
+			document.getElementById("purchaseAvailable-button").setAttribute("style", "display: none;");
+			document.getElementById("purchaseNotAvailable-button").setAttribute("style", "");
+		} else {
+			document.getElementById("purchaseAvailable-button").setAttribute("style", "");
+			document.getElementById("purchaseNotAvailable-button").setAttribute("style", "display: none;");
+		}
+	}
+	
 	// 총금액을 갱신한다.
 	function updateTotalAmount() {
 		var totalAmount = 0;
@@ -647,6 +657,7 @@
 		updateTotalDeliveryCharge();
 		updateTotalAmount();
 		updateTotalProductPoint();
+		updatePurchaseAvailable();
 	}
 
 	// 사용 적립금이 user의 잔여 적립금 이하인지 확인한다.
