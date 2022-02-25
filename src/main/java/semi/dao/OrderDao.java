@@ -115,6 +115,12 @@ public class OrderDao {
 				+ "where o.user_no = ? ";
 		if ("change".equals(criteria.getStatus())) {
 			sql += "and o.order_status in ('취소', '반품', '교환') ";
+		} else if ("return".equals(criteria.getStatus())) {
+			sql += "			and o.order_status = '반품' ";
+		} else if ("exchange".equals(criteria.getStatus())) {
+			sql += "			and o.order_status = '교환' ";
+		} else if ("cancel".equals(criteria.getStatus())) {
+			sql += "			and o.order_status = '취소' ";
 		} else {
 			sql += "and o.order_status = '주문완료' ";
 		}
