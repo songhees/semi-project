@@ -1,4 +1,4 @@
-# nadri Project
+# semi Project
 
 팀 프로젝트로 진행한 **인터넷 쇼핑몰**입니다.   
 
@@ -36,7 +36,11 @@
 ### 회원가입
 ![회원가입1](https://user-images.githubusercontent.com/92537000/155652380-38bfea67-6c5b-415c-b74c-9fa211fd1e26.gif) 
 
+---
+
 ![회원가입2](https://user-images.githubusercontent.com/92537000/155652385-0d37367b-7dfd-4723-aedc-53fd3f4ec35c.gif)
+
+---
 
 ![회원가입3](https://user-images.githubusercontent.com/92537000/155652389-53b2e659-7771-4c37-96fc-40fecee2b7fa.gif)
 
@@ -57,12 +61,23 @@
 
 </br>
   
-### 포인트
+### 적립금
 
-![신규포인트](https://user-images.githubusercontent.com/92537000/155653223-39aeef88-1311-4092-a7ce-505f2001944c.gif)
+**신규가입시**
+![신규적립금](https://user-images.githubusercontent.com/92537000/155653223-39aeef88-1311-4092-a7ce-505f2001944c.gif)
 
-+ 신규 회원 가입시 2000포인트가 미리 적립되도록 했습니다.
-+ 제품구매시 1%의 포인트가 자동 적립됩니다.
+---
+
+**상품구매시**
+![구매사용포인트](https://user-images.githubusercontent.com/92537000/155743986-39eec0fd-21e4-4773-85bc-565a4dd140bb.gif)
+
++ 사용가능 적립금과 등급을 볼 수 있습니다.
++ 사용자의 적립금 내역을 확인할 수 있습니다.
++ 신규 회원 가입시
+    + 2000원 적립금가 미리 적립됩니다.
++ 상품 구매시
+    + 1%의 적립금가 자동 적립됩니다.
+    + 사용한 적립금만큼 차감 됩니다.
 
 </br>
   
