@@ -54,7 +54,7 @@
 </head>
 <body>
 <%@ include file="common/navbar.jsp" %>
-<%
+<%-- <%
 	ProductDao productDao = ProductDao.getInstance();
 	ProductCriteria topProductCriteria = new ProductCriteria();
 	ProductCriteria dressProductCriteria = new ProductCriteria();
@@ -331,7 +331,7 @@
 			}
 		%>
 	</div>
-</div>
+</div> --%>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script type="text/javascript">
 	// 이미지의 경로에서 확장자를 제외한 마지막 문자를 imgNumber로 변경한다.
